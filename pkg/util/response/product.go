@@ -1,0 +1,37 @@
+package response
+
+type Category struct {
+	Id           int
+	CategoryName string
+}
+type Product struct {
+	ID                  uint   `json:"id"`
+	CategoryID          int    `json:"category_id"`
+	Product_Name        string `json:"product_name"`
+	Price               int    `json:"price"`
+	SKU                 string `json:"sku,omitempty"`
+	Brand               string `json:"brand"`
+	Product_Description string `json:"product_description,omitempty"`
+	Product_Image       string `json:"product_image"`
+	Is_Blocked          bool   `json:"is_blocked"`
+}
+
+type ProductItem struct {
+	ID                  uint     `json:"id"`
+	CategoryID          int      `json:"category_id"`
+	Product_Name        string   `json:"product_name"`
+	Price               int      `json:"price"`
+	SKU                 string   `json:"sku"`
+	Brand               string   `json:"brand"`
+	Product_Description string   `json:"product_description"`
+	Product_Image       string   `json:"product_image"`
+	Is_Blocked          bool     `json:"is_blocked"`
+	RatingAndReviews    []Rating `json:"rating_and_reviews"`
+}
+
+type Rating struct {
+	ID          int    `json:"rating_id"`
+	User_name   string `json:"user_name"`
+	Rating      int    `json:"rating"`
+	Description string `json:"desription"`
+}

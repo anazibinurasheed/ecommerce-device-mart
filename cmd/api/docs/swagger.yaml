@@ -1,0 +1,1909 @@
+basePath: /api/v1
+definitions:
+  request.Address:
+    properties:
+      address_line:
+        type: string
+      alternative_phone:
+        type: string
+      district:
+        type: string
+      landmark:
+        type: string
+      locality:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      pincode:
+        type: string
+      state_id:
+        type: integer
+    required:
+    - address_line
+    - name
+    - phone_number
+    - pincode
+    type: object
+  request.Category:
+    properties:
+      categoryname:
+        minLength: 2
+        type: string
+    required:
+    - categoryname
+    type: object
+  request.ChangePassword:
+    properties:
+      new_password:
+        type: string
+      re_new_password:
+        type: string
+    type: object
+  request.Coupon:
+    properties:
+      code:
+        type: string
+      coupon_name:
+        type: string
+      discount_max_amount:
+        type: number
+      discount_percentage:
+        type: number
+      min_order_value:
+        type: number
+      validity_days:
+        type: integer
+    required:
+    - code
+    - coupon_name
+    - discount_max_amount
+    - discount_percentage
+    - min_order_value
+    type: object
+  request.LoginData:
+    properties:
+      password:
+        type: string
+      phone:
+        type: integer
+    required:
+    - password
+    - phone
+    type: object
+  request.LoginSudoAdmin:
+    properties:
+      password:
+        description: Phone    string `json:"phone"`
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  request.OldPassword:
+    properties:
+      old_password:
+        type: string
+    type: object
+  request.Otp:
+    properties:
+      otp:
+        type: string
+      unique_id:
+        type: string
+    required:
+    - otp
+    - unique_id
+    type: object
+  request.Phone:
+    properties:
+      phone:
+        type: integer
+    required:
+    - phone
+    type: object
+  request.Product:
+    properties:
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+    required:
+    - price
+    - product_description
+    - product_name
+    type: object
+  request.Rating:
+    properties:
+      description:
+        type: string
+      rating:
+        type: integer
+    type: object
+  request.SignUpData:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+      uuid:
+        description: for retrieve user phone
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  request.VerifyPayment:
+    properties:
+      razorpay_order_id:
+        type: string
+      razorpay_payment_id:
+        type: string
+      razorpay_signature:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      statuscode:
+        type: integer
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: anazibinurasheed@gmail.com
+    name: Anaz Ibinu Rasheed
+    url: https://www.linkedin.com/in/anaz-ibinu-rasheed-a2b461253/
+  description: A e-Commerce API in Go using Gin framework
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Project Device Mart API
+  version: "1.0"
+paths:
+  /admin/category/add-category:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category based on the provided category name.
+      parameters:
+      - description: Category name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new category
+      tags:
+      - admin category management
+  /admin/category/all-category:
+    get:
+      description: Retrieves all categories available.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List out all categories
+      tags:
+      - admin category management
+  /admin/category/block-category/{categoryID}:
+    patch:
+      description: Blocks a category with the specified ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Block a category
+      tags:
+      - admin category management
+  /admin/category/unblock-category/{categoryID}:
+    patch:
+      consumes:
+      - application/json
+      description: Unblocks a category with the specified ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Unblock a category
+      tags:
+      - admin category management
+  /admin/category/update-category/{categoryID}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a category with the specified ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Category name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update a category
+      tags:
+      - admin category management
+  /admin/create-admin:
+    post:
+      consumes:
+      - application/json
+      description: Sudo admin can create new admin account.
+      parameters:
+      - description: Signup data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.SignUpData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Admin signup
+      tags:
+      - sudo admin
+  /admin/orders:
+    get:
+      description: Retrieves all order overview data.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get all order overview data
+      tags:
+      - admin order management
+  /admin/orders/{orderID}/update-status/{statusID}:
+    put:
+      description: Updates the status of an order with the specified ID.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: integer
+      - description: Status ID
+        in: path
+        name: statusID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update order status
+      tags:
+      - admin order management
+  /admin/orders/management:
+    get:
+      description: Retrieves order management data.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get order management data
+      tags:
+      - admin order management
+  /admin/products/add-product/{categoryID}:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product with the specified details.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Product details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new product
+      tags:
+      - admin product management
+  /admin/products/all-products:
+    get:
+      description: Retrieves a list of all products including blocked.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Display all products to admin
+      tags:
+      - admin product management
+  /admin/products/block-product/{productID}:
+    patch:
+      consumes:
+      - application/json
+      description: Blocks a product with the specified ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Block a product
+      tags:
+      - admin product management
+  /admin/products/unblock-product/{productID}:
+    post:
+      description: Unblocks a product with the specified ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Unblock a product
+      tags:
+      - admin product management
+  /admin/products/update-product/{productID}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing product with the specified ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      - description: Product object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update a product
+      tags:
+      - admin product management
+  /admin/promotions/all-coupons:
+    get:
+      description: List out all the created coupons to the admin.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List out all coupons to admin
+      tags:
+      - promotions
+  /admin/promotions/block-coupon/{couponID}:
+    put:
+      description: Block the existing coupon by id.
+      parameters:
+      - description: coupon ID
+        in: path
+        name: couponID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Block coupon
+      tags:
+      - promotions
+  /admin/promotions/create-coupon:
+    post:
+      consumes:
+      - application/json
+      description: Create a new coupon with the provided details
+      parameters:
+      - description: Coupon details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new coupon
+      tags:
+      - promotions
+  /admin/promotions/unblock-coupon/{couponID}:
+    put:
+      description: Unblock the existing coupon by id.
+      parameters:
+      - description: coupon ID
+        in: path
+        name: couponID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Unblock coupon
+      tags:
+      - promotions
+  /admin/promotions/update-coupon/{couponID}:
+    put:
+      consumes:
+      - application/json
+      description: Create a new coupon with the provided details
+      parameters:
+      - description: coupon ID
+        in: path
+        name: couponID
+        required: true
+        type: integer
+      - description: Coupon details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Updates the existing
+      tags:
+      - promotions
+  /admin/sudo/login:
+    post:
+      consumes:
+      - application/json
+      description: For sudo admin login.
+      parameters:
+      - description: Sudo admin login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginSudoAdmin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Sudo Admin Login
+      tags:
+      - sudo admin
+  /admin/user-management/block-user/{userID}:
+    post:
+      consumes:
+      - application/json
+      description: Blocks a user with the specified ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Block a user
+      tags:
+      - admin user management
+  /admin/user-management/unblock-user/{userID}:
+    post:
+      consumes:
+      - application/json
+      description: Unblocks a user with the specified ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Unblock a user
+      tags:
+      - admin user management
+  /admin/user-management/view-all-users:
+    get:
+      description: List of all users
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Response'
+        "501":
+          description: Failed
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: View all users
+      tags:
+      - admin user management
+  /cart:
+    get:
+      description: Retrieves the cart items for the authenticated user.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: View cart
+      tags:
+      - cart
+  /cart/{productID}/decrement:
+    patch:
+      description: Decrements the quantity of a product in the cart for the authenticated
+        user.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Decrement product quantity in cart
+      tags:
+      - cart
+  /cart/{productID}/increment:
+    patch:
+      description: Increments the quantity of a product in the cart for the authenticated
+        user.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Increment product quantity in cart
+      tags:
+      - cart
+  /cart/add/{productID}:
+    post:
+      description: Adds a product to the cart for the authenticated user.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Add product to cart
+      tags:
+      - cart
+  /cart/remove/{productID}:
+    delete:
+      description: Removes a product from the cart for the authenticated user.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Remove product from cart
+      tags:
+      - cart
+  /checkout:
+    get:
+      description: Displays the checkout details for the current user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Checkout page
+      tags:
+      - checkout
+  /coupon/apply:
+    post:
+      consumes:
+      - application/json
+      description: Apply the coupon and if valid provide coupon discount
+      parameters:
+      - description: Coupon code
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Apply coupon
+      tags:
+      - coupon
+  /coupon/available:
+    get:
+      description: Get a list of available coupons for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List available coupons for the user
+      tags:
+      - coupon
+  /coupon/remove/{couponID}:
+    delete:
+      description: Remove the applied coupon from the user's coupon tracking.
+      parameters:
+      - description: Coupon ID
+        in: path
+        name: couponID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Remove applied coupon
+      tags:
+      - coupon
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user and sends an OTP for verification.
+      parameters:
+      - description: User login data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User login data, verify it and send otp
+      tags:
+      - common
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out user and remove cookie from browser.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User Logout
+      tags:
+      - common
+  /my-orders:
+    get:
+      description: Retrieves the order history of the current user.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get order history
+      tags:
+      - user orders
+  /my-orders/cancel/{orderID}:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Cancel the order. For online payments, the amount will be added to the user's wallet. For cash on delivery orders,will be marked as cancelled.
+        If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Cancel an order
+      tags:
+      - user orders
+  /payment/order-cod-confirmed:
+    post:
+      description: Confirms the cash on delivery (COD) delivery for the current user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Confirm COD delivery
+      tags:
+      - checkout
+  /payment/razorpay:
+    get:
+      description: Make payment using razorpay page .
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Make payment razorpay
+      tags:
+      - checkout
+  /payment/razorpay/process-order:
+    post:
+      description: Verify razorpay payment using razorpay credentials .
+      parameters:
+      - description: Payment details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.VerifyPayment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Verify razorpay payment
+      tags:
+      - checkout
+  /product-item/{productID}:
+    get:
+      description: Retrieves details of a product with the specified ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: View a product
+      tags:
+      - products
+  /product/rating/{productID}:
+    get:
+      consumes:
+      - application/json
+      description: Validates if the user is authorized to rate a product.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Validate product rating request
+      tags:
+      - user orders
+    post:
+      consumes:
+      - application/json
+      description: Adds a new rating for a product.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      - description: Rating details
+        in: body
+        name: rating
+        required: true
+        schema:
+          $ref: '#/definitions/request.Rating'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Add product rating
+      tags:
+      - user orders
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all available products for the user.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Display all products to the user
+      tags:
+      - products
+  /products-by-category/{categoryID}:
+    get:
+      consumes:
+      - application/json
+      description: Lists products based on the provided category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List products by category
+      tags:
+      - products
+  /products/search:
+    post:
+      consumes:
+      - application/json
+      description: Searches for products based on the provided search input
+      parameters:
+      - description: Search input
+        in: query
+        name: search
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Search Products
+      tags:
+      - products
+  /profile:
+    get:
+      description: Retrieves the profile information for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get user profile
+      tags:
+      - user profile
+  /profile/add-address:
+    get:
+      description: Retrieves the list of states for address selection.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get the page for adding an address
+      tags:
+      - user profile
+    post:
+      consumes:
+      - application/json
+      description: Adds a new address for the user.
+      parameters:
+      - description: Address details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Add a new address
+      tags:
+      - user profile
+  /profile/addresses:
+    get:
+      description: Retrieves all addresses for the user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get all addresses
+      tags:
+      - user profile
+  /profile/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change the password of the authenticated user
+      parameters:
+      - description: Change password request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Change user password
+      tags:
+      - user profile
+  /profile/delete-address/{addressID}:
+    delete:
+      description: Deletes an address by its ID.
+      parameters:
+      - description: Address ID
+        in: path
+        name: addressID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete an address
+      tags:
+      - user profile
+  /profile/edit-username:
+    post:
+      consumes:
+      - application/json
+      description: Edit the username of the authenticated user
+      parameters:
+      - description: New username
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit user username
+      tags:
+      - user profile
+  /profile/update-address/{addressID}:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing address for the user.
+      parameters:
+      - description: Address ID
+        in: path
+        name: addressID
+        required: true
+        type: integer
+      - description: Address updation details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Address'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update an address
+      tags:
+      - user profile
+  /profile/verify-password:
+    post:
+      consumes:
+      - application/json
+      description: validate the user password based on the provided old password and
+        give access to password change api.
+      parameters:
+      - description: User's old password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.OldPassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password request
+      tags:
+      - user profile
+  /profile/wallet:
+    get:
+      description: Get the wallet details for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: View user wallet
+      tags:
+      - user profile
+  /referral/claim:
+    post:
+      consumes:
+      - application/json
+      description: Apply a  referral code  to get wallet money,
+      parameters:
+      - description: Referral code to apply
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success, bonus amount updated in wallet.
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid Input.
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Failed.
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed.
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Apply referral code for referral bonus.
+      tags:
+      - referral
+  /referral/get-code:
+    get:
+      description: Get the referral code of the currently logged-in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success.
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed.
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get the referral code for the current user
+      tags:
+      - referral
+  /send-otp:
+    post:
+      consumes:
+      - application/json
+      description: Sends an OTP to the provided phone number.
+      parameters:
+      - description: Phone number
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Phone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Send sign up OTP to Phone
+      tags:
+      - common
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account.
+      parameters:
+      - description: User Sign-Up Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.SignUpData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User Sign-Up after otp validation
+      tags:
+      - common
+  /user/address-default/{addressID}:
+    put:
+      description: Sets the specified address as the default address for the authenticated
+        user.
+      parameters:
+      - description: Address ID
+        in: path
+        name: addressID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Set default address
+      tags:
+      - user profile
+  /verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Validates the provided OTP for a phone number.
+      parameters:
+      - description: OTP
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Otp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Verify signup  OTP
+      tags:
+      - common
+swagger: "2.0"
