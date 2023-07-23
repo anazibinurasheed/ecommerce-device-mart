@@ -325,6 +325,7 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 }
 
 // CreateUserWallet godoc
+//
 //	@Summary		Create user wallet
 //	@Description	Initialize the wallet for the authenticated user.
 //	@Tags			wallet
@@ -352,9 +353,7 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //
 //	@Summary		View user wallet
 //	@Description	Get the wallet details for the authenticated user.
-//
 //	@Tags			wallet
-//
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
