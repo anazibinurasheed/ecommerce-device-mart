@@ -254,12 +254,12 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 //	@Tags			admin product management
 //	@Accept			json
 //	@Produce		json
-//	@Param			categoryID	path	int				true	"Category ID"
-//	@Param			body		body	request.Product	true	"Product details"
-//	@Success		200	{object}	response.Response
-//	@Failure		400	{object}	response.Response
-//	@Failure		403	{object}	response.Response
-//	@Failure		500	{object}	response.Response
+//	@Param			categoryID	path		int				true	"Category ID"
+//	@Param			body		body		request.Product	true	"Product details"
+//	@Success		200			{object}	response.Response
+//	@Failure		400			{object}	response.Response
+//	@Failure		403			{object}	response.Response
+//	@Failure		500			{object}	response.Response
 //	@Router			/admin/products/add-product/{categoryID} [post]
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	var body request.Product
