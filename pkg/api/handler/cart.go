@@ -58,7 +58,7 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 //	@Description	Retrieves the cart items for the authenticated user.
 //	@Tags			cart
 //	@Param			page	query	int	true	"Page number"				default(1)
-//	@Param			count	query	int	true	"Number of items per page"	default(10)
+//	@Param			count	query	int	true	"Number of items per page"	default(5)
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response

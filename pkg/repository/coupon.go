@@ -116,7 +116,7 @@ func (cd *couponDatabase) ChangeCoupon(couponID, userID int) (response.CouponTra
 
 func (cd *couponDatabase) FindAppliedCouponByUserId(userID int) (response.CouponTracking, error) {
 	var Coupon response.CouponTracking
-	query := `SELECT * FROM coupon_trackings WHERE user_id = $1 AND is_used = false ;`
+	query := `SELECT * FROM coupon_trackings WHERE user_id = $1 AND is_used !=true ;`
 	err := cd.DB.Raw(query, userID).Scan(&Coupon).Error
 
 	return Coupon, err

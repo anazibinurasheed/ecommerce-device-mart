@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-//changed int to uint
+// changed int to uint
 type PaymentMethod struct {
 	ID         uint   `gorm:"primaryKey;AutoIncrement;unique"`
 	MethodName string `gorm:"not null;unique"`
@@ -38,9 +38,9 @@ type OrderLine struct {
 	Qty             int           `gorm:"not null"`
 	Price           float32       `gorm:"not null"`
 	CouponID        uint
-	Coupon          Coupon `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	// Coupon          Coupon `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 /*Pending

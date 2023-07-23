@@ -882,7 +882,7 @@ paths:
         name: page
         required: true
         type: integer
-      - default: 10
+      - default: 5
         description: Number of items per page
         in: query
         name: count
@@ -1275,6 +1275,27 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Verify razorpay payment
+      tags:
+      - checkout
+  /payment/wallet:
+    post:
+      description: User can purchase using wallet
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Wallet payment
       tags:
       - checkout
   /product-item/{productID}:
@@ -1726,23 +1747,6 @@ paths:
       summary: Change user password request
       tags:
       - user profile
-  /profile/wallet:
-    get:
-      description: Get the wallet details for the authenticated user.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: View user wallet
-      tags:
-      - user profile
   /referral/claim:
     post:
       consumes:
@@ -1906,4 +1910,40 @@ paths:
       summary: Verify signup  OTP
       tags:
       - common
+  /wallet/:
+    get:
+      description: Get the wallet details for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: View user wallet
+      tags:
+      - wallet
+  /wallet/create:
+    post:
+      consumes:
+      - application/json
+      description: Initialize the wallet for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create user wallet
+      tags:
+      - wallet
 swagger: "2.0"

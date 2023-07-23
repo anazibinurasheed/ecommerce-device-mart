@@ -33,7 +33,6 @@ func (cu *CartUseCase) AddToCart(userID int, productID int) error {
 			return fmt.Errorf("Failed %s", err)
 		}
 		return nil
-
 	}
 
 	CartItem, err = cu.cartRepo.AddToCart(userID, productID)
@@ -50,8 +49,8 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 		CartItems.Cart = append(CartItems.Cart, item)
 		CartItems.Total += float32(item.Qty) * float32(item.Price)
 	}
+
 	CouponDetails, err := cu.coupenRepo.CheckForAppliedCoupon(userID)
-	fmt.Println("COUPON DETAILS ", CouponDetails.CouponID)
 	if err != nil {
 		return response.CartItems{}, fmt.Errorf("Failed to fetch coupon details")
 	}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -323,39 +324,41 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 
 }
 
-// // CreateUserWallet godoc
-// // @Summary Create user wallet
-// // @Description Initialize the wallet for the authenticated user.
-// // @Tags user profile
-// // @Accept json
-// // @Produce json
-// // @Success 200 {object} response.Response
-// // @Failure 500 {object} response.Response
-// // @Router /profile/wallet [post]
-// func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
-// 	userID, _ := helper.GetUserIdFromContext(c)
+// CreateUserWallet godoc
+//	@Summary		Create user wallet
+//	@Description	Initialize the wallet for the authenticated user.
+//	@Tags			wallet
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/wallet/create [post]
+func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
+	userID, _ := helper.GetUserIdFromContext(c)
 
-// 	err := oh.orderUseCase.CreateUserWallet(userID)
-// 	if err != nil {
-// 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
-// 		c.JSON(http.StatusInternalServerError, response)
-// 		return
-// 	}
+	err := oh.orderUseCase.CreateUserWallet(userID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
 
-// 	response := response.ResponseMessage(200, "Success ,wallet initialized ", nil, nil)
-// 	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(200, "Success ,wallet initialized ", nil, nil)
+	c.JSON(http.StatusOK, response)
 
-// }
+}
 
 // ViewUserWallet godoc
 //
 //	@Summary		View user wallet
 //	@Description	Get the wallet details for the authenticated user.
-//	@Tags			user profile
+//
+//	@Tags			wallet
+//
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/profile/wallet [get]
+//	@Router			/wallet/ [get]
 func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 	userID, _ := helper.GetUserIdFromContext(c)
 
@@ -367,5 +370,78 @@ func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 	}
 
 	response := response.ResponseMessage(200, "Success", Wallet, nil)
+	c.JSON(http.StatusOK, response)
+}
+
+func (od *OrderHandler) WebhookHandler(c *gin.Context) {
+	// // Get the raw webhook request body
+	// webhookBody, _ := c.GetRawData()
+
+	// // Get the signature from the X-Razorpay-Signature header
+	// webhookSignature := c.GetHeader("X-Razorpay-Signature")
+
+	// Validate the webhook signature
+	// if !helper.ValidateWebhookSignature(string(webhookBody), webhookSignature) {
+	// 	fmt.Println("errr")
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid webhook signature"})
+	// 	return
+	// }
+
+	// Parse the webhook event data
+	var eventData map[string]interface{}
+	if err := c.BindJSON(&eventData); err != nil {
+		fmt.Println("error")
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid webhook payload"})
+		return
+	}
+
+	// Check the event type to determine payment status
+	eventType, _ := eventData["event"].(string)
+	switch eventType {
+
+	case "payment.authorized":
+		fmt.Println(eventType)
+		paymentID, _ := eventData["razorpay_payment_id"].(string)
+		fmt.Println("Payment authorized for Payment ID:", paymentID)
+		// Payment is authorized, handle success case here
+		c.JSON(http.StatusOK, gin.H{"message": "Payment authorized"})
+	case "payment.failed":
+		fmt.Println(eventType)
+
+		// Payment failed, handle failure case here
+		c.JSON(http.StatusOK, gin.H{"message": "Payment failed"})
+	default:
+		// Handle other events if needed
+		c.JSON(http.StatusOK, gin.H{"message": "Event received"})
+	}
+}
+
+// WalletPayment godoc
+//
+//	@Summary		Wallet payment
+//	@Description	User can purchase using wallet
+//	@Tags			checkout
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		400	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/payment/wallet [post]
+func (od *OrderHandler) WalletPayment(c *gin.Context) {
+	userID, _ := helper.GetUserIdFromContext(c)
+	err := od.orderUseCase.ValidateWalletPayment(userID)
+	if err != nil {
+		response := response.ResponseMessage(400, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = od.orderUseCase.ConfirmedOrder(userID, 3) // 3 refers wallet payment
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
 }

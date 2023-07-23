@@ -55,17 +55,3 @@ func GenerateJwtToken(userId int) (string, string, error) {
 	}
 	return tokenString, refreshTokenString, err
 }
-
-// func TokenForSecure(c *gin.Context) {
-// 	token := jwt.New(jwt.SigningMethodHS256)
-
-// 	secureString, err := token.SignedString([]byte(config.GetConfig().JwtSecret))
-// 	if err != nil {
-// 		log.Println("FAILED TO CREATE SIGNED TOKEN")
-// 		return
-// 	}
-// 	maxAge := int(time.Now().Add(time.Minute * 6).Unix())
-// 	c.SetCookie("LoginOtpToken", secureString, maxAge, "", "", false, true)
-// 	c.SetSameSite(http.SameSiteLaxMode)
-
-// }

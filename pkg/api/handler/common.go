@@ -19,7 +19,7 @@ type CommonHandler struct {
 	commonUseCase services.CommonUseCase
 }
 
-//for wire
+// for wire
 func NewCommonHandler(useCase services.CommonUseCase) *CommonHandler {
 	return &CommonHandler{
 		commonUseCase: useCase,
@@ -46,6 +46,7 @@ var (
 )
 
 // SendOtpToPhone is the handler function for sending OTP to a phone number.
+//
 //	@Summary		Send sign up OTP to Phone
 //	@Description	Sends an OTP to the provided phone number.
 //	@Tags			common
@@ -82,7 +83,6 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 	phoneDataMutex.Lock()
 	uid := helper.GenerateUniqueID()
 	phoneDataMap[uid] = fmt.Sprint(Phone)
-	fmt.Println("PHONE1", phoneDataMap[uid])
 	phoneDataMutex.Unlock()
 	c.JSON(http.StatusOK, response.Response{
 		StatusCode: 200,
@@ -94,6 +94,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 }
 
 // OtpValidater is the handler function for validating OTP.
+//
 //	@Summary		Verify signup  OTP
 //	@Description	Validates the provided OTP for a phone number.
 //	@Tags			common

@@ -78,6 +78,10 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 		return
 	}
 
+	phoneDataMutex.Lock()
+	delete(phoneDataMap, body.Id)
+	phoneDataMutex.Unlock()
+
 	c.JSON(http.StatusOK, response.Response{
 		StatusCode: 200,
 		Message:    "Success account created",

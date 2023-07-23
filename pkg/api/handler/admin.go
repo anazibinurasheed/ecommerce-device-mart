@@ -104,7 +104,10 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 		return
 	}
 	//from here phone details from map not needed .
+	phoneDataMutex.Lock()
 	delete(phoneDataMap, body.Id)
+	phoneDataMutex.Unlock()
+
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
 
@@ -167,6 +170,7 @@ func (ah *AdminHandler) SudoAdminLogin(c *gin.Context) {
 // }
 
 // ListUsers	godoc
+//
 //	@Summary		View all users
 //	@Description	List of all users
 //	@Tags			admin user management

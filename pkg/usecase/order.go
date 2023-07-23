@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"fmt"
-	"sync"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
@@ -19,7 +18,7 @@ type orderUseCase struct {
 	walletRepo  interfaces.WalletRepository
 }
 
-//some times error will invoke from here
+// some times error will invoke from here
 func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services.CartUseCase, paymentUseCase interfaces.PaymentRepository, OrderUseCase interfaces.OrderRepository, CouponUseCase interfaces.CouponRepository) services.OrderUseCase {
 	return &orderUseCase{
 		userRepo:    UserUseCase,
@@ -57,7 +56,6 @@ func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
 	CheckOutDetails.Total = cartItems.Total
 	CheckOutDetails.Discount = cartItems.Discount
 	CheckOutDetails.PaymentOptions = paymentMethods
-	fmt.Println("CHECKOUT DETAILS:::::", CheckOutDetails)
 
 	return CheckOutDetails, nil
 }
@@ -91,18 +89,6 @@ func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderId 
 	return nil
 }
 
-var sessionPayment sync.Map
-
-func (ou *orderUseCase) PaymentOption(userID int, methodID int) {
-
-	sessionPayment.Store(userID, methodID)
-	// sessionPayment.Range(func(key, value interface{}) bool {
-	// 	fmt.Printf("Key: %v, Value: %v\n", key, value)
-	// 	return true
-	// })
-	return
-}
-
 func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 
 	address, err := ou.userRepo.FindDefaultAddressById(userID)
@@ -110,11 +96,6 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		return fmt.Errorf("Failed to find default address : %s", err)
 	}
 	addressID := address.ID
-	// methodId, ok := sessionPayment.Load(userID)
-	// if !ok {
-	// 	return fmt.Errorf("Failed to retrieve paymentMethodId from paymentSession : %s", err)
-	// }
-	// paymentMethodID := methodId.(int)
 
 	cartData, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
@@ -133,17 +114,22 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		if UpdatedCouponTracking.ID == 0 {
 			return fmt.Errorf("Failed to verify inserted coupon record")
 		}
-
 	}
-	Coupon, err := ou.couponRepo.FindCouponById(CouponDetails.CouponID)
-	if !helper.IsCouponValid(Coupon.ValidTill) {
-		return fmt.Errorf("Failed applied Coupon is expired")
+	if CouponDetails.ID != 0 {
+		Coupon, err := ou.couponRepo.FindCouponById(CouponDetails.CouponID)
+		if err != nil {
+			return fmt.Errorf("Failed to find coupon by id : %s", err)
+		}
+		if !helper.IsCouponValid(Coupon.ValidTill) {
+			return fmt.Errorf("Failed applied Coupon is expired")
+		}
 	}
 	status, err := ou.orderRepo.GetStatusPending()
 	if err != nil {
 		return fmt.Errorf("Failed to get order status :%s", err)
 	}
 	statusID := status.ID
+	fmt.Println("COUPONDETAILS ::::::::ID ", CouponDetails.CouponID)
 
 	for _, productData := range cartData.Cart {
 		newOrderLine, err := ou.orderRepo.InsertOrderLine(userID, int(productData.ProductID), int(addressID), productData.Qty, productData.Price, paymentMethodID, int(statusID), CouponDetails.CouponID)
@@ -248,7 +234,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 
 	//checking user has used coupon or not
 	//reduct coupon percentage and insert money into wallet
-	if CancellingOrder.CouponID != 0 && PaymentMethodUsed.MethodName == "online payment" {
+	if CancellingOrder.CouponID != 0 && PaymentMethodUsed.MethodName == "online payment" || PaymentMethodUsed.MethodName == "Wallet" {
 		CouponUsedOrders, err := ou.orderRepo.FindOrdersUsedByCoupon(int(CancellingOrder.CouponID))
 		if err != nil {
 			return fmt.Errorf("Failed to fetch orders purchased using coupon : %s", err)
@@ -342,12 +328,40 @@ func (ou *orderUseCase) GetUserWallet(userID int) (response.Wallet, error) {
 }
 
 func (ou *orderUseCase) CreateUserWallet(userID int) error {
+
+	wallet, err := ou.orderRepo.FindUserWallet(userID)
+	if err != nil {
+		return fmt.Errorf("Failed to check user wallet :%s", err)
+	}
+
+	if wallet.ID != 0 {
+		return fmt.Errorf("User already have wallet")
+	}
 	Wallet, err := ou.orderRepo.InitializeNewWallet(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize wallet for user %d : %s", userID, err)
 	}
 	if Wallet.ID == 0 {
 		return fmt.Errorf("Failed to verify new wallet for user id  %d", userID)
+	}
+	return nil
+}
+
+func (ou *orderUseCase) ValidateWalletPayment(userID int) error {
+	wallet, err := ou.orderRepo.FindUserWallet(userID)
+	if err != nil {
+		return fmt.Errorf("Failed to find user wallet : %s", err)
+	}
+	if wallet.ID == 0 {
+		return fmt.Errorf("User dont have wallet ")
+	}
+
+	userCart, err := ou.cartUseCase.ViewCart(userID)
+	if err != nil {
+		return fmt.Errorf("Failed to fetch user cart : %s", err)
+	}
+	if userCart.Total > wallet.Amount {
+		return fmt.Errorf("Insufficient balance")
 	}
 	return nil
 }

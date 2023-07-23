@@ -45,9 +45,9 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		user.POST("/verify-otp", commonHandler.OtpValidater) // otp for verify signup phone number
 		user.POST("/sign-up", middleware.IsVerified, userHandler.UserSignUp)
 		user.POST("/login", userHandler.UserLogin)
-		// user.POST("/login-otp", userHandler.ValidateLoginOtp)
-		user.GET("/refresh_token", commonHandler.RefreshToken)
+		// user.GET("/refresh_token", commonHandler.RefreshToken)
 		user.POST("/logout", commonHandler.Logout)
+		user.POST("/webhook", orderHandler.WebhookHandler)
 
 		//changed route path //verirify login otp in this route
 		//it will send otp if the credentials are verified
@@ -82,13 +82,12 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			}
 			payment := user.Group("/payment")
 			{
-				// payment.POST("/:methodId", orderHandler.PaymentOption)
 				payment.POST("/order-cod-confirmed", orderHandler.ConfirmCodDelivery)
 				payment.GET("/razorpay/", orderHandler.MakePaymentRazorpay)
 				payment.POST("/razorpay/process-order", orderHandler.ProccessRazorpayOrder)
+				payment.POST("/wallet", orderHandler.WalletPayment)
 
 			}
-
 			profile := user.Group("/profile")
 			{
 				profile.GET("/", userHandler.Profile)
@@ -101,7 +100,6 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				profile.POST("/edit-username", userHandler.EditUserName)
 				profile.POST("/verify-password", userHandler.ChangePasswordRequest)
 				profile.POST("/change-password", userHandler.ChangePassword) //m.authchangepass
-				profile.GET("/wallet", orderHandler.ViewUserWallet)
 
 			}
 
@@ -116,6 +114,13 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			{
 				referral.GET("/get-code", refferalHandler.GetRefferalCode)
 				referral.POST("/claim", refferalHandler.ApplyRefferalCode)
+			}
+
+			wallet := user.Group("/wallet")
+			{
+				wallet.GET("/", orderHandler.ViewUserWallet)
+				wallet.POST("/create", orderHandler.CreateUserWallet)
+
 			}
 
 		}
