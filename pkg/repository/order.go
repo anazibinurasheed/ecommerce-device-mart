@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -18,10 +19,10 @@ func NewOrderRepository(DB *gorm.DB) interfaces.OrderRepository {
 	}
 }
 
-func (od *orderDatabase) InsertOrderLine(userID int, productID int, addressID int, qty int, price int, paymentMethodID int, orderStatusID int, couponID int) (response.OrderLine, error) {
+func (od *orderDatabase) InsertOrderLine(userID int, productID int, addressID int, qty int, price int, paymentMethodID int, orderStatusID int, couponID int, createdAt time.Time, updatedAt time.Time) (response.OrderLine, error) {
 	var NewOrderLine response.OrderLine
-	query := `INSERT INTO order_lines (user_id,product_id,addresses_id,qty,price,payment_method_id,order_status_id,coupon_id)VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING * ;`
-	err := od.DB.Raw(query, userID, productID, addressID, qty, price, paymentMethodID, orderStatusID, couponID).Scan(&NewOrderLine).Error
+	query := `INSERT INTO order_lines (user_id,product_id,addresses_id,qty,price,payment_method_id,order_status_id,coupon_id,created_at,updated_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING * ;`
+	err := od.DB.Raw(query, userID, productID, addressID, qty, price, paymentMethodID, orderStatusID, couponID, createdAt, updatedAt).Scan(&NewOrderLine).Error
 	return NewOrderLine, err
 
 }
@@ -36,6 +37,14 @@ func (od *orderDatabase) GetStatusPending() (response.OrderStatus, error) {
 func (od *orderDatabase) GetStatusCancelled() (response.OrderStatus, error) {
 	var OrderStatus response.OrderStatus
 	query := `SELECT * FROM order_statuses WHERE status = 'Cancelled';`
+	err := od.DB.Raw(query).Scan(&OrderStatus).Error
+	return OrderStatus, err
+
+}
+
+func (od *orderDatabase) GetStatusReturned() (response.OrderStatus, error) {
+	var OrderStatus response.OrderStatus
+	query := `SELECT * FROM order_statuses WHERE status = 'Returned';`
 	err := od.DB.Raw(query).Scan(&OrderStatus).Error
 	return OrderStatus, err
 
@@ -75,6 +84,36 @@ ORDER BY o.id DESC OFFSET $2 FETCH NEXT $3 ROW ONLY;`
 	// 	fmt.Println(value)
 	// }
 	return OrderHistory, err
+}
+
+func (od *orderDatabase) GetInvoiceData(orderID int) (response.Orders, error) {
+
+	var OrderData response.Orders
+
+	query := `SELECT
+    o.id AS order_id,
+    o.product_id,
+    p.product_image,
+    p.product_name,
+    p.price AS product_price,
+    o.order_status_id,
+    s.status AS order_status,
+    o.payment_method_id,
+    m.method_name AS payment_method,
+    o.addresses_id,
+    CONCAT(a.name, ', ', a.locality, ', ', a.address_line, ', ', a.district, ', ', states.name, ', ', a.landmark, ', ', a.pincode, ', ', a.phone_number, ', ', a.alternative_phone) AS delivery_address
+FROM
+    order_lines o
+INNER JOIN products p ON o.product_id = p.id
+INNER JOIN order_statuses s ON o.order_status_id = s.id
+INNER JOIN payment_methods m ON o.payment_method_id = m.id
+INNER JOIN addresses a ON o.addresses_id = a.id
+INNER JOIN states states ON a.state_id = states.id
+WHERE  o.id = $1;`
+
+	err := od.DB.Raw(query, orderID).Scan(&OrderData).Error
+
+	return OrderData, err
 }
 
 func (od *orderDatabase) AllOrderData(startIndex, endIndex int) ([]response.Orders, error) {

@@ -42,6 +42,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 	user := Engine.Group("/api/v1")
 	{
+		user.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
 
 		user.POST("/send-otp", commonHandler.SendOtpToPhone) //sign up otp
 		user.POST("/verify-otp", commonHandler.OtpValidater) // otp for verify signup phone number
@@ -109,7 +110,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			{
 				order.GET("/", orderHandler.UserOrderHistory)
 				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
-				order.POST("/return/:orderID")
+				order.POST("/return/:orderID", orderHandler.ReturnOrder)
 
 			}
 			referral := user.Group("/referral")

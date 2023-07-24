@@ -3,10 +3,10 @@ module github.com/anazibinurasheed/project-device-mart
 go 1.18
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.5.0
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/razorpay/razorpay-go v0.0.0-20230410044935-943abe07d4c1
 	github.com/spf13/viper v1.16.0
 	github.com/swaggo/files v1.0.1
@@ -14,7 +14,6 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/twilio/twilio-go v1.7.2
 	golang.org/x/crypto v0.10.0
-	golang.org/x/net v0.11.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )
@@ -50,6 +49,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
+	golang.org/x/net v0.11.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )

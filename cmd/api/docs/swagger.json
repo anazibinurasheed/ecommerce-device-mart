@@ -1418,6 +1418,44 @@
                 }
             }
         },
+        "/download-invoice/{orderID}": {
+            "get": {
+                "description": "Download the invoice as a PDF file.",
+                "produces": [
+                    "application/pdf"
+                ],
+                "summary": "Download invoice",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Logs in a user and sends an OTP for verification.",
@@ -1550,6 +1588,50 @@
                     "user orders"
                 ],
                 "summary": "Cancel an order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/my-orders/return/{orderID}": {
+            "post": {
+                "description": "Return the order if the order is valid for return.Amount will be added to the user's wallet.\nIf the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user orders"
+                ],
+                "summary": "Return order",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2128,6 +2210,47 @@
                 }
             }
         },
+        "/profile/address-default/{addressID}": {
+            "put": {
+                "description": "Sets the specified address as the default address for the authenticated user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user profile"
+                ],
+                "summary": "Set default address",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Address ID",
+                        "name": "addressID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/profile/addresses": {
             "get": {
                 "description": "Retrieves all addresses for the user.",
@@ -2546,47 +2669,6 @@
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/address-default/{addressID}": {
-            "put": {
-                "description": "Sets the specified address as the default address for the authenticated user.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user profile"
-                ],
-                "summary": "Set default address",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Address ID",
-                        "name": "addressID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }

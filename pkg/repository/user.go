@@ -141,6 +141,15 @@ func (ud *userDatabase) ChangePassword(userId int, newPassword string) error {
 
 }
 
+func (ud *userDatabase) FindAddressByAddressID(addressID int) (response.Address, error) {
+
+	var UserAddress response.Address
+	query := `SELECT * FROM addresses WHERE id = $1 ;  `
+
+	err := ud.DB.Raw(query, addressID).Scan(&UserAddress).Error
+
+	return UserAddress, err
+}
 func (ud *userDatabase) FindUserAddress(userID int) (response.Address, error) {
 
 	var UserAddress response.Address

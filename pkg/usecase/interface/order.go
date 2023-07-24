@@ -12,7 +12,9 @@ type OrderUseCase interface {
 	GetRazorPayDetails(userID int) (response.PaymentDetails, error)
 	VerifyRazorPayPayment(signature string, razorpayOrderId string, paymentId string) error
 	OrderCancellation(orderID int) error
+	ProcessReturnRequest(orderID int) error
 	GetUserWallet(userID int) (response.Wallet, error)
 	CreateUserWallet(userID int) error
 	ValidateWalletPayment(userID int) error
+	CreateInvoice(orderID int) ([]byte, error)
 }

@@ -7,13 +7,13 @@ type Category struct {
 type Product struct {
 	ID                  uint   `json:"id"`
 	CategoryID          int    `json:"category_id"`
-	Product_Name        string `json:"product_name"`
+	ProductName         string `json:"product_name"`
 	Price               int    `json:"price"`
 	SKU                 string `json:"sku,omitempty"`
 	Brand               string `json:"brand"`
 	Product_Description string `json:"product_description,omitempty"`
 	Product_Image       string `json:"product_image"`
-	Is_Blocked          bool   `json:"is_blocked"`
+	IsBlocked           bool   `json:"is_blocked"`
 }
 
 type ProductItem struct {

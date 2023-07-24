@@ -105,7 +105,7 @@ func (pu *productUseCase) UnBlockCategoryWithId(ParamId int) (response.Category,
 
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------
 func (pu *productUseCase) CreateNewProduct(product request.Product) (response.Product, error) {
 
 	log.Println("USECASE :", product)
@@ -213,13 +213,13 @@ func (pd *productUseCase) ViewProductById(productId int) (response.ProductItem, 
 	var ProductData response.ProductItem
 	ProductData.ID = Product.ID
 	ProductData.CategoryID = Product.CategoryID
-	ProductData.Product_Name = Product.Product_Name
+	ProductData.Product_Name = Product.ProductName
 	ProductData.Price = Product.Price
 	ProductData.SKU = Product.SKU
 	ProductData.Brand = Product.Brand
 	ProductData.Product_Description = Product.Product_Description
 	ProductData.Product_Image = Product.Product_Image
-	ProductData.Is_Blocked = Product.Is_Blocked
+	ProductData.Is_Blocked = Product.IsBlocked
 	ProductData.RatingAndReviews = Ratings
 
 	return ProductData, nil

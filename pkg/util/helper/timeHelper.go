@@ -25,3 +25,16 @@ func IsCouponValid(expiration time.Time) bool {
 	// Compare the current date with the expiration date
 	return now.Before(expiration) || now.Equal(expiration)
 }
+
+func IsValidReturn(orderPlacedTime time.Time) bool {
+	returnPeriodDuration := 7 * 24 * time.Hour // 7 days
+
+	// Get the current time
+	currentTime := time.Now()
+
+	// Calculate the time difference between the current time and the order placed time
+	timeDifference := currentTime.Sub(orderPlacedTime)
+
+	// Check if the time difference is greater than or equal to the return period duration
+	return timeDifference <= returnPeriodDuration
+}

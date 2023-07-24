@@ -1103,6 +1103,31 @@ paths:
       summary: Remove applied coupon
       tags:
       - coupon
+  /download-invoice/{orderID}:
+    get:
+      description: Download the invoice as a PDF file.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: integer
+      produces:
+      - application/pdf
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Download invoice
   /login:
     post:
       consumes:
@@ -1211,6 +1236,37 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Cancel an order
+      tags:
+      - user orders
+  /my-orders/return/{orderID}:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Return the order if the order is valid for return.Amount will be added to the user's wallet.
+        If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Return order
       tags:
       - user orders
   /payment/order-cod-confirmed:
@@ -1577,6 +1633,34 @@ paths:
       summary: Add a new address
       tags:
       - user profile
+  /profile/address-default/{addressID}:
+    put:
+      description: Sets the specified address as the default address for the authenticated
+        user.
+      parameters:
+      - description: Address ID
+        in: path
+        name: addressID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Set default address
+      tags:
+      - user profile
   /profile/addresses:
     get:
       description: Retrieves all addresses for the user.
@@ -1852,34 +1936,6 @@ paths:
       summary: User Sign-Up after otp validation
       tags:
       - common
-  /user/address-default/{addressID}:
-    put:
-      description: Sets the specified address as the default address for the authenticated
-        user.
-      parameters:
-      - description: Address ID
-        in: path
-        name: addressID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Set default address
-      tags:
-      - user profile
   /verify-otp:
     post:
       consumes:

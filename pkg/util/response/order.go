@@ -1,5 +1,7 @@
 package response
 
+import "time"
+
 type CheckOut struct {
 	Address        []Address       `json:"delivey_address"`
 	Cart           []Cart          `json:"items"`
@@ -14,15 +16,17 @@ type PaymentMethod struct {
 }
 
 type OrderLine struct {
-	ID              uint    `json:""`
-	UserID          uint    `json:""`
-	AddressesID     uint    `json:""`
-	ProductID       uint    `json:""`
-	PaymentMethodID int     `json:""`
-	OrderStatusId   int     `json:""`
-	Qty             int     `json:""`
-	Price           float32 `json:""`
-	CouponID        uint    `json:""`
+	ID              uint      `json:""`
+	UserID          uint      `json:""`
+	AddressesID     uint      `json:""`
+	ProductID       uint      `json:""`
+	PaymentMethodID int       `json:""`
+	OrderStatusId   int       `json:""`
+	Qty             int       `json:""`
+	Price           float32   `json:""`
+	CouponID        uint      `json:""`
+	CreatedAt       time.Time `json:""`
+	UpdatedAt       time.Time `json:""`
 }
 type OrderStatus struct {
 	ID     uint   `json:""`
@@ -62,3 +66,6 @@ type OrderManagement struct {
 }
 
 // order_id | product_id | product_image |  product_name   | product_price | order_status_id | order_status | payment_method_id |  payment_method  | delivery_address
+
+type Invoice struct {
+}

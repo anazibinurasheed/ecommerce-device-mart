@@ -21,4 +21,5 @@ type UserRepository interface {
 	ChangePassword(userId int, newPassword string) error
 	FindUserAddress(userID int) (response.Address, error)
 	UpdateUserName(name string, userID int) (response.UserData, error)
+	FindAddressByAddressID(addressID int) (response.Address, error)
 }

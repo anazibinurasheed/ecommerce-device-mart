@@ -346,9 +346,48 @@ func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-
+	err = oh.orderUseCase.ProcessReturnRequest(orderID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
 	response := response.ResponseMessage(200, "Success, order return approved", nil, nil)
 	c.JSON(http.StatusOK, response)
+}
+
+// DownloadInvoice godoc
+//
+// @Summary Download invoice
+// @Description Download the invoice as a PDF file.
+// @Produce application/pdf
+// @Param orderID path int true "Order ID"
+// @Success 200 {file} application/pdf
+// @Failure 400 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /download-invoice/{orderID} [get]
+func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
+	// Sample invoice data (you can replace this with your actual invoice data)
+	orderID, err := strconv.Atoi(c.Param("orderID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	pdfData, err := oh.orderUseCase.CreateInvoice(orderID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	// Set the response headers for downloading the file
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", "attachment; filename=invoice.pdf")
+
+	// Send the PDF data as the response
+	c.Data(http.StatusOK, "application/pdf", pdfData)
 }
 
 // CreateUserWallet godoc
