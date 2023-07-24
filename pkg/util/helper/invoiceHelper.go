@@ -6,45 +6,6 @@ import (
 	"github.com/jung-kurt/gofpdf"
 )
 
-// func GenerateInvoicePDF(invoiceData map[string]interface{}) []byte {
-// 	// Create a new PDF
-// 	pdf := gofpdf.New("P", "mm", "A4", "")
-// 	pdf.AddPage()
-// 	pdf.SetFont("Arial", "B", 16)
-
-// 	// Set initial position and left margin
-// 	x, y, leftMargin := 10.0, 10.0, 10.0
-
-// 	// Add invoice details to the PDF
-// 	for key, value := range invoiceData {
-// 		// Use SetLeftMargin to control the left margin for the text
-// 		pdf.SetLeftMargin(leftMargin)
-
-// 		// Use SetXY to set the position
-// 		pdf.SetXY(x, y)
-
-// 		// Use MultiCell to wrap text and control alignment
-// 		pdf.MultiCell(0, 10, key, "0", "L", false)
-// 		y += 10
-
-// 		// Use SetLeftMargin again to adjust the position of the value
-// 		pdf.SetLeftMargin(leftMargin + 40)
-
-// 		// Use SetXY to set the position for the value
-// 		pdf.SetXY(x+40, y)
-// 		pdf.MultiCell(0, 10, ": "+value.(string), "0", "L", false)
-// 		y += 20 // Increase the y position for the next line
-
-// 		// You can customize the layout and design of the invoice here
-// 	}
-
-// 	// Save the PDF to a buffer
-// 	var pdfBuf bytes.Buffer
-// 	pdf.Output(&pdfBuf)
-
-// 	return pdfBuf.Bytes()
-// }
-
 func GenerateInvoicePDF(invoiceData map[string]interface{}) []byte {
 	// Create a new PDF
 	pdf := gofpdf.New("P", "mm", "A4", "")

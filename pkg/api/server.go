@@ -28,8 +28,8 @@ type ServerHTTP struct {
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host		localhost:3000
-// @BasePath	/api/v1
+//	@host		localhost:3000
+//	@BasePath	/api/v1
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, refferalHandler *handler.RefferalHandler) *ServerHTTP {
 
@@ -177,7 +177,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			{
 				order_management.GET("/", orderHandler.GetAllOrderOverViewPage)
 				order_management.GET("/management", orderHandler.GetOrderManagementPage)
-				order_management.PUT("/:orderId/update-status/:statusID", orderHandler.UpdateOrderStatus)
+				order_management.PUT("/:orderID/update-status/:statusID", orderHandler.UpdateOrderStatus)
 			}
 		}
 	}

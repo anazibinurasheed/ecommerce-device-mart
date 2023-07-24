@@ -211,6 +211,7 @@ func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, er
 }
 
 func (ou *orderUseCase) UpdateOrderStatus(statusID int, orderID int) error {
+	fmt.Println(statusID, orderID)
 	updatedOrder, err := ou.orderRepo.ChangeOrderStatus(statusID, orderID)
 	if err != nil {
 		return fmt.Errorf("Failed to update order : %s", err)
@@ -439,7 +440,6 @@ func (ou *orderUseCase) CreateInvoice(orderID int) ([]byte, error) {
 	}
 
 	invoiceData := map[string]interface{}{
-		"": "Device mart",
 
 		"   ": "",
 
@@ -457,7 +457,5 @@ func (ou *orderUseCase) CreateInvoice(orderID int) ([]byte, error) {
 
 		"Total Amount": fmt.Sprint(product.Price),
 	}
-
 	return helper.GenerateInvoicePDF(invoiceData), nil
-
 }

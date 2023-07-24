@@ -191,7 +191,7 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/admin/orders/management [get]com
+//	@Router			/admin/orders/management [get]
 func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -275,13 +275,21 @@ func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
 //	@Router			/admin/orders/{orderID}/update-status/{statusID} [put]
 func (oh *OrderHandler) UpdateOrderStatus(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("orderID"))
-	statusID, err := strconv.Atoi(c.Param("statusID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	fmt.Println(orderID)
+	statusID, err := strconv.Atoi(c.Param("statusID"))
+	fmt.Println(orderID, statusID)
 
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	fmt.Println(orderID, statusID)
 	err = oh.orderUseCase.UpdateOrderStatus(statusID, orderID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
@@ -358,14 +366,15 @@ func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 
 // DownloadInvoice godoc
 //
-// @Summary Download invoice
-// @Description Download the invoice as a PDF file.
-// @Produce application/pdf
-// @Param orderID path int true "Order ID"
-// @Success 200 {file} application/pdf
-// @Failure 400 {object} response.Response
-// @Failure 500 {object} response.Response
-// @Router /download-invoice/{orderID} [get]
+//	@Summary		Download invoice
+//	@Description	Download the invoice as a PDF file.
+//	@Tags			user orders
+//	@Produce		application/pdf
+//	@Param			orderID	path		int	true	"Order ID"
+//	@Success		200		{file}		application/pdf
+//	@Failure		400		{object}	response.Response
+//	@Failure		500		{object}	response.Response
+//	@Router			/download-invoice/{orderID} [get]
 func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
 	// Sample invoice data (you can replace this with your actual invoice data)
 	orderID, err := strconv.Atoi(c.Param("orderID"))
@@ -455,7 +464,6 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 	// Parse the webhook event data
 	var eventData map[string]interface{}
 	if err := c.BindJSON(&eventData); err != nil {
-		fmt.Println("error")
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid webhook payload"})
 		return
 	}

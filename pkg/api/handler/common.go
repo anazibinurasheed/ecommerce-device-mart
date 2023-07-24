@@ -143,12 +143,9 @@ func (uh *CommonHandler) Logout(c *gin.Context) {
 	c.SetCookie("AdminAuthorization", "", -1, "", "", false, true)
 	c.SetCookie("SudoAdminAuthorization", "", -1, "", "", false, true)
 	c.SetCookie("UserAuthorization", "", -1, "", "", false, true)
-	c.JSON(http.StatusAccepted, response.Response{
-		StatusCode: 200,
-		Message:    "Logged out successfully",
-		Data:       nil,
-		Error:      nil,
-	})
+
+	response := response.ResponseMessage(200, "Logged out, success", nil, nil)
+	c.JSON(http.StatusAccepted, response)
 }
 
 func (uh *CommonHandler) RefreshToken(c *gin.Context) {

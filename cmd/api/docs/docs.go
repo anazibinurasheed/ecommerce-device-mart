@@ -594,7 +594,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/unblock-product/{productID}": {
-            "post": {
+            "patch": {
                 "description": "Unblocks a product with the specified ID.",
                 "produces": [
                     "application/json"
@@ -1430,6 +1430,9 @@ const docTemplate = `{
                 "description": "Download the invoice as a PDF file.",
                 "produces": [
                     "application/pdf"
+                ],
+                "tags": [
+                    "user orders"
                 ],
                 "summary": "Download invoice",
                 "parameters": [
@@ -2950,6 +2953,9 @@ const docTemplate = `{
                 "product_name"
             ],
             "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
                 "price": {
                     "type": "integer"
                 },

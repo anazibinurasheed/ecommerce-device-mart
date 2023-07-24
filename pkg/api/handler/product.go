@@ -472,7 +472,7 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/admin/products/unblock-product/{productID} [post]
+//	@Router			/admin/products/unblock-product/{productID} [patch]
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
