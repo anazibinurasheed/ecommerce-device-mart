@@ -45,7 +45,7 @@ var (
 	phoneDataMutex = new(sync.Mutex)
 )
 
-// SendOtpToPhone is the handler function for sending OTP to a phone number.
+// SendOtpToPhone godoc
 //
 //	@Summary		Send sign up OTP to Phone
 //	@Description	Sends an OTP to the provided phone number.
@@ -59,41 +59,28 @@ var (
 func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 	var body request.Phone
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input. ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	Phone, err := ch.commonUseCase.ValidateSignupRequest(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Failed",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	// fmt.Println(Phone)
-	// helper.SetToCookie(Phone, "UserPhoneForCheckOtp", c)
+
 	phoneDataMutex.Lock()
 	uid := helper.GenerateUniqueID()
 	phoneDataMap[uid] = fmt.Sprint(Phone)
 	phoneDataMutex.Unlock()
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Successfull, otp sended ",
-		Data:       uid,
-		Error:      nil,
-	})
 
+	response := response.ResponseMessage(202, "Success, otp sended", uid, nil)
+	c.JSON(http.StatusAccepted, response)
 }
 
-// OtpValidater is the handler function for validating OTP.
+// OtpValidater godoc
 //
 //	@Summary		Verify signup  OTP
 //	@Description	Validates the provided OTP for a phone number.
@@ -109,12 +96,8 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -129,25 +112,15 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 
 	status, err := helper.CheckOtp(number, body.Otp)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Failed.",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if status == "incorrect" {
-
-		c.JSON(http.StatusUnauthorized, response.Response{
-			StatusCode: 401,
-			Message:    "Incorrect otp. ",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Incorrect otp", nil, nil)
+		c.JSON(http.StatusBadRequest, response)
 		return
-
 	}
 
 	tokenString, _, err := helper.GenerateJwtToken(0)
@@ -155,22 +128,17 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 	c.SetCookie("PhoneAuthorization", tokenString, maxAge, "", "", false, true)
 	c.SetSameSite(http.SameSiteLaxMode)
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Successfull, Verified phone number.",
-		Data:       body.ID,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(202, "Success, verified phone number", body.ID, nil)
+	c.JSON(http.StatusAccepted, response)
 }
 
-//	@Summary		User Logout
-//	@Description	Logs out user and remove cookie from browser.
-//	@Tags			common
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	response.Response{}
-//	@Router			/logout [post]
+// @Summary		User Logout
+// @Description	Logs out user and remove cookie from browser.
+// @Tags			common
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	response.Response{}
+// @Router			/logout [post]
 func (uh *CommonHandler) Logout(c *gin.Context) {
 	c.SetCookie("AdminAuthorization", "", -1, "", "", false, true)
 	c.SetCookie("SudoAdminAuthorization", "", -1, "", "", false, true)

@@ -62,7 +62,7 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 		return response.UserData{}, err
 	} else if UserData.Id == 0 {
 		return response.UserData{}, errors.New("user dont have an account.")
-	} else if UserData.IsBlocked == true {
+	} else if UserData.IsBlocked {
 		return response.UserData{}, errors.New("user have been blocked.")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(user.Password)); err != nil {
@@ -195,8 +195,10 @@ func (u *userUseCase) DeleteUserAddress(addressId int) error {
 		return fmt.Errorf("Failed to set default address %s", err)
 	}
 	if UserAddress.ID != 0 {
-		u.userRepo.SetIsDefaultStatusOnAddress(true, int(UserAddress.ID), int(UserAddress.UserID))
-
+		_, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(UserAddress.ID), int(UserAddress.UserID))
+		if err != nil {
+			return fmt.Errorf("Failed to update default address :%s", err)
+		}
 	}
 	return nil
 }
@@ -206,11 +208,11 @@ func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 		return fmt.Errorf("Failed to find default address :%s", err)
 	}
 	Address, err := u.userRepo.SetIsDefaultStatusOnAddress(false, int(DefaultAddress.ID), userID)
-	if Address.ID == 0 || Address.IsDefault != false || err != nil {
+	if Address.ID == 0 || Address.IsDefault || err != nil {
 		return fmt.Errorf("Failed to change default address : %s", err)
 	}
 	NewDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, addressID, userID)
-	if err != nil || NewDefaultAddress.IsDefault != true {
+	if err != nil || !NewDefaultAddress.IsDefault {
 		return fmt.Errorf("Failed to set  address to default : %s", err)
 	}
 	return nil
@@ -242,7 +244,7 @@ func (u *userUseCase) GetProfile(userId int) (response.Profile, error) {
 
 }
 
-//profile
+// profile
 func (u *userUseCase) ForgotPassword(userid int, c *gin.Context) error {
 	UserData, err := u.userRepo.FindUserById(userid)
 	if err != nil {
@@ -253,8 +255,10 @@ func (u *userUseCase) ForgotPassword(userid int, c *gin.Context) error {
 		return fmt.Errorf("User not found.")
 	}
 
-	helper.SendOtp(fmt.Sprint(UserData.Phone))
-
+	err = helper.SendOtp(fmt.Sprint(UserData.Phone))
+	if err != nil {
+		return fmt.Errorf("Failed to send otp")
+	}
 	helper.SetToCookie(userid, "PasswordChange", c)
 
 	return nil

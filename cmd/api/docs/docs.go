@@ -2949,7 +2949,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "devicemart.store",
+	Host:             "localhost:3000",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Project Device Mart API",

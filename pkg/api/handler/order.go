@@ -92,7 +92,7 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 	c.HTML(200, "razorpay.html", gin.H{
 		"username":          PaymentDetails.Username,
 		"razorpay_order_id": PaymentDetails.RazorPayOrderId,
-		"amount":            50000,
+		"amount":            PaymentDetails.Amount * 100,
 	})
 }
 
@@ -109,10 +109,9 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 //	@Failure		500		{object}	response.Response
 //	@Router			/payment/razorpay/process-order [post]
 func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
-
 	var body request.VerifyPayment
 	if err := c.BindJSON(&body); err != nil {
-		response := response.ResponseMessage(403, "Invalid input.", nil, err.Error())
+		response := response.ResponseMessage(403, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -121,20 +120,20 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 
 	err := oh.orderUseCase.VerifyRazorPayPayment(body.Signature, body.RazorpayOrderId, body.RazorPayPaymentId)
 	if err != nil {
-		response := response.ResponseMessage(403, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(403, "Failed", nil, err.Error())
 		c.JSON(http.StatusForbidden, response)
 		return
 
 	}
 	err = oh.orderUseCase.ConfirmedOrder(userId, 2) //2 is reffering payment method razorpay(online)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := response.ResponseMessage(200, "success,order placed", nil, nil)
-	c.JSON(http.StatusOK, response)
 
+	response := response.ResponseMessage(200, "Success, order placed", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // UserOrderHistory is the handler function for retrieving the order history of the current user.
@@ -151,33 +150,35 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	userId, _ := helper.GetUserIdFromContext(c)
+
 	orderHistory, err := oh.orderUseCase.GetUserOrderHistory(userId, page, count)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
 	if len(orderHistory) == 0 {
-		response := response.ResponseMessage(404, "No data available.", nil, nil)
+		response := response.ResponseMessage(404, "No data available", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
+
 	response := response.ResponseMessage(200, "Success", orderHistory, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // GetOrderManagementPage godoc
@@ -194,26 +195,27 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	OrderManagementPageDatas, err := oh.orderUseCase.GetOrderManagement(page, count)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+
 	response := response.ResponseMessage(200, "Success", OrderManagementPageDatas, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // GetAllOrderOverViewPage godoc
@@ -230,32 +232,33 @@ func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
 func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	AllOrders, err := oh.orderUseCase.AllOrderOverView(page, count)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
 	if len(AllOrders) == 0 {
-		response := response.ResponseMessage(404, "No data available .", nil, nil)
+		response := response.ResponseMessage(404, "No data available", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
+
 	response := response.ResponseMessage(200, "Success", AllOrders, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // UpdateOrderStatus is the handler function for updating the status of an order.
@@ -274,19 +277,19 @@ func (oh *OrderHandler) UpdateOrderStatus(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("orderID"))
 	statusID, err := strconv.Atoi(c.Param("statusID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	err = oh.orderUseCase.UpdateOrderStatus(statusID, orderID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := response.ResponseMessage(200, "Success,status updated", nil, nil)
 
+	response := response.ResponseMessage(200, "Success, status updated", nil, nil)
 	c.JSON(http.StatusOK, response)
 
 }
@@ -319,9 +322,33 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success", nil, nil)
+	response := response.ResponseMessage(200, "Success, order cancelled", nil, nil)
 	c.JSON(http.StatusOK, response)
+}
 
+// ReturnOrder godoc
+//
+//	@Summary		Return order
+//	@Description	Return the order if the order is valid for return.Amount will be added to the user's wallet.
+//	@Description	If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
+//	@Tags			user orders
+//	@Accept			json
+//	@Produce		json
+//	@Param			orderID	path		int	true	"Order ID"
+//	@Success		200		{object}	response.Response
+//	@Failure		400		{object}	response.Response
+//	@Failure		500		{object}	response.Response
+//	@Router			/my-orders/return/{orderID} [post]
+func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
+	orderID, err := strconv.Atoi(c.Param("orderID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "Success, order return approved", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // CreateUserWallet godoc

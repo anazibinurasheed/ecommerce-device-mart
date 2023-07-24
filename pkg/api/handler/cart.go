@@ -34,7 +34,7 @@ func NewCartHandler(useCase services.CartUseCase) *CartHandler {
 func (ch *CartHandler) AddToCart(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -43,12 +43,12 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 
 	err = ch.cartUseCase.AddToCart(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", nil, nil)
+	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -81,12 +81,12 @@ func (ch *CartHandler) ViewCart(c *gin.Context) {
 
 	CartItems, err := ch.cartUseCase.ViewCart(userID) ///////////////
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", CartItems, nil)
+	response := response.ResponseMessage(200, "Success", CartItems, nil)
 	c.JSON(http.StatusOK, response)
 
 }
@@ -103,10 +103,9 @@ func (ch *CartHandler) ViewCart(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/cart/{productID}/increment [patch]
 func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
-
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -115,14 +114,13 @@ func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 
 	err = ch.cartUseCase.IncrementQuantity(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", nil, nil)
+	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // DecrementQuantity is the handler function for decrementing the quantity of a product in the cart.
@@ -137,10 +135,9 @@ func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/cart/{productID}/decrement [patch]
 func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
-
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -149,14 +146,13 @@ func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
 
 	err = ch.cartUseCase.DecrementQuantity(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", nil, nil)
+	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // RemoveFromCart is the handler function for removing a product from the cart.
@@ -171,10 +167,9 @@ func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/cart/remove/{productID} [delete]
 func (ch *CartHandler) RemoveFromCart(c *gin.Context) {
-
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -183,12 +178,11 @@ func (ch *CartHandler) RemoveFromCart(c *gin.Context) {
 
 	err = ch.cartUseCase.RemoveFromCart(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", nil, nil)
+	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }

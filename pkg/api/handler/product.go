@@ -138,20 +138,18 @@ func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid input.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusInternalServerError, response)
-
 		return
 	}
 
 	UpdatedCategory, err := ph.productUseCase.UpdateCategoryWithId(categoryID, body)
-
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed to update category", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
-
 		return
 	}
 

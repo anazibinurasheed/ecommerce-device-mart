@@ -161,7 +161,7 @@ definitions:
       statuscode:
         type: integer
     type: object
-host: devicemart.store
+host: localhost:3000
 info:
   contact:
     email: anazibinurasheed@gmail.com

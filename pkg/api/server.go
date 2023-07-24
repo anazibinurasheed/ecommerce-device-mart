@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	_ "github.com/anazibinurasheed/project-device-mart/cmd/api/docs"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
@@ -26,8 +28,8 @@ type ServerHTTP struct {
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-//	@host		devicemart.store
-//	@BasePath	/api/v1
+// @host		localhost:3000
+// @BasePath	/api/v1
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, refferalHandler *handler.RefferalHandler) *ServerHTTP {
 
@@ -182,5 +184,5 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 }
 
 func (s *ServerHTTP) Start() {
-	s.engine.Run(":3000")
+	log.Fatal(s.engine.Run(":3000"))
 }

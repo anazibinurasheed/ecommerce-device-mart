@@ -37,27 +37,28 @@ func NewCouponHandler(useCase services.CouponUseCase) *CouponHandler {
 func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 	var body request.Coupon
 	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid Input.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	err := helper.ValidateStruct(body)
 	if err != nil {
-		response := response.ResponseMessage(400, "Unable to process without filling up required credentials.", nil, err.Error())
+		response := response.ResponseMessage(400, "Unable to process without filling up required credentials", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 
 	}
+
 	err = ch.coupenUseCase.CreateCoupons(body)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful,created new coupon.", nil, nil)
-	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(201, "Success, created new coupon", nil, nil)
+	c.JSON(http.StatusCreated, response)
 }
 
 // UpdateCoupon  Updates existing  coupon by id .
@@ -76,32 +77,32 @@ func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 func (ch *CouponHandler) UpdateCoupon(c *gin.Context) {
 	var body request.Coupon
 	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid Input.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid Input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	err := helper.ValidateStruct(body)
 	if err != nil {
-		response := response.ResponseMessage(400, "Unable to process without filling up required credentials.", nil, err.Error())
+		response := response.ResponseMessage(400, "Unable to process without filling up required credentials", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	couponID, err := strconv.Atoi(c.Param("couponID"))
 	if err != nil {
-		response := response.ResponseMessage(500, "Invalid entry.", nil, err.Error())
+		response := response.ResponseMessage(500, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	err = ch.coupenUseCase.UpdateCoupon(body, couponID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful,coupon updated.", nil, nil)
+	response := response.ResponseMessage(200, "Successful,coupon updated", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -117,22 +118,21 @@ func (ch *CouponHandler) UpdateCoupon(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/admin/promotions/block-coupon/{couponID}  [put]
 func (ch *CouponHandler) BlockCoupon(c *gin.Context) {
-
 	couponID, err := strconv.Atoi(c.Param("couponID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	err = ch.coupenUseCase.BlockCoupon(couponID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful,coupon blocked.", nil, nil)
+	response := response.ResponseMessage(200, "Success, coupon blocked", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -148,22 +148,21 @@ func (ch *CouponHandler) BlockCoupon(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/admin/promotions/unblock-coupon/{couponID}  [put]
 func (ch *CouponHandler) UnBlockCoupon(c *gin.Context) {
-
 	couponID, err := strconv.Atoi(c.Param("couponID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	err = ch.coupenUseCase.UnBlockCoupon(couponID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful,coupon unblocked.", nil, nil)
+	response := response.ResponseMessage(200, "Success, coupon unblocked", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -177,15 +176,14 @@ func (ch *CouponHandler) UnBlockCoupon(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/admin/promotions/all-coupons  [get]
 func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
-
 	Coupons, err := ch.coupenUseCase.ViewAllCoupons()
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful.", Coupons, nil)
+	response := response.ResponseMessage(200, "Success", Coupons, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -204,21 +202,22 @@ func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
 func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 	var body string
 	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid Input.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	userID, _ := helper.GetUserIdFromContext(c)
+
 	err := ch.coupenUseCase.ProcessApplyCoupon(body, userID)
 	if err != nil {
 		response := response.ResponseMessage(403, "Failed", nil, err.Error())
 		c.JSON(http.StatusForbidden, response)
 		return
 	}
+
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // ListOutAvailableCouponsToUser godoc
@@ -232,22 +231,22 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 //	@Router			/coupon/available [get]
 func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
 	userID, _ := helper.GetUserIdFromContext(c)
+
 	AvailabeCoupons, err := ch.coupenUseCase.ListOutAvailableCouponsToUser(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
-
 	}
+
 	if len(AvailabeCoupons) == 0 {
 		response := response.ResponseMessage(404, "No available coupons", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
-
 	}
+
 	response := response.ResponseMessage(200, "Success", AvailabeCoupons, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // RemoveAppliedCoupon godoc
@@ -264,7 +263,7 @@ func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
 func (ch *CouponHandler) RemoveAppliedCoupon(c *gin.Context) {
 	couponID, err := strconv.Atoi(c.Param("couponID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -275,9 +274,8 @@ func (ch *CouponHandler) RemoveAppliedCoupon(c *gin.Context) {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
-
 	}
+
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }

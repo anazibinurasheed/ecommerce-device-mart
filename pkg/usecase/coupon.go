@@ -96,7 +96,7 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 		return fmt.Errorf("Failed to find coupon  :%s", err)
 	}
 
-	if Coupon.IsBlocked == true || !helper.IsCouponValid(Coupon.ValidTill) || Coupon.ID == 0 {
+	if Coupon.IsBlocked || !helper.IsCouponValid(Coupon.ValidTill) || Coupon.ID == 0 {
 		return fmt.Errorf("coupon cant use ,invalid coupon")
 	}
 
@@ -109,9 +109,9 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 		return fmt.Errorf("Failed to find coupon tracking details : %s", err)
 	}
 
-	if TrackingDetails.CouponID == Coupon.ID && TrackingDetails.IsUsed == true {
+	if TrackingDetails.CouponID == Coupon.ID && TrackingDetails.IsUsed {
 		return fmt.Errorf("Failed coupon already used")
-	} else if TrackingDetails.CouponID == Coupon.ID && TrackingDetails.IsUsed == false {
+	} else if TrackingDetails.CouponID == Coupon.ID && !TrackingDetails.IsUsed {
 		return nil
 	}
 	PreviousCoupon, err := cu.couponRepo.CheckForAppliedCoupon(userID)
@@ -122,7 +122,7 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 	if err != nil {
 		return fmt.Errorf("Failed to find  previous coupon details from coupon tracking ")
 	}
-	if PreviousCoupon.ID != 0 && PreviousCoupon.IsUsed == false {
+	if PreviousCoupon.ID != 0 && !PreviousCoupon.IsUsed {
 		ChangedCoupon, err := cu.couponRepo.ChangeCoupon(Coupon.ID, userID)
 		if err != nil {
 			return fmt.Errorf("Failed to change coupon : %s", err)

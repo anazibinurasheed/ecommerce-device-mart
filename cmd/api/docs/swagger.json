@@ -15,7 +15,7 @@
         },
         "version": "1.0"
     },
-    "host": "devicemart.store",
+    "host": "localhost:3000",
     "basePath": "/api/v1",
     "paths": {
         "/admin/category/add-category": {

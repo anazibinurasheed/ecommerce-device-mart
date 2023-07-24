@@ -24,38 +24,6 @@ func NewAdminHandler(useCase services.AdminUseCase) *AdminHandler {
 		adminUseCase: useCase}
 }
 
-// func (ah *AdminHandler) ValidateSignupRequest(c *gin.Context) {
-// 	var body commonreq.Phone
-// 	if err := c.ShouldBindJSON(&body); err != nil {
-// 		c.JSON(http.StatusBadRequest, response.Response{
-// 			StatusCode: 400,
-// 			Messase:    "Invalid input. ",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	err := ah.adminUseCase.ValidateSignupRequest(body, c)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, response.Response{
-// 			StatusCode: 400,
-// 			Messase:    err.Error(),
-// 			Data:       nil,
-// 			Error:      nil,
-// 		})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, response.Response{
-// 		StatusCode: 200,
-// 		Messase:    "Successfull, otp sended ",
-// 		Data:       nil,
-// 		Error:      nil,
-// 	})
-
-// }
-
 // AdminSignup godoc
 //
 //	@Summary		Admin signup
@@ -69,9 +37,7 @@ func NewAdminHandler(useCase services.AdminUseCase) *AdminHandler {
 //	@Failure		400	{object}	response.Response
 //	@Router			/admin/create-admin [post]
 func (ah *AdminHandler) AdminSignup(c *gin.Context) {
-
 	var body request.SignUpData
-
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -103,6 +69,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	//from here phone details from map not needed .
 	phoneDataMutex.Lock()
 	delete(phoneDataMap, body.Id)
@@ -156,18 +123,7 @@ func (ah *AdminHandler) SudoAdminLogin(c *gin.Context) {
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
-
-// func (ah *AdminHandler) AdminLogout(c *gin.Context) {
-// 	c.SetCookie("AdminAuthorization", "", -1, "", "", false, true)
-// 	c.JSON(http.StatusOK, response.Response{
-// 		StatusCode: 200,
-// 		Message:    "Logged out successfully",
-// 		Data:       nil,
-// 		Error:      nil,
-// 	})
-// }
 
 // ListUsers	godoc
 //
@@ -204,7 +160,6 @@ func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
 
 	response := response.ResponseMessage(200, "Success", ListOfAllUserData, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // BlockUser godoc
@@ -221,21 +176,20 @@ func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
 //	@Router			/admin/user-management/block-user/{userID} [post]
 func (ah *AdminHandler) BlockUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userID"))
-
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	if err := ah.adminUseCase.BlockUserById(id); err != nil {
+	err = ah.adminUseCase.BlockUserById(id)
+	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 	}
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // UnblockUser godoc
@@ -252,19 +206,19 @@ func (ah *AdminHandler) BlockUser(c *gin.Context) {
 //	@Router			/admin/user-management/unblock-user/{userID} [post]
 func (ah *AdminHandler) UnblockUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("userID"))
-
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	if err := ah.adminUseCase.UnBlockUserById(id); err != nil {
+	err = ah.adminUseCase.UnBlockUserById(id)
+	if err != nil {
 		response := response.ResponseMessage(500, "Unblocking user failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
+		return
 	}
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }

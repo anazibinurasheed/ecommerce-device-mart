@@ -140,7 +140,7 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 
 	var CoockieName string
 
-	if UserData.IsAdmin == true {
+	if UserData.IsAdmin {
 		CoockieName = "AdminAuthorization"
 	} else {
 		CoockieName = "UserAuthorization"
@@ -667,7 +667,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/user/address-default/{addressID} [put]
+//	@Router			/profile/address-default/{addressID} [put]
 func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 	addressID, err := strconv.Atoi(c.Param("addressID"))
 	if err != nil || addressID == 0 {
@@ -682,11 +682,11 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 	userID, _ := helper.GetUserIdFromContext(c)
 	err = uh.userUseCase.SetDefaultAddress(userID, addressID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed to set address as default", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	response := response.ResponseMessage(200, "Success,address set to default", nil, nil)
+	response := response.ResponseMessage(200, "Success, updated default address", nil, nil)
 	c.JSON(http.StatusOK, response)
 
 }

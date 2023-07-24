@@ -38,9 +38,8 @@ type OrderLine struct {
 	Qty             int           `gorm:"not null"`
 	Price           float32       `gorm:"not null"`
 	CouponID        uint
-	// Coupon          Coupon `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 /*Pending

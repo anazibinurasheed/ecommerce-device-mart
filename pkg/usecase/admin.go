@@ -8,7 +8,6 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/net/context"
 )
 
 type adminUsecase struct {
@@ -76,8 +75,6 @@ func (ac *adminUsecase) BlockUserById(id int) error {
 	}
 	return nil
 }
-
-var ctx context.Context
 
 func (ac *adminUsecase) UnBlockUserById(id int) error {
 	err := ac.adminRepo.UnBlockUserOnDatabase(id)

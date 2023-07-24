@@ -217,6 +217,17 @@ func (ou *orderUseCase) UpdateOrderStatus(statusID int, orderID int) error {
 	return nil
 }
 
+// func (ou *orderUseCase) ProcessReturnRequest(orderID int) error {
+// 	order, err := ou.orderRepo.FindOrderById(orderID)
+// 	if err != nil {
+// 		return fmt.Errorf("Failed to fetch order details: %s", err)
+// 	}
+// 	if order.ID == 0 {
+// 		return fmt.Errorf("Failed to verify order by id")
+// 	}
+
+// }
+
 func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	//find the order by provided orderID
 	CancellingOrder, err := ou.orderRepo.FindOrderById(orderID)
@@ -225,7 +236,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	}
 
 	if CancellingOrder.ID == 0 {
-		return fmt.Errorf("Failed to veirfy order  by id")
+		return fmt.Errorf("Failed to veirfy order by id")
 	}
 	PaymentMethodUsed, err := ou.paymentRepo.FindPaymentMethodById(CancellingOrder.PaymentMethodID)
 	if err != nil {
