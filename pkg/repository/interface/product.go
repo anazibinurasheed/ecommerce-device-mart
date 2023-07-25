@@ -12,7 +12,7 @@ type ProductRepository interface {
 	BlockCategoryFromDatabase(ParamId int) (response.Category, error)
 	UnBlockCategoryFromDatabase(ParamId int) (response.Category, error)
 	FindCategoryByName(name string) (response.Category, error)
-	FindCategoryById(id int) (response.Category, error)
+	FindCategoryByID(ID int) (response.Category, error)
 
 	InsertNewProductToDatabase(product request.Product) (response.Product, error)
 	ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error)

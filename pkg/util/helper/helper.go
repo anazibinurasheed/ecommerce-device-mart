@@ -49,7 +49,7 @@ func GenerateUniqueID() string {
 	return fmt.Sprintf("%s-%d", id, timestamp)
 }
 
-func MakeSku(name string) string {
+func MakeSKU(name string) string {
 	name = strings.ReplaceAll(name, " ", "-")
 	return name
 }

@@ -42,7 +42,7 @@ func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
 		return response.CheckOut{}, fmt.Errorf("Failed to retrieve checkout details %s", err)
 	}
 	if len(addresses) == 0 {
-		return response.CheckOut{}, fmt.Errorf("User have no address")
+		return response.CheckOut{}, fmt.Errorf("User dont have an address")
 	}
 
 	cartItems, err := ou.cartUseCase.ViewCart(userID)

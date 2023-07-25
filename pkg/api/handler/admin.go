@@ -184,11 +184,11 @@ func (ah *AdminHandler) BlockUser(c *gin.Context) {
 
 	err = ah.adminUseCase.BlockUserById(id)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed to block user", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := response.ResponseMessage(200, "Success", nil, nil)
+	response := response.ResponseMessage(200, "Success, user has been blocked", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -214,11 +214,11 @@ func (ah *AdminHandler) UnblockUser(c *gin.Context) {
 
 	err = ah.adminUseCase.UnBlockUserById(id)
 	if err != nil {
-		response := response.ResponseMessage(500, "Unblocking user failed", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed to unblock user", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success", nil, nil)
+	response := response.ResponseMessage(200, "Success, user has been unblocked", nil, nil)
 	c.JSON(http.StatusOK, response)
 }

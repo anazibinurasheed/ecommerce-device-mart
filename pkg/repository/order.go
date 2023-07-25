@@ -24,14 +24,12 @@ func (od *orderDatabase) InsertOrderLine(userID int, productID int, addressID in
 	query := `INSERT INTO order_lines (user_id,product_id,addresses_id,qty,price,payment_method_id,order_status_id,coupon_id,created_at,updated_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING * ;`
 	err := od.DB.Raw(query, userID, productID, addressID, qty, price, paymentMethodID, orderStatusID, couponID, createdAt, updatedAt).Scan(&NewOrderLine).Error
 	return NewOrderLine, err
-
 }
 func (od *orderDatabase) GetStatusPending() (response.OrderStatus, error) {
 	var OrderStatus response.OrderStatus
 	query := `SELECT * FROM order_statuses WHERE status = 'Pending';`
 	err := od.DB.Raw(query).Scan(&OrderStatus).Error
 	return OrderStatus, err
-
 }
 
 func (od *orderDatabase) GetStatusCancelled() (response.OrderStatus, error) {
@@ -39,7 +37,6 @@ func (od *orderDatabase) GetStatusCancelled() (response.OrderStatus, error) {
 	query := `SELECT * FROM order_statuses WHERE status = 'Cancelled';`
 	err := od.DB.Raw(query).Scan(&OrderStatus).Error
 	return OrderStatus, err
-
 }
 
 func (od *orderDatabase) GetStatusReturned() (response.OrderStatus, error) {
@@ -47,13 +44,10 @@ func (od *orderDatabase) GetStatusReturned() (response.OrderStatus, error) {
 	query := `SELECT * FROM order_statuses WHERE status = 'Returned';`
 	err := od.DB.Raw(query).Scan(&OrderStatus).Error
 	return OrderStatus, err
-
 }
 
 func (od *orderDatabase) UserOrderHistory(userID, startIndex, endIndex int) ([]response.Orders, error) {
-
 	var OrderHistory = make([]response.Orders, 0)
-
 	query := `SELECT
     o.id AS order_id,
     o.product_id,
@@ -76,20 +70,11 @@ INNER JOIN states states ON a.state_id = states.id
 WHERE o.user_id = $1
 ORDER BY o.id DESC OFFSET $2 FETCH NEXT $3 ROW ONLY;`
 	err := od.DB.Raw(query, userID, startIndex, endIndex).Scan(&OrderHistory).Error
-
-	// fmt.Println("ORDER HISTORY")
-	// for key, value := range OrderHistory {
-	// 	fmt.Println(key)
-	// 	fmt.Println("PRODUCT IMG", value.OrderID, "->", value.ProductImage, "<-")
-	// 	fmt.Println(value)
-	// }
 	return OrderHistory, err
 }
 
 func (od *orderDatabase) GetInvoiceData(orderID int) (response.Orders, error) {
-
 	var OrderData response.Orders
-
 	query := `SELECT
     o.id AS order_id,
     o.product_id,
@@ -192,8 +177,6 @@ func (od *orderDatabase) FindOrdersUsedByCoupon(couponID int) ([]response.OrderL
 	err := od.DB.Raw(query, couponID).Scan(&Orders).Error
 	return Orders, err
 }
-
-///
 
 func (od *orderDatabase) InitializeNewWallet(userID int) (response.Wallet, error) {
 	var NewWallet response.Wallet

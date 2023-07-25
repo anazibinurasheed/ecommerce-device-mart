@@ -19,6 +19,8 @@ func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 	db, dbErr := gorm.Open(postgres.Open(dsn), &gorm.Config{SkipDefaultTransaction: true})
 	db.Set("gorm.singular_table_names", true)
 
+	db.Debug() //to log the query
+
 	if err := db.AutoMigrate(
 
 		&domain.User{},

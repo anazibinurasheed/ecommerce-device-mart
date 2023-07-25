@@ -1,8 +1,8 @@
 package response
 
 type Category struct {
-	Id           int
-	CategoryName string
+	ID           int    `json:"id"`
+	CategoryName string `json:"category_name"`
 }
 type Product struct {
 	ID                  uint   `json:"id"`

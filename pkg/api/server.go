@@ -86,7 +86,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			payment := user.Group("/payment")
 			{
 				payment.POST("/order-cod-confirmed", orderHandler.ConfirmCodDelivery)
-				payment.GET("/razorpay/", orderHandler.MakePaymentRazorpay)
+				payment.GET("/razorpay", orderHandler.MakePaymentRazorpay)
 				payment.POST("/razorpay/process-order", orderHandler.ProccessRazorpayOrder)
 				payment.POST("/wallet", orderHandler.WalletPayment)
 

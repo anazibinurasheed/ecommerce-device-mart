@@ -29,23 +29,9 @@ type OrderLine struct {
 	UpdatedAt       time.Time `json:""`
 }
 type OrderStatus struct {
-	ID     uint   `json:""`
-	Status string `json:""`
+	ID     uint   `json:"id"`
+	Status string `json:"order_status"`
 }
-
-// type Orders struct {
-// 	Order_Id          int     `json:"order_id"`
-// 	Product_Id        int     `json:"product_id"`
-// 	Product_Image     string  `json:"product_image"`
-// 	Product_Name      string  `json:"product_name"`
-// 	Product_Price     float32 `json:"product_price"`
-// 	Order_Status_Id   int     `json:"order_status_id"`
-// 	Order_Status      string  `json:"order_status"`
-// 	Payment_Method_Id int     `json:"payment_method_id"`
-// 	Payment_Method    string  `json:"payment_method"`
-// 	Addresses_Id      int
-// 	DeliveryAddress   string `json:"delivery_address"`
-// }
 
 type Orders struct {
 	OrderID         int     `json:"order_id"`
@@ -63,9 +49,4 @@ type Orders struct {
 type OrderManagement struct {
 	OrderStatuses []OrderStatus `json:"order_statuses"`
 	Orders        []Orders      `json:"orders"`
-}
-
-// order_id | product_id | product_image |  product_name   | product_price | order_status_id | order_status | payment_method_id |  payment_method  | delivery_address
-
-type Invoice struct {
 }

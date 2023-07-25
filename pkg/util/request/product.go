@@ -1,7 +1,7 @@
 package request
 
 type Category struct {
-	CategoryName string `json:"categoryname" binding:"required,min=2"`
+	CategoryName string `json:"category_name" binding:"required,min=2"`
 }
 
 type Product struct {

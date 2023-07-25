@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"log"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -61,7 +60,6 @@ func (pd *productDatabase) UnBlockCategoryFromDatabase(ParamId int) (response.Ca
 
 }
 
-//-------------------------------------------------------------------------------------------------------------
 func (pd *productDatabase) FindCategoryByName(name string) (response.Category, error) {
 	var ResultOfFinding response.Category
 	query := "SELECT * FROM Categories WHERE Category_Name = $1"
@@ -69,19 +67,15 @@ func (pd *productDatabase) FindCategoryByName(name string) (response.Category, e
 	return ResultOfFinding, err
 
 }
-func (pd *productDatabase) FindCategoryById(id int) (response.Category, error) {
+func (pd *productDatabase) FindCategoryByID(ID int) (response.Category, error) {
 	var ResultOfFinding response.Category
-	log.Println("FIND CATEGORY BY ID :", id)
 	query := "SELECT * FROM Categories WHERE Id = $1 "
-	err := pd.DB.Raw(query, id).Scan(&ResultOfFinding).Error
+	err := pd.DB.Raw(query, ID).Scan(&ResultOfFinding).Error
 	return ResultOfFinding, err
 }
 
-//product
-//--------------------------------------------------------------------------------------------------------------
+// product
 func (pd *productDatabase) InsertNewProductToDatabase(product request.Product) (response.Product, error) {
-	log.Println("REPOSITORY :", product)
-	fmt.Println("REPOSITORY :", product)
 	var NewProduct response.Product
 	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *"
 	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.Product_Description, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&NewProduct).Error
@@ -90,11 +84,9 @@ func (pd *productDatabase) InsertNewProductToDatabase(product request.Product) (
 
 func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error) {
 	var ListOfAllProducts = make([]response.Product, 0)
-
 	query := "SELECT * FROM Products OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllProducts).Error
 	return ListOfAllProducts, err
-
 }
 
 func (pd *productDatabase) UpdateProductToDatabase(paramId int, updations request.Product) (response.Product, error) {

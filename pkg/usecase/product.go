@@ -1,9 +1,7 @@
 package usecase
 
 import (
-	"errors"
 	"fmt"
-	"log"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
@@ -25,24 +23,24 @@ func NewProductUseCase(productRepo interfaces.ProductRepository, orderRepo inter
 
 }
 
-func (pu *productUseCase) CreateNewCategory(category request.Category) (response.Category, error) {
-
-	DoCategoryExist, _ := pu.productRepo.FindCategoryByName(category.CategoryName)
-
-	if DoCategoryExist.CategoryName != "" {
-		return DoCategoryExist, errors.New("Category already exist")
-
+func (pu *productUseCase) CreateNewCategory(category request.Category) error {
+	DoCategoryExist, err := pu.productRepo.FindCategoryByName(category.CategoryName)
+	if DoCategoryExist.ID != 0 {
+		return fmt.Errorf("Category already exist with this name")
 	}
 
 	NewCategory, err := pu.productRepo.CreateCategory(category)
-
 	if err != nil {
-		log.Println(" CREATE CATEGORY FAILED ")
-		return response.Category{}, err
+		return fmt.Errorf("Failed to create category : %s", err)
 	}
-	return NewCategory, nil
 
+	if NewCategory.ID == 0 {
+		return fmt.Errorf("Failed to verify created category")
+	}
+
+	return nil
 }
+
 func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Category, error) {
 	if page <= 0 {
 		page = 1
@@ -50,93 +48,85 @@ func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Cat
 	if count < 10 {
 		count = 10
 	}
+
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
+
 	ListOfAllCategories, err := pu.productRepo.ReadCategory(startIndex, endIndex)
 	if err != nil {
-		log.Println("  FAILED WHILE READING ALL CATEGORIES ")
-		return nil, err
+		return nil, fmt.Errorf("Failed to find categories :%s", err)
 	}
+
 	return ListOfAllCategories, nil
-
 }
-func (pu *productUseCase) UpdateCategoryWithId(ParamId int, category request.Category) (response.Category, error) {
 
+func (pu *productUseCase) UpdateCategoryWithId(ParamId int, category request.Category) error {
 	UpdatedCategory, err := pu.productRepo.UpdateCategory(ParamId, category)
-
 	if err != nil {
-		log.Println("FAILED WHILE UPDATING CATEGORY ")
-		return response.Category{}, err
+		return fmt.Errorf("Failed to update category :%s", err)
 	}
-	if UpdatedCategory.Id == 0 {
-		return response.Category{}, errors.New("Category not found")
-	}
-	return UpdatedCategory, nil
 
+	if UpdatedCategory.ID == 0 {
+		return fmt.Errorf("Failed to verify updated category")
+	}
+
+	return nil
 }
 
-func (pu *productUseCase) BlockCategoryWithId(ParamId int) (response.Category, error) {
+func (pu *productUseCase) BlockCategoryWithId(ParamId int) error {
 	BlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(ParamId)
 	if err != nil {
-		log.Println(" FAILED WHILE DELETE CATEGORY ")
-		return response.Category{}, err
-	}
-	if BlockedCategory.Id == 0 {
-
-		return response.Category{}, errors.New("Category not found ")
+		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	return BlockedCategory, nil
+	if BlockedCategory.ID == 0 {
+		return fmt.Errorf("Failed to verify the blocked category")
+	}
 
+	return nil
 }
 
-func (pu *productUseCase) UnBlockCategoryWithId(ParamId int) (response.Category, error) {
+func (pu *productUseCase) UnBlockCategoryWithId(ParamId int) error {
 	UnBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(ParamId)
 	if err != nil {
-		log.Println(" FAILED WHILE DELETE CATEGORY ")
-		return response.Category{}, err
-	}
-	if UnBlockedCategory.Id == 0 {
-
-		return response.Category{}, errors.New("Category not found ")
+		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	return UnBlockedCategory, nil
+	if UnBlockedCategory.ID == 0 {
+		return fmt.Errorf("Failed to verify blocked category")
+	}
 
+	return nil
 }
-
-// -----------------------------------------------------------------------------------------------------------------------------
-func (pu *productUseCase) CreateNewProduct(product request.Product) (response.Product, error) {
-
-	log.Println("USECASE :", product)
-
-	ResultOfFinding, err := pu.productRepo.FindCategoryById(product.CategoryID)
+func (pu *productUseCase) CreateNewProduct(product request.Product) error {
+	category, err := pu.productRepo.FindCategoryByID(product.CategoryID)
 	if err != nil {
-		return response.Product{}, err
-	} else if ResultOfFinding.Id == 0 {
-		return response.Product{}, errors.New("Category Not found")
+		return fmt.Errorf("failed to find category: %s", err)
+	}
+	if category.ID == 0 {
+		return fmt.Errorf("category not found")
 	}
 
-	product.Brand = ResultOfFinding.CategoryName
-	product.SKU = helper.MakeSku(product.ProductName)
-	fmt.Printf("PRODUCT.BRAND =  %s   RESULTOFFINDING.CATEGORYNAME  =  %s ", product.Brand, ResultOfFinding.CategoryName)
+	product.Brand = category.CategoryName
+	product.SKU = helper.MakeSKU(product.ProductName)
 
-	ProductExist, err := pu.productRepo.FindProductByName(product.ProductName)
+	existingProduct, err := pu.productRepo.FindProductByName(product.ProductName)
 	if err != nil {
-		return response.Product{}, errors.New("Error while Finding product by name ")
+		return fmt.Errorf("failed to find product by name: %s", err)
 	}
-	if ProductExist.ID != 0 {
-		return response.Product{}, errors.New("Product already exist")
+	if existingProduct.ID != 0 {
+		return fmt.Errorf("product already exists with the same name")
 	}
 
-	NewProduct, err := pu.productRepo.InsertNewProductToDatabase(product)
+	newProduct, err := pu.productRepo.InsertNewProductToDatabase(product)
 	if err != nil {
-		return response.Product{}, err
+		return fmt.Errorf("failed to create new product: %s", err)
 	}
-	if NewProduct.ID == 0 {
-		return response.Product{}, errors.New(" Failed to  create product ")
+	if newProduct.ID == 0 {
+		return fmt.Errorf("failed to verify created product")
 	}
-	return NewProduct, nil
+
+	return nil
 }
 
 func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response.Product, error) {
@@ -146,15 +136,18 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	if count < 10 {
 		count = 10
 	}
+
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
+
 	ListOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
-	return ListOfAllProducts, nil
 
+	return ListOfAllProducts, nil
 }
+
 func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]response.Product, error) {
 	if page <= 0 {
 		page = 1
@@ -162,67 +155,77 @@ func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]r
 	if count < 10 {
 		count = 10
 	}
+
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
+
 	ListOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
-	return ListOfAllProducts, nil
 
+	return ListOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductWithId(paramId int, updations request.Product) (response.Product, error) {
-
+func (pu *productUseCase) UpdateProductWithId(paramId int, updations request.Product) error {
 	UpdatedProduct, err := pu.productRepo.UpdateProductToDatabase(paramId, updations)
 	if err != nil {
-		return response.Product{}, err
+		return fmt.Errorf("Failed to update product :%s", err)
 	}
-	return UpdatedProduct, nil
-}
-func (pu *productUseCase) BlockProductWithId(paramId int) (response.Product, error) {
-	BlockedProduct, err := pu.productRepo.BlockProductFromDatabase(paramId)
-	if err != nil {
-		return response.Product{}, errors.New("Failed while blocking Product ")
+	if UpdatedProduct.ID == 0 {
+		return fmt.Errorf("Failed to verify the updated product")
 	}
-	return BlockedProduct, nil
+	return nil
 }
 
-func (pu *productUseCase) UnBlockProductWithId(paramId int) (response.Product, error) {
-	BlockedProduct, err := pu.productRepo.UnblockProductFromDatabase(paramId)
+func (pu *productUseCase) BlockProductWithId(paramId int) error {
+	BlockedProduct, err := pu.productRepo.BlockProductFromDatabase(paramId)
 	if err != nil {
-		return response.Product{}, errors.New("Failed while unblocking Product failed")
+		return fmt.Errorf("Failed to block product :%s", err)
 	}
-	return BlockedProduct, nil
+	if BlockedProduct.ID == 0 {
+		return fmt.Errorf("Failed to verify updated product")
+	}
+	return nil
+}
+
+func (pu *productUseCase) UnBlockProductWithId(paramId int) error {
+	unBlockedProduct, err := pu.productRepo.UnblockProductFromDatabase(paramId)
+	if err != nil {
+		return fmt.Errorf("Failed unblock product :%s", err)
+	}
+	if unBlockedProduct.ID == 0 {
+		return fmt.Errorf("Failed to verify unblocked product")
+	}
+	return nil
 }
 
 func (pd *productUseCase) ViewProductById(productId int) (response.ProductItem, error) {
 	Product, err := pd.productRepo.FindProductById(productId)
 	if err != nil {
-		return response.ProductItem{}, fmt.Errorf("Failed to find product : %s", err)
+		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
 	if Product.ID == 0 {
-		return response.ProductItem{}, fmt.Errorf("unable to retrieve item from database")
+		return response.ProductItem{}, fmt.Errorf("Failed to fetch product")
 	}
 
 	Ratings, err := pd.productRepo.GetProductReviews(productId)
 	if err != nil {
-		return response.ProductItem{}, fmt.Errorf("Failed to find product reviews : %s", err)
+		return response.ProductItem{}, fmt.Errorf("Failed to find product reviews :%s", err)
 	}
 
-	var ProductData response.ProductItem
-	ProductData.ID = Product.ID
-	ProductData.CategoryID = Product.CategoryID
-	ProductData.Product_Name = Product.ProductName
-	ProductData.Price = Product.Price
-	ProductData.SKU = Product.SKU
-	ProductData.Brand = Product.Brand
-	ProductData.Product_Description = Product.Product_Description
-	ProductData.Product_Image = Product.Product_Image
-	ProductData.Is_Blocked = Product.IsBlocked
-	ProductData.RatingAndReviews = Ratings
-
-	return ProductData, nil
+	return response.ProductItem{
+		ID:                  Product.ID,
+		CategoryID:          Product.CategoryID,
+		Product_Name:        Product.ProductName,
+		Price:               Product.Price,
+		SKU:                 Product.SKU,
+		Brand:               Product.Brand,
+		Product_Description: Product.Product_Description,
+		Product_Image:       Product.Product_Image,
+		Is_Blocked:          Product.IsBlocked,
+		RatingAndReviews:    Ratings,
+	}, nil
 
 }
 

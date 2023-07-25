@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// cap
 type ProductHandler struct {
 	productUseCase services.ProductUseCase
 }
@@ -36,36 +34,20 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 func (ph *ProductHandler) CreateCategory(c *gin.Context) {
 	var body request.Category
 	if err := c.BindJSON(&body); err != nil {
-
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	NewCategory, err := ph.productUseCase.CreateNewCategory(body)
+	err := ph.productUseCase.CreateNewCategory(body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: 500,
-			Message:    "Failed to create new category",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(500, "Failed to create new category", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "success,created new category",
-		Data:       NewCategory,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(400, "Success, created new category", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 // ReadAllCategories godoc
 //
@@ -81,41 +63,32 @@ func (ph *ProductHandler) CreateCategory(c *gin.Context) {
 func (ph *ProductHandler) ReadAllCategories(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	ListOfAllCategories, err := ph.productUseCase.ReadAllCategories(page, count)
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, response.Response{
-			StatusCode: 503,
-			Message:    " Failed to retrieve all categories ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(503, "Failed to retrieve categories", nil, err.Error())
+		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
 	if len(ListOfAllCategories) == 0 {
-		response := response.ResponseMessage(404, "No data available .", nil, nil)
+		response := response.ResponseMessage(404, "No data available", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "success",
-		Data:       ListOfAllCategories,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "success", ListOfAllCategories, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // UpdateCategory godoc
@@ -146,16 +119,15 @@ func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	UpdatedCategory, err := ph.productUseCase.UpdateCategoryWithId(categoryID, body)
+	err = ph.productUseCase.UpdateCategoryWithId(categoryID, body)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success,category updated", UpdatedCategory, nil)
-	c.JSON(http.StatusInternalServerError, response)
-
+	response := response.ResponseMessage(200, "Success, category updated", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // BlockCategory godoc
@@ -172,33 +144,20 @@ func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	BlockedCategory, err := ph.productUseCase.BlockCategoryWithId(categoryID)
 
+	err = ph.productUseCase.BlockCategoryWithId(categoryID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: 500,
-			Message:    "Failed to block category",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(500, "Failed to block category", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Success,Blocked  category",
-		Data:       BlockedCategory,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success, blocked category", nil, err.Error())
+	c.JSON(http.StatusOK, response)
 }
 
 // UnBlockCategory godoc
@@ -216,33 +175,20 @@ func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	BlockedCategory, err := ph.productUseCase.BlockCategoryWithId(categoryID)
 
+	err = ph.productUseCase.BlockCategoryWithId(categoryID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: 500,
-			Message:    "Failed to block category",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(500, "Failed to block category", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Success,unblocked  category",
-		Data:       BlockedCategory,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success, unblocked category", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // CreateProduct godoc
@@ -262,54 +208,34 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	var body request.Product
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	body.CategoryID = categoryID
-	fmt.Println("BRAND OF PRODUCT ", body.CategoryID)
-	Product, err := ph.productUseCase.CreateNewProduct(body)
-	if err != nil && Product.CategoryID != 0 {
-		c.JSON(http.StatusForbidden, response.Response{
-			StatusCode: 403,
-			Message:    "Product already exists",
-			Data:       Product,
-			Error:      err.Error(),
-		})
+
+	err = ph.productUseCase.CreateNewProduct(body)
+	if err != nil {
+		response := response.ResponseMessage(403, "Failed", nil, err.Error())
+		c.JSON(http.StatusForbidden, response)
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: 500,
-			Message:    "Something went wrong,Cant create product,please try again later",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Success,Product added",
-		Data:       Product,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success, added new product", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // / DisplayAllProductsToAdmin is the handler function for viewing all products by an admin.
@@ -328,35 +254,34 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 func (ph *ProductHandler) DisplayAllProductsToAdmin(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	ListOfAllProducts, err := ph.productUseCase.DisplayAllProductsToAdmin(page, count)
+	products, err := ph.productUseCase.DisplayAllProductsToAdmin(page, count)
 	if err != nil {
-		response := response.ResponseMessage(503, "An error occurred during processing. Please try again.", nil, err.Error())
+		response := response.ResponseMessage(503, "Failed", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)
 		return
 
 	}
 
-	if len(ListOfAllProducts) == 0 {
-		response := response.ResponseMessage(404, "No data available for the specified page number.", nil, nil)
+	if len(products) == 0 {
+		response := response.ResponseMessage(404, "No data available", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful", ListOfAllProducts, nil)
+	response := response.ResponseMessage(200, "Success", products, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // UpdateProduct godoc
@@ -374,47 +299,28 @@ func (ph *ProductHandler) DisplayAllProductsToAdmin(c *gin.Context) {
 //	@Router			/admin/products/update-product/{productID} [patch]
 func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 	var body request.Product
-
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	UpdatedProduct, err := ph.productUseCase.UpdateProductWithId(productID, body)
-
+	err = ph.productUseCase.UpdateProductWithId(productID, body)
 	if err != nil {
-
-		c.JSON(http.StatusServiceUnavailable, response.Response{
-			StatusCode: 503,
-			Message:    " Our service is currently unavailable due to maintenance or high server load.",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(503, "Failed", nil, err.Error())
+		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "success",
-		Data:       UpdatedProduct,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success, product updated", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // BlockProduct godoc
@@ -432,34 +338,20 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input ",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	BlockedProduct, err := ph.productUseCase.BlockProductWithId(productID)
+	err = ph.productUseCase.BlockProductWithId(productID)
 	if err != nil {
-
-		c.JSON(http.StatusServiceUnavailable, response.Response{
-			StatusCode: 503,
-			Message:    "Failed to block product",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(503, "Failed", nil, err.Error())
+		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "success",
-		Data:       BlockedProduct,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // UnBlockProduct godoc
@@ -476,38 +368,23 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input ",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	fmt.Println(productID)
 
-	UnBlockedProduct, err := ph.productUseCase.UnBlockProductWithId(productID)
+	err = ph.productUseCase.UnBlockProductWithId(productID)
 	if err != nil {
-
-		c.JSON(http.StatusServiceUnavailable, response.Response{
-			StatusCode: 503,
-			Message:    " Failed to block product",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(503, "Failed to block product", nil, err)
+		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "success",
-		Data:       UnBlockedProduct,
-		Error:      nil,
-	})
-
+	response := response.ResponseMessage(200, "Success, unblocked product", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
 
-// DisplayAllProductsToUser is the handler function for displaying all available products to the user.
+// DisplayAllProductsToUser godoc
 //
 //	@Summary		Display all products to the user
 //	@Description	Retrieves all available products for the user.
@@ -536,24 +413,24 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 		return
 	}
 
-	ListOfAllProducts, err := ph.productUseCase.DisplayAllAvailabeProductsToUser(page, count)
+	products, err := ph.productUseCase.DisplayAllAvailabeProductsToUser(page, count)
 	if err != nil {
-		response := response.ResponseMessage(503, "An error occurred during processing. Please try again.", nil, err.Error())
+		response := response.ResponseMessage(503, "Failed to retrieve products", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
-	if len(ListOfAllProducts) == 0 {
-		response := response.ResponseMessage(404, "No products available for the specified page number.", nil, nil)
+	if len(products) == 0 {
+		response := response.ResponseMessage(404, "No products available.", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Successful", ListOfAllProducts, nil)
+	response := response.ResponseMessage(200, "Success", products, nil)
 	c.JSON(http.StatusOK, response)
 }
 
-// ViewProductItem is the handler function for viewing a product by ID.
+// ViewProductItem godoc
 //
 //	@Summary		View a product
 //	@Description	Retrieves details of a product with the specified ID.
@@ -566,35 +443,21 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 //	@Router			/product-item/{productID} [get]
 func (pd *ProductHandler) ViewProductItem(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input ",
-			Data:       nil,
-			Error:      nil,
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	product, err := pd.productUseCase.ViewProductById(productID)
-
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, response.Response{
-			StatusCode: 503,
-			Message:    "An error occurred during processing. Please try again.",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(503, "Failed", nil, err.Error())
+		c.JSON(http.StatusServiceUnavailable, response)
 		return
 	}
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Successful",
-		Data:       product,
-		Error:      nil,
-	})
+	response := response.ResponseMessage(200, "Success", product, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // ValidateRatingRequest is the handler function for validating a product rating request.
@@ -611,24 +474,22 @@ func (pd *ProductHandler) ViewProductItem(c *gin.Context) {
 //	@Router			/product/rating/{productID} [get]
 func (pd *ProductHandler) ValidateRatingRequest(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
-
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
-
 	}
+
 	userID, _ := helper.GetUserIdFromContext(c)
 	err = pd.productUseCase.ValidateProductRatingRequest(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(401, "Failed", nil, err.Error())
+		response := response.ResponseMessage(401, "Failed, user is unauthorized to perform a rating", nil, err.Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success,authorized user", nil, nil)
+	response := response.ResponseMessage(200, "Success, authorized user", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // AddProductRating is the handler function for adding a product rating.
@@ -652,11 +513,13 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	if body.Rating == 0 || body.Description == "" {
 		response := response.ResponseMessage(403, "Fields not be empty", nil, nil)
 		c.JSON(http.StatusForbidden, response)
 		return
 	}
+
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -666,12 +529,14 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 	}
 
 	userID, _ := helper.GetUserIdFromContext(c)
+
 	err = pd.productUseCase.InsertNewProductRating(userID, productID, body)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to add rating", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+
 	response := response.ResponseMessage(200, "Success ", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
@@ -691,54 +556,37 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 //	@Failure		403		{object}	response.Response
 //	@Router			/products/search [post]
 func (ph *ProductHandler) SearchProducts(c *gin.Context) {
-	// var body string
-	// if err := c.ShouldBindJSON(&body); err != nil {
-	// 	c.JSON(http.StatusBadRequest, response.Response{
-	// 		StatusCode: 400,
-	// 		Message:    "Invalid input. ",
-	// 		Data:       nil,
-	// 		Error:      err.Error(),
-	// 	})
-	// 	return
-	// }
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	search := c.Query("search")
 
 	Products, err := ph.productUseCase.SearchProducts(search, page, count)
 	if err != nil {
-		c.JSON(http.StatusForbidden, response.Response{
-			StatusCode: 403,
-			Message:    "Failed. ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(403, "Failed", nil, err.Error())
+		c.JSON(http.StatusForbidden, response)
 		return
 	}
 
 	if len(Products) == 0 {
-		response := response.ResponseMessage(404, "No data available.", nil, nil)
+		response := response.ResponseMessage(404, "No data available", nil, nil)
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Success. ",
-		Data:       Products,
-		Error:      nil,
-	})
 
+	response := response.ResponseMessage(200, "Success", Products, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // ListProductsByCategory lists products by category ID.
@@ -758,33 +606,31 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
-		return
-
 	}
+
 	Products, err := ph.productUseCase.GetProductsByCategory(categoryID, page, count)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
-
 	}
 
 	response := response.ResponseMessage(200, "Success", Products, nil)
 	c.JSON(http.StatusBadRequest, response)
-
 }

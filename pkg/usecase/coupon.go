@@ -89,9 +89,7 @@ func (cu *couponUseCase) UnBlockCoupon(couponID int) error {
 func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error {
 
 	Coupon, err := cu.couponRepo.FindCouponByCode(couponCode)
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("1::::", Coupon)
+
 	if err != nil {
 		return fmt.Errorf("Failed to find coupon  :%s", err)
 	}
@@ -101,9 +99,6 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 	}
 
 	TrackingDetails, err := cu.couponRepo.FindCouponTracking(userID, Coupon.ID)
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("2:::COUPON TRACKING:", TrackingDetails)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find coupon tracking details : %s", err)
@@ -115,9 +110,6 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 		return nil
 	}
 	PreviousCoupon, err := cu.couponRepo.CheckForAppliedCoupon(userID)
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("3::::", PreviousCoupon)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find  previous coupon details from coupon tracking ")
@@ -132,11 +124,6 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 		}
 	} else {
 		InsertedRecord, err := cu.couponRepo.InsertIntoCouponTracking(userID, Coupon.ID)
-		fmt.Println("")
-		fmt.Println("")
-		fmt.Println("4::::", InsertedRecord)
-		fmt.Println("")
-		fmt.Println("")
 		if err != nil {
 			return fmt.Errorf("Failed to insert tracking record : %s", err)
 		}
@@ -157,10 +144,9 @@ func (cu *couponUseCase) ListOutAvailableCouponsToUser(userID int) ([]response.C
 	return AllCoupons, nil
 
 }
+
 func (cu *couponUseCase) RemoveFromCouponTracking(couponID, userID int) error {
-	fmt.Println("COUPON AND USERID", couponID, userID)
 	RemovedCoupon, err := cu.couponRepo.RemoveCouponFromCouponTracking(couponID, userID)
-	fmt.Println("REMOVE COUPON TRACKING ", RemovedCoupon)
 	if err != nil {
 		return fmt.Errorf("Failed to remove coupon from coupon tracking :%s", err)
 	}
