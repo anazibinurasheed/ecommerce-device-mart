@@ -2,23 +2,20 @@ package handler
 
 import (
 	"fmt"
-	"strconv"
-	"time"
-
-	"net/http"
-
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 type AdminHandler struct {
 	adminUseCase services.AdminUseCase
 }
 
-// for wire
 func NewAdminHandler(useCase services.AdminUseCase) *AdminHandler {
 	return &AdminHandler{
 		adminUseCase: useCase}

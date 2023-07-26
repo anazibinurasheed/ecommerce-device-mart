@@ -7,7 +7,6 @@ import (
 )
 
 type OrderRepository interface {
-	// InsertShopOrder(userID int, addressID int, paymentMethodID int, orderTotal float32, orderStatusId int) (response.ShopOrder, error)
 	UserOrderHistory(userID, startIndex, endIndex int) ([]response.Orders, error)
 	GetStatusPending() (response.OrderStatus, error)
 	GetOrderStatuses() ([]response.OrderStatus, error)
@@ -24,4 +23,6 @@ type OrderRepository interface {
 	UpdateUserWallet(userID int, amount float32) (response.Wallet, error)
 	GetStatusReturned() (response.OrderStatus, error)
 	GetInvoiceData(orderID int) (response.Orders, error)
+	UpdateWalletTransactionHistory(updations response.WalletTransactionHistory) (response.WalletTransactionHistory, error)
+	GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error)
 }

@@ -36,15 +36,10 @@ func NewUserHandler(useCase services.UserUseCase) *UserHandler {
 //	@Failure		400		{object}	response.Response
 //	@Router			/sign-up [post]
 func (u *UserHandler) UserSignUp(c *gin.Context) {
-
 	var body request.SignUpData
 	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input. ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -66,15 +61,13 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 		return
 
 	}
+
 	body.Phone = Number
+
 	err = u.userUseCase.SignUp(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Failed",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -82,12 +75,8 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	delete(phoneDataMap, body.Id)
 	phoneDataMutex.Unlock()
 
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Success account created",
-		Data:       nil,
-		Error:      nil,
-	})
+	response := response.ResponseMessage(200, "Success, account created", nil, err.Error())
+	c.JSON(http.StatusOK, response)
 }
 
 // UserLogin godoc
@@ -106,35 +95,22 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 func (uh *UserHandler) UserLogin(c *gin.Context) {
 	var body request.LoginData
 	if err := c.ShouldBindJSON(&body); err != nil {
-
-		c.JSON(http.StatusBadRequest, response.Response{
-			StatusCode: 400,
-			Message:    "Invalid input. ",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	UserData, err := uh.userUseCase.ValidateUserLoginCredentials(body)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, response.Response{
-			StatusCode: 401,
-			Message:    "Failed.",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(401, "Failed", nil, err.Error())
+		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
-	fmt.Println("INSERTED USER ID ::::", UserData.Id)
+
 	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.Id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.Response{
-			StatusCode: 500,
-			Message:    "Failed to generate jwt token",
-			Data:       nil,
-			Error:      err.Error(),
-		})
+		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
@@ -150,137 +126,10 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(CoockieName, TokenString, MaxAge, "", "", false, true)
 	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
-	c.JSON(http.StatusOK, response.Response{
-		StatusCode: 200,
-		Message:    "Login success",
-		Data:       nil,
-		Error:      nil,
-	})
 
-	// phone := strconv.Itoa(UserData.Phone)
-
-	// err = helper.SendOtp(phone)
-
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, response.Response{
-	// 		StatusCode: 500,
-	// 		Message:    "Failed to send otp.",
-	// 		Data:       nil,
-	// 		Error:      err.Error(),
-	// 	})
-	// 	return
-
-	// }
-	// helper.SetToCookie(UserData.Id, "UserIdForCheckOtp", c)
-
-	// c.JSON(200, response.Response{
-	// 	StatusCode: 200,
-	// 	Message:    "Success otp sended.",
-	// 	Data:       nil,
-	// 	Error:      nil,
-	// })
+	response := response.ResponseMessage(200, "Login success", nil, nil)
+	c.JSON(http.StatusOK, response)
 }
-
-// // ValidateOtp godoc
-// //	@Summary		Validate user login  OTP
-// //	@Description	Validate OTP for user authentication.
-// //	@Tags			common
-// //	@Accept			json
-// //	@Produce		json
-// //	@Param			body	body		request.Otp	true	"One time OTP for user authentication"
-// //	@Success		200		{object}	response.Response
-// //	@Failure		400		{object}	response.Response
-// //	@Failure		401		{object}	response.Response
-// //	@Failure		500		{object}	response.Response
-// //	@Router			/login-otp [post]
-// func (uh *UserHandler) ValidateLoginOtp(c *gin.Context) {
-// 	var body request.Otp
-// 	if err := c.ShouldBindJSON(&body); err != nil {
-// 		c.JSON(http.StatusBadRequest, response.Response{
-// 			StatusCode: 400,
-// 			Message:    "Invalid input. ",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-// 		return
-// 	}
-// 	UserId, err := helper.GetFromCookie("UserIdForCheckOtp", c)
-// 	helper.DeleteCookie("UserIdForCheckOtp", c)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, response.Response{
-// 			StatusCode: 500,
-// 			Message:    "Failed to identify user.",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-
-// 		return
-// 	}
-
-// 	UserData, err := uh.userUseCase.FindUserById(UserId)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, response.Response{
-// 			StatusCode: 500,
-// 			Message:    "Failed find user to verify otp  ",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-// 		return
-
-// 	}
-// 	phone := strconv.Itoa(UserData.Phone)
-
-// 	status, err := helper.CheckOtp(phone, body.Otp)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, response.Response{
-// 			StatusCode: 500,
-// 			Message:    "Failed verify otp  ",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-// 		return
-
-// 	} else if status == "incorrect" {
-// 		c.JSON(http.StatusUnauthorized, response.Response{
-// 			StatusCode: 401,
-// 			Message:    "Incorrect otp",
-// 			Data:       nil,
-// 			Error:      nil,
-// 		})
-// 		return
-
-// 	}
-// 	TokenString, err := helper.GenerateJwtToken(UserData.Id)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, response.Response{
-// 			StatusCode: 500,
-// 			Message:    "Failed to generate jwt token",
-// 			Data:       nil,
-// 			Error:      err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	var CoockieName string
-
-// 	if UserData.IsAdmin == true {
-// 		CoockieName = "AdminAuthorization"
-// 	} else {
-// 		CoockieName = "UserAuthorization"
-// 	}
-
-// 	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
-// 	c.SetSameSite(http.SameSiteLaxMode)
-// 	c.SetCookie(CoockieName, TokenString, MaxAge, "", "", false, true)
-
-// 	c.JSON(http.StatusOK, response.Response{
-// 		StatusCode: 200,
-// 		Message:    "Login success",
-// 		Data:       nil,
-// 		Error:      nil,
-// 	})
-
-// }
 
 // GetAddAddressPage godoc
 //

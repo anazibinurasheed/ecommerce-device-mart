@@ -518,3 +518,7 @@ func (od *OrderHandler) WalletPayment(c *gin.Context) {
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (od *OrderHandler) WalletPaymentHistory(c *gin.Context) {
+
+}

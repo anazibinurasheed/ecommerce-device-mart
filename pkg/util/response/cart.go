@@ -14,12 +14,3 @@ type CartItems struct {
 	Discount float32 `json:"discount"`
 	Total    float32 `json:"total"`
 }
-
-// Items struct {
-// 	ID          uint   `json:"cart_id"`
-// 	ProductID   uint   `json:"product_id"`
-// 	ProductName string `json:"product_name"`
-// 	Price       int    `json:"price"`
-// 	Brand       string `json:"brand"`
-// 	Qty         int    `json:"qty"`
-// } `json:"items"`

@@ -17,7 +17,7 @@ import (
 func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s ", cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
 	db, dbErr := gorm.Open(postgres.Open(dsn), &gorm.Config{SkipDefaultTransaction: true})
-	db.Set("gorm.singular_table_names", true)
+	// db.Set("gorm.singular_table_names", true)
 
 	db.Debug() //to log the query
 
@@ -37,6 +37,7 @@ func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.CouponTracking{},
 		&domain.Wallet{},
 		&domain.Referral{},
+		&domain.WalletTransactionHistory{},
 	); err != nil {
 		log.Fatal("FAILED TO CONNECT WITH DATABASE ", err)
 		return nil, err
