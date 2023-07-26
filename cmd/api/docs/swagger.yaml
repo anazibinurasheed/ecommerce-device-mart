@@ -28,11 +28,11 @@ definitions:
     type: object
   request.Category:
     properties:
-      categoryname:
+      category_name:
         minLength: 2
         type: string
     required:
-    - categoryname
+    - category_name
     type: object
   request.ChangePassword:
     properties:
@@ -163,7 +163,7 @@ definitions:
       statuscode:
         type: integer
     type: object
-host: devicemart.store
+host: localhost:3000
 info:
   contact:
     email: anazibinurasheed@gmail.com

@@ -71,7 +71,7 @@ func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 
 }
 
-// MakePaymentRazorpay is the handler function for pay using razorpay.
+// MakePaymentRazorpay godoc
 //
 //	@Summary		Make payment razorpay
 //	@Description	Make payment using razorpay page .
@@ -84,7 +84,7 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 	userID, _ := helper.GetUserIdFromContext(c)
 	PaymentDetails, err := oh.orderUseCase.GetRazorPayDetails(userID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
