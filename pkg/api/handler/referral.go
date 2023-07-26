@@ -13,7 +13,7 @@ type RefferalHandler struct {
 	refferalUseCase services.RefferalUseCase
 }
 
-//for wire
+// for wire
 func NewRefferalHandler(useCase services.RefferalUseCase) *RefferalHandler {
 	return &RefferalHandler{
 		refferalUseCase: useCase,
@@ -21,6 +21,7 @@ func NewRefferalHandler(useCase services.RefferalUseCase) *RefferalHandler {
 }
 
 // GetRefferalCode godoc
+//
 //	@Summary		Get the referral code for the current user
 //	@Description	Get the referral code of the currently logged-in user
 //	@Tags			referral
@@ -43,6 +44,7 @@ func (rh *RefferalHandler) GetRefferalCode(c *gin.Context) {
 }
 
 // ApplyRefferalCode godoc
+//
 //	@Summary		Apply referral code for referral bonus.
 //	@Description	Apply a  referral code  to get wallet money,
 //	@Tags			referral
