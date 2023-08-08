@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	SaveUserOnDatabase(user request.SignUpData) error
+	SaveUserOnDatabase(user request.SignUpData) (response.UserData, error)
 	FindUserByPhone(phone int) (response.UserData, error)
 	FindUserByEmail(email string) (response.UserData, error)
 	FindUserById(id int) (response.UserData, error)

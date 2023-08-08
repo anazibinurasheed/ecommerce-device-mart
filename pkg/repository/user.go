@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"time"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -42,19 +41,13 @@ func (ud *userDatabase) FindUserById(id int) (response.UserData, error) {
 	return UserData, err
 }
 
-// the error is violating unique constraint of email
-func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) error {
-	query := `INSERT INTO users (user_name,  email, phone, password,created_at) VALUES ($1,$2,$3,$4,$5) returning *`
-	CreatedAt := time.Now()
-	var UserData response.UserData
-	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password, CreatedAt).Scan(&UserData).Error
-	fmt.Println(UserData)
+func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) (response.UserData, error) {
+	query := `INSERT INTO users (user_name,  email, phone, password,created_at) VALUES ($1,$2,$3,$4) RETURNING id,user_name,email,phone;`
+	var userData response.UserData
+	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password).Scan(&userData).Error
+	fmt.Println(userData)
 
-	if err != nil {
-		return fmt.Errorf("failed to save user on database %s", user.UserName)
-	}
-
-	return nil
+	return userData, err
 }
 
 func (ud *userDatabase) ReadCategory() ([]response.Category, error) {

@@ -3,6 +3,7 @@ module github.com/anazibinurasheed/project-device-mart
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.5.0
@@ -14,6 +15,7 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/twilio/twilio-go v1.7.2
 	golang.org/x/crypto v0.10.0
+	gopkg.in/go-playground/assert.v1 v1.2.1
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )
