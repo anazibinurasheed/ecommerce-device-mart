@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-//it is the tables in the database
+// it is the tables in the database
 type User struct {
 	ID        uint   `gorm:"primaryKey;unique;autoIncrement;not null"`
 	UserName  string `gorm:"not null" binding:"required,min=3,max=15"`

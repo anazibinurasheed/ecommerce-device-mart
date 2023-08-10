@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//user service is collection of method signature in the usecase package .
-//usecase have a struct that struct have repository/interfaces.UserRespository type variable ,with including that methods we
-//created a new method , that method signature will hold in this  UserService interface .
+// user service is collection of method signature in the usecase package .
+// usecase have a struct that struct have repository/interfaces.UserRespository type variable ,with including that methods we
+// created a new method , that method signature will hold in this  UserService interface .
 type UserUseCase interface {
 	SignUp(user request.SignUpData) error
 	ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error)

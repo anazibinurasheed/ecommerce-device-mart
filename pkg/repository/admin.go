@@ -23,9 +23,9 @@ func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
 
 }
 
-//from .env
-//error not setting as admin
-//not working properly
+// from .env
+// error not setting as admin
+// not working properly
 func (ud *adminDatabase) SaveAdminOnDatabase(admin request.SignUpData) (response.UserData, error) {
 	query := `INSERT INTO users (user_name,  email, phone, password,created_at,is_admin) VALUES ($1,$2,$3,$4,$5,$6) RETURNING * ;`
 	CreatedAt := time.Now()

@@ -26,20 +26,19 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 
 func (u *userUseCase) SignUp(user request.SignUpData) error {
 
-	UserData, err := u.userRepo.FindUserByPhone(user.Phone)
+	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
 		return err
 	}
-	fmt.Println("SIGNUP :::", user.Phone)
-	fmt.Println("USER DATA:::", UserData)
-	if UserData.Id != 0 {
+
+	if userData.Id != 0 {
 		return errors.New("User already exist with this phone number")
 	}
-	UserData, err = u.userRepo.FindUserByEmail(user.Email)
+	userData, err = u.userRepo.FindUserByEmail(user.Email)
 	if err != nil {
 		return err
 	}
-	if UserData.Id != 0 {
+	if userData.Id != 0 {
 		return errors.New("User already exist with this email address")
 	}
 	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
@@ -48,7 +47,7 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 		return errors.New("Unable to process the request ")
 	}
 	user.Password = string(HashedPassword)
-	if err := u.userRepo.SaveUserOnDatabase(user); err != nil {
+	if _, err := u.userRepo.SaveUserOnDatabase(user); err != nil {
 		log.Println("FAILED TO SAVE USER ON DATABASE")
 		return err
 	}
@@ -98,7 +97,7 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 		return nil, err
 	}
 	if len(ListOfStates) == 0 {
-		return nil, errors.New("No states found ")
+		return nil, errors.New("No states found")
 	}
 
 	return ListOfStates, nil

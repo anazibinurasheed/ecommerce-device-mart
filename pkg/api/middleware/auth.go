@@ -45,7 +45,7 @@ func AuthChangePass(c *gin.Context) {
 
 // }
 
-//for admin routes
+// for admin routes
 func AdminAuthJWT(c *gin.Context) {
 	if _, err := c.Cookie("AdminAuthorization"); err == nil {
 		AuthenticateAdminJwt(c)

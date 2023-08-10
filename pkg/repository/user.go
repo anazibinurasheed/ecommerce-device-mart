@@ -23,6 +23,7 @@ func (ud *userDatabase) FindUserByPhone(phone int) (response.UserData, error) {
 	var UserData response.UserData
 	query := `SELECT * FROM users WHERE  phone = $1`
 	err := ud.DB.Raw(query, phone).Scan(&UserData).Error
+
 	return UserData, err
 }
 
@@ -45,16 +46,13 @@ func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) (response.Us
 	query := `INSERT INTO users (user_name,  email, phone, password,created_at) VALUES ($1,$2,$3,$4) RETURNING id,user_name,email,phone;`
 	var userData response.UserData
 	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password).Scan(&userData).Error
-	fmt.Println(userData)
 
 	return userData, err
 }
 
 func (ud *userDatabase) ReadCategory() ([]response.Category, error) {
 	var ListOfAllCategories = make([]response.Category, 0)
-
 	query := `SELECT * FROM Categories WHERE Is_blocked = false  ORDER BY Category_Name ; `
-
 	err := ud.DB.Raw(query).Scan(&ListOfAllCategories).Error
 	return ListOfAllCategories, err
 }
@@ -62,7 +60,6 @@ func (ud *userDatabase) ReadCategory() ([]response.Category, error) {
 func (ud *userDatabase) GetListOfStates() ([]response.States, error) {
 	var ListOfStates = make([]response.States, 0)
 	query := `SELECT * FROM States`
-
 	err := ud.DB.Raw(query).Scan(&ListOfStates).Error
 	return ListOfStates, err
 }

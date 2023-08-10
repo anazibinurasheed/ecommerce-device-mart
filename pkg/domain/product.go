@@ -1,6 +1,6 @@
 package domain
 
-//gorm is creating tables with underscore when the capital encounter .
+// gorm is creating tables with underscore when the capital encounter .
 type Category struct {
 	ID            uint   ` gorm:"primaryKey;AutoIncrement;unique"`
 	Category_Name string ` gorm:"unique;not null"`

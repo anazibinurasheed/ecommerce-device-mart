@@ -22,12 +22,12 @@ func NewCartUseCase(cartUseCase interfaces.CartRepository, coupenUseCase interfa
 }
 
 func (cu *CartUseCase) AddToCart(userID int, productID int) error {
-	CartItem, err := cu.cartRepo.GetCartItem(userID, productID)
+	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
 	fmt.Println("user id :", userID)
 	if err != nil {
 		return fmt.Errorf("Failed to add to cart : %s", err)
 	}
-	if CartItem.ID != 0 {
+	if cartItem.ID != 0 {
 		err = cu.IncrementQuantity(userID, productID)
 		if err != nil {
 			return fmt.Errorf("Failed %s", err)
@@ -35,28 +35,32 @@ func (cu *CartUseCase) AddToCart(userID int, productID int) error {
 		return nil
 	}
 
-	CartItem, err = cu.cartRepo.AddToCart(userID, productID)
-	if err != nil || CartItem.ID == 0 {
+	cartItem, err = cu.cartRepo.AddToCart(userID, productID)
+	if err != nil || cartItem.ID == 0 {
 		return fmt.Errorf("Add to cart failed:%s", err)
 	}
 	return nil
 }
-func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
-	CartInfo, err := cu.cartRepo.ViewCart(userID)
 
-	var CartItems response.CartItems
-	for _, item := range CartInfo {
-		CartItems.Cart = append(CartItems.Cart, item)
-		CartItems.Total += float32(item.Qty) * float32(item.Price)
+func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
+	cart, err := cu.cartRepo.ViewCart(userID)
+
+	var cartItems response.CartItems
+
+	for _, item := range cart {
+		cartItems.Cart = append(cartItems.Cart, item)
+		cartItems.Total += float32(item.Qty) * float32(item.Price)
 	}
 
-	CouponDetails, err := cu.coupenRepo.CheckForAppliedCoupon(userID)
+	couponDetails, err := cu.coupenRepo.CheckForAppliedCoupon(userID)
 	if err != nil {
 		return response.CartItems{}, fmt.Errorf("Failed to fetch coupon details")
 	}
-	var DiscountPrize float64
-	if CouponDetails.ID != 0 && CouponDetails.CouponID != 0 {
-		Coupon, err := cu.coupenRepo.FindCouponById(CouponDetails.CouponID)
+
+	var discountPrize float64
+
+	if couponDetails.ID != 0 && couponDetails.CouponID != 0 {
+		Coupon, err := cu.coupenRepo.FindCouponById(couponDetails.CouponID)
 		fmt.Println(Coupon)
 		if err != nil {
 			return response.CartItems{}, fmt.Errorf("Failed to find coupon :%s", err)
@@ -66,19 +70,20 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 		if !helper.IsCouponValid(Coupon.ValidTill) {
 			return response.CartItems{}, fmt.Errorf("Expired coupon")
 		}
-		if CartItems.Total > float32(Coupon.MinOrderValue) {
-			DiscountPrize = (float64(CartItems.Total) * Coupon.DiscountPercent) / 100
-			if DiscountPrize > Coupon.DiscountMaxAmount {
-				DiscountPrize = Coupon.DiscountMaxAmount
+		if cartItems.Total > float32(Coupon.MinOrderValue) {
+			discountPrize = (float64(cartItems.Total) * Coupon.DiscountPercent) / 100
+			if discountPrize > Coupon.DiscountMaxAmount {
+				discountPrize = Coupon.DiscountMaxAmount
 			}
 		}
 	}
-	CartItems.Discount = float32(DiscountPrize)
-	CartItems.Total = CartItems.Total - float32(DiscountPrize)
 
-	fmt.Println("CART ITEMS PRIZES :::", CartItems.Discount, CartItems.Total)
-	return CartItems, err
+	cartItems.Discount = float32(discountPrize)
+	cartItems.Total = cartItems.Total - float32(discountPrize)
 
+	fmt.Println("CART ITEMS PRIZES :::", cartItems.Discount, cartItems.Total)
+
+	return cartItems, err
 }
 
 func (cu *CartUseCase) RemoveFromCart(userID int, productID int) error {

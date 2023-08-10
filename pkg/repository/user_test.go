@@ -61,6 +61,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+
 		t.Run(tc.name, func(t *testing.T) {
 			mockDB, mockSQL, err := sqlmock.New()
 			if err != nil {

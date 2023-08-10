@@ -132,13 +132,13 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-//	@Summary		User Logout
-//	@Description	Logs out user and remove cookie from browser.
-//	@Tags			common
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	response.Response{}
-//	@Router			/logout [post]
+// @Summary		User Logout
+// @Description	Logs out user and remove cookie from browser.
+// @Tags			common
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	response.Response{}
+// @Router			/logout [post]
 func (uh *CommonHandler) Logout(c *gin.Context) {
 	c.SetCookie("AdminAuthorization", "", -1, "", "", false, true)
 	c.SetCookie("SudoAdminAuthorization", "", -1, "", "", false, true)

@@ -22,6 +22,9 @@ run: ## Start application
 test: ## Run tests
 	$(GOCMD) test ./... -cover
 
+# mockgen: ## Generate mock repository and usecase functions 
+# mockgen -source=pkg/repository/interface/user.go -destination=pkg/mock/repoMock/user_repo.go -package=mock
+
 test-coverage: ## Run tests and generate coverage file
 	$(GOCMD) test ./... -coverprofile=$(CODE_COVERAGE).out
 	$(GOCMD) tool cover -html=$(CODE_COVERAGE).out
