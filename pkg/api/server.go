@@ -51,7 +51,6 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		// user.GET("/refresh_token", commonHandler.RefreshToken)
 		user.POST("/logout", commonHandler.Logout)
 		user.POST("/webhook", orderHandler.WebhookHandler)
-
 		//changed route path //verirify login otp in this route
 		//it will send otp if the credentials are verified
 		user.Use(middleware.AuthenticateUserJwt)
