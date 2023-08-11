@@ -26,3 +26,15 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    -name: Deploy to EC2 instance
+     uses: appleboy/ssh-action@master
+     with:
+      host: ${{secrets.PUBLIC_IP}}
+      username: ubuntu
+      key: ${{secrets.SSH_KEY}}
+      script: |
+      cd mainDevicemart/devicemart
+      git pull
+      go build ./cmd/api
+      sudo systemctl restart mainDevicemart.service
