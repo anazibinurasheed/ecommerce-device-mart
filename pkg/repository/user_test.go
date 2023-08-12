@@ -15,11 +15,11 @@ import (
 
 func TestSaveUserOnDatabase(t *testing.T) {
 	testCases := []struct {
-		name       string
-		input      request.SignUpData
-		beforeTest func(sqlmock.Sqlmock)
-		want       response.UserData
-		wantErr    error
+		name        string
+		input       request.SignUpData
+		beforeTest  func(sqlmock.Sqlmock)
+		want        response.UserData
+		expectedErr error
 	}{
 		{
 			name: "success sign up",
@@ -40,7 +40,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 				Email:    "anazibinurasheed@gmail.com",
 				Phone:    8590138151,
 			},
-			wantErr: nil,
+			expectedErr: nil,
 		},
 
 		{
@@ -55,13 +55,12 @@ func TestSaveUserOnDatabase(t *testing.T) {
 				expectedQuery := `^INSERT INTO users (.+)$`
 				mockSQL.ExpectQuery(expectedQuery).WithArgs("Anas", "anazibinurasheed@gmail.com", 8590138151, "password123").WillReturnError(fmt.Errorf("user already exist"))
 			},
-			want:    response.UserData{},
-			wantErr: fmt.Errorf("user already exist"),
+			want:        response.UserData{},
+			expectedErr: fmt.Errorf("user already exist"),
 		},
 	}
 
 	for _, tc := range testCases {
-
 		t.Run(tc.name, func(t *testing.T) {
 			mockDB, mockSQL, err := sqlmock.New()
 			if err != nil {
@@ -85,7 +84,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 
 			got, err := ud.SaveUserOnDatabase(tc.input)
 
-			assert.Equal(t, tc.wantErr, err)
+			assert.Equal(t, tc.expectedErr, err)
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("Expected UserData: %v, but got: %v", tc.want, got)
 			}

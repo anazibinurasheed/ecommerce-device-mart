@@ -2,13 +2,14 @@
 // Source: pkg/repository/interface/user.go
 
 // Package mock is a generated GoMock package.
-package mockRepo
+package mock
 
 import (
+	reflect "reflect"
+
 	request "github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	response "github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // MockUserRepository is a mock of UserRepository interface.

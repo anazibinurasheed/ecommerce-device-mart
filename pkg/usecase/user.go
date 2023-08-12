@@ -25,27 +25,28 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 }
 
 func (u *userUseCase) SignUp(user request.SignUpData) error {
-
 	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
 		return err
 	}
-
 	if userData.Id != 0 {
-		return errors.New("User already exist with this phone number")
+		return fmt.Errorf("user already exist with this phone number")
 	}
+
 	userData, err = u.userRepo.FindUserByEmail(user.Email)
 	if err != nil {
 		return err
 	}
 	if userData.Id != 0 {
-		return errors.New("User already exist with this email address")
+		return fmt.Errorf("user already exist with this email address")
 	}
+
 	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		log.Println("FAILED TO HASH PASSWORD", err)
-		return errors.New("Unable to process the request ")
+		return fmt.Errorf("failed to generate hash from password")
 	}
+
 	user.Password = string(HashedPassword)
 	if _, err := u.userRepo.SaveUserOnDatabase(user); err != nil {
 		log.Println("FAILED TO SAVE USER ON DATABASE")
@@ -60,12 +61,12 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 	if err != nil {
 		return response.UserData{}, err
 	} else if UserData.Id == 0 {
-		return response.UserData{}, errors.New("user dont have an account.")
+		return response.UserData{}, errors.New("user dont have an account")
 	} else if UserData.IsBlocked {
-		return response.UserData{}, errors.New("user have been blocked.")
+		return response.UserData{}, errors.New("user have been blocked")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(user.Password)); err != nil {
-		return response.UserData{}, errors.New("Incorrect password.")
+		return response.UserData{}, errors.New("incorrect password")
 	}
 
 	return UserData, nil
@@ -97,7 +98,7 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 		return nil, err
 	}
 	if len(ListOfStates) == 0 {
-		return nil, errors.New("No states found")
+		return nil, fmt.Errorf("no states found")
 	}
 
 	return ListOfStates, nil
