@@ -27,7 +27,7 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 func (u *userUseCase) SignUp(user request.SignUpData) error {
 	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find user by phone :%s", err)
 	}
 	if userData.Id != 0 {
 		return fmt.Errorf("user already exist with this phone number")
@@ -35,22 +35,21 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 
 	userData, err = u.userRepo.FindUserByEmail(user.Email)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find user by email :%s", err)
 	}
 	if userData.Id != 0 {
 		return fmt.Errorf("user already exist with this email address")
 	}
 
-	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	if err != nil {
-		log.Println("FAILED TO HASH PASSWORD", err)
-		return fmt.Errorf("failed to generate hash from password")
-	}
+	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to generate hash from password :%s", err)
+	// }
 
-	user.Password = string(HashedPassword)
+	// user.Password = string(hashedPassword)
+
 	if _, err := u.userRepo.SaveUserOnDatabase(user); err != nil {
-		log.Println("FAILED TO SAVE USER ON DATABASE")
-		return err
+		return fmt.Errorf("failed to save user on db, user sign up failed :%s", err)
 	}
 
 	return nil
@@ -104,31 +103,31 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 	return ListOfStates, nil
 }
 
-func (u *userUseCase) AddNewAddress(userId int, address request.Address) error {
-	CreatedAddress, err := u.userRepo.AddAdressToDatabase(userId, address)
+func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
+	createdAddress, err := u.userRepo.AddAdressToDatabase(userID, address)
+	if err != nil {
+		return fmt.Errorf("failed to add address to db :%s", err)
+	}
 
+	if createdAddress.ID == 0 {
+		return fmt.Errorf("failed to verify created address")
+
+	}
+
+	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
 	if err != nil {
 		return err
 	}
 
-	if CreatedAddress.ID == 0 {
-		return errors.New("Failed to create new address")
+	if defaultAddress.ID == 0 {
 
-	}
-
-	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userId)
-	if err != nil {
-		return err
-	}
-
-	if DefaultAddress.ID == 0 {
-		SetDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(CreatedAddress.ID), userId)
+		setDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(createdAddress.ID), userID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to set default address :%s", err)
 		}
 
-		if SetDefaultAddress.ID == 0 {
-			return errors.New("Failed to set default address as new address ")
+		if setDefaultAddress.ID == 0 {
+			return fmt.Errorf("failed to set default address as new address")
 		}
 	}
 	return nil
@@ -138,28 +137,16 @@ func (u *userUseCase) FindDefaultAddress(userId int) (response.Address, error) {
 	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userId)
 
 	if err != nil {
-		return response.Address{}, err
+		return response.Address{}, fmt.Errorf("failed to find default address :%s ", err)
 	}
 
 	if DefaultAddress.ID == 0 {
-		return response.Address{}, errors.New("Failed to find default address")
+		return response.Address{}, fmt.Errorf("failed to verify retrieved default address")
 	}
 	return DefaultAddress, nil
 }
 
-// func (u *userUseCase) GetAllUserAddresses(userId int) ([]response.Address, error) {
-// 	DefaultAddress, err := u.userRepository.GetAllUserAddresses(userId)
-// 	//double check
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return DefaultAddress, nil
-
-// }
-
 func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, userID int) error {
-
 	UpdatedAddress, err := u.userRepo.UpdateAddress(address, addressID, userID)
 
 	if err != nil {
@@ -237,11 +224,8 @@ func (u *userUseCase) GetProfile(userId int) (response.Profile, error) {
 	if err != nil {
 		return response.Profile{}, fmt.Errorf("Failed to find user addresses:  %s", err)
 	}
-	for key, val := range profile.Addresses {
-		fmt.Println("UserAddress ", key, "   :", val)
-	}
-	return profile, nil
 
+	return profile, nil
 }
 
 // profile

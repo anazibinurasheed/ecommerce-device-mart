@@ -25,23 +25,23 @@ func TestSignup(t *testing.T) {
 	}{
 		{name: "success sign up",
 			input: request.SignUpData{
-				UserName: "Anas",
+				UserName: "Anaz",
 				Email:    "anazibinurasheed@gmail.com",
 				Phone:    8590138151,
-				Password: gomock.Any().String(),
+				Password: "123456789",
 			},
 
 			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
 				userRepo.EXPECT().FindUserByPhone(8590138151).Return(response.UserData{}, nil)
 				userRepo.EXPECT().FindUserByEmail("anazibinurasheed@gmail.com").Return(response.UserData{}, nil)
 				userRepo.EXPECT().SaveUserOnDatabase(request.SignUpData{
-					UserName: "Anas",
+					UserName: "Anaz",
 					Email:    "anazibinurasheed@gmail.com",
 					Phone:    8590138151,
-					Password: gomock.Any().String(),
+					Password: "123456789",
 				}).Return(response.UserData{
 					Id:       1,
-					UserName: "Anas",
+					UserName: "Anaz",
 					Email:    "anazibinurasheed@gmail.com",
 					Phone:    8590138151,
 				}, nil)

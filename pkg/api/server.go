@@ -42,7 +42,6 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 	user := Engine.Group("/api/v1")
 	{
-		user.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
 
 		user.POST("/send-otp", commonHandler.SendOtpToPhone) //sign up otp
 		user.POST("/verify-otp", commonHandler.OtpValidater) // otp for verify signup phone number
@@ -51,6 +50,8 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		// user.GET("/refresh_token", commonHandler.RefreshToken)
 		user.POST("/logout", commonHandler.Logout)
 		user.POST("/webhook", orderHandler.WebhookHandler)
+
+		user.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
 		//changed route path //verirify login otp in this route
 		//it will send otp if the credentials are verified
 		user.Use(middleware.AuthenticateUserJwt)
@@ -126,6 +127,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			}
 
 		}
+
 	}
 	//
 	admin := Engine.Group("api/v1/admin")

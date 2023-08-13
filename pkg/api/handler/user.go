@@ -75,7 +75,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	delete(phoneDataMap, body.Id)
 	phoneDataMutex.Unlock()
 
-	response := response.ResponseMessage(200, "Success, account created", nil, err.Error())
+	response := response.ResponseMessage(200, "Success, account created", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
