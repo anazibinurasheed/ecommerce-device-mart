@@ -87,10 +87,10 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.LoginData	true	"User login data"
-//	@Success		200		{object}	response.Response{}
-//	@Failure		400		{object}	response.Response{}
-//	@Failure		401		{object}	response.Response{}
-//	@Failure		500		{object}	response.Response{}
+//	@Success		200		{object}	response.Response
+//	@Failure		400		{object}	response.Response
+//	@Failure		401		{object}	response.Response
+//	@Failure		500		{object}	response.Response
 //	@Router			/login [post]
 func (uh *UserHandler) UserLogin(c *gin.Context) {
 	var body request.LoginData
@@ -100,7 +100,8 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	UserData, err := uh.userUseCase.ValidateUserLoginCredentials(body)
+	UserData, err := uh.userUseCase.
+		ValidateUserLoginCredentials(body)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed", nil, err.Error())
 		c.JSON(http.StatusUnauthorized, response)

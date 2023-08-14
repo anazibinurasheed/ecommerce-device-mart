@@ -56,19 +56,21 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 }
 
 func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error) {
-	UserData, err := u.userRepo.FindUserByPhone(user.Phone)
+	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
 		return response.UserData{}, err
-	} else if UserData.Id == 0 {
+	} else if userData.Id == 0 {
 		return response.UserData{}, errors.New("user dont have an account")
-	} else if UserData.IsBlocked {
+	} else if userData.IsBlocked {
 		return response.UserData{}, errors.New("user have been blocked")
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(user.Password)); err != nil {
+
+	if err := bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(user.Password)); err != nil {
 		return response.UserData{}, errors.New("incorrect password")
 	}
 
-	return UserData, nil
+	userData.Password = ""
+	return userData, nil
 
 }
 
@@ -83,7 +85,6 @@ func (u *userUseCase) FindUserById(id int) (response.UserData, error) {
 func (u *userUseCase) ReadAllCategories() ([]response.Category, error) {
 	ListOfAllCategories, err := u.userRepo.ReadCategory()
 	if err != nil {
-		log.Println("  FAILED WHILE READING ALL CATEGORIES ")
 		return nil, err
 	}
 	return ListOfAllCategories, nil
@@ -153,7 +154,7 @@ func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, 
 		return err
 	}
 	if UpdatedAddress.ID == 0 {
-		return errors.New("Failed to update address")
+		return errors.New("failed to update address")
 	}
 	return nil
 
@@ -250,13 +251,6 @@ func (u *userUseCase) ForgotPassword(userid int, c *gin.Context) error {
 
 func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userId int, c *gin.Context) error {
 
-	// _, err1 := c.Cookie("PasswordChange")
-	// if err1 != nil {
-
-	// 	return errors.New("Unauthorized api call")
-
-	// }
-
 	if password.NewPassword != password.ReNewPassword {
 		return errors.New("Password is not matching")
 	}
@@ -271,7 +265,6 @@ func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userId
 	if err != nil {
 		return fmt.Errorf("Failed to change password %s", err)
 	}
-	// helper.DeleteCookie("PasswordChange", c)
 	return nil
 }
 
@@ -294,8 +287,9 @@ func (u *userUseCase) UpdateUserName(username string, userID int) error {
 
 		return fmt.Errorf("Failed to update username : %s", err)
 	}
+
 	if UserData.UserName != username {
-		return fmt.Errorf("Failed to update username ")
+		return fmt.Errorf("Failed to update username")
 	}
 	return nil
 }

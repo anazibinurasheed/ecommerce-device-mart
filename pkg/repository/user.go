@@ -20,11 +20,11 @@ func NewUserRepository(DB *gorm.DB) interfaces.UserRepository {
 }
 
 func (ud *userDatabase) FindUserByPhone(phone int) (response.UserData, error) {
-	var UserData response.UserData
+	var userData response.UserData
 	query := `SELECT * FROM users WHERE  phone = $1`
-	err := ud.DB.Raw(query, phone).Scan(&UserData).Error
+	err := ud.DB.Raw(query, phone).Scan(&userData).Error
 
-	return UserData, err
+	return userData, err
 }
 
 func (ud *userDatabase) FindUserByEmail(email string) (response.UserData, error) {
@@ -34,6 +34,7 @@ func (ud *userDatabase) FindUserByEmail(email string) (response.UserData, error)
 
 	return UserData, err
 }
+
 func (ud *userDatabase) FindUserById(id int) (response.UserData, error) {
 	var UserData response.UserData
 	query := `SELECT * FROM users WHERE  ID= $1`
@@ -52,7 +53,7 @@ func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) (response.Us
 
 func (ud *userDatabase) ReadCategory() ([]response.Category, error) {
 	var ListOfAllCategories = make([]response.Category, 0)
-	query := `SELECT * FROM Categories WHERE Is_blocked = false  ORDER BY Category_Name ; `
+	query := `SELECT * FROM Categories WHERE Is_blocked = false  ORDER BY Category_Name;`
 	err := ud.DB.Raw(query).Scan(&ListOfAllCategories).Error
 	return ListOfAllCategories, err
 }
@@ -76,6 +77,7 @@ func (ud *userDatabase) AddAdressToDatabase(userId int, address request.Address)
 	return NewAddress, err
 
 }
+
 func (ud *userDatabase) FindDefaultAddressById(userId int) (response.Address, error) {
 	var DefaultAdrress response.Address
 	query := `SELECT * FROM Addresses WHERE is_default = true AND user_id = $1 FETCH FIRST 1 ROW ONLY ; `
@@ -105,7 +107,6 @@ func (ud *userDatabase) GetAllUserAddresses(userID int) ([]response.Address, err
 }
 
 func (ud *userDatabase) UpdateAddress(address request.Address, addressID int, userID int) (response.Address, error) {
-
 	var UpdatedAddress response.Address
 
 	query := `UPDATE addresses SET name = $1 ,phone_number = $2 , pincode = $3 ,locality = $4 , address_line = $5 ,district = $6 , state_id = $7 , landmark = $8 , alternative_phone = $9 WHERE id = $10 AND user_id = $11 RETURNING *;`

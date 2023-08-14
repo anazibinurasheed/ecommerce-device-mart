@@ -2,10 +2,10 @@ package repository
 
 import (
 	"fmt"
-	"reflect"
+	"log"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"gopkg.in/go-playground/assert.v1"
@@ -52,7 +52,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 				Password: "password123",
 			},
 			beforeTest: func(mockSQL sqlmock.Sqlmock) {
-				expectedQuery := `^INSERT INTO users (.+)$`
+				expectedQuery := `^INSERT INTO users(.+)$`
 				mockSQL.ExpectQuery(expectedQuery).WithArgs("Anas", "anazibinurasheed@gmail.com", 8590138151, "password123").WillReturnError(fmt.Errorf("user already exist"))
 			},
 			want:        response.UserData{},
@@ -62,9 +62,10 @@ func TestSaveUserOnDatabase(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// t.Parallel()
 			mockDB, mockSQL, err := sqlmock.New()
 			if err != nil {
-				t.Fatalf("Failed to create mock database: %v", err)
+				t.Fatalf("failed to create mock database: %v", err)
 			}
 			defer mockDB.Close()
 
@@ -73,22 +74,65 @@ func TestSaveUserOnDatabase(t *testing.T) {
 			}), &gorm.Config{})
 
 			if err != nil {
-				t.Fatalf("Failed to create GORM database: %v", err)
+				t.Fatalf("failed to create GORM database: %v", err)
 			}
 
-			if tc.beforeTest != nil {
-				tc.beforeTest(mockSQL)
-			}
+			tc.beforeTest(mockSQL)
 
 			ud := NewUserRepository(gormDB)
 
 			got, err := ud.SaveUserOnDatabase(tc.input)
 
 			assert.Equal(t, tc.expectedErr, err)
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Errorf("Expected UserData: %v, but got: %v", tc.want, got)
+			assert.Equal(t, got, tc.want)
+			// if !reflect.DeepEqual(got, tc.want) {
+			// 	t.Errorf("Expected UserData: %v, but got: %v", tc.want, got)
+			// }
+
+		})
+	}
+}
+
+func TestFindUserByEmail(t *testing.T) {
+	testCases := []struct {
+		name        string
+		input       string
+		beforeTest  func(sqlmock.Sqlmock)
+		want        response.UserData
+		expectedErr error
+	}{{
+		name:  "finding user by email",
+		input: "anazibinurasheed@gmail.com",
+		beforeTest: func(mockSQL sqlmock.Sqlmock) {
+			expectedQuery := `SELECT \* FROM users WHERE  email \= \$1`
+			mockSQL.ExpectQuery(expectedQuery).WithArgs("anazibinurasheed@gmail.com").WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "email", "phone"}).AddRow(1, "anaz", "anazibinurasheed@gmail.com", 8590138151))
+		},
+
+		want: response.UserData{
+			Id:       1,
+			UserName: "anaz",
+			Email:    "anazibinurasheed@gmail.com",
+			Phone:    8590138151,
+		},
+		expectedErr: nil,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDB, mockSQL, err := sqlmock.New()
+			if err != nil {
+				log.Fatalf("failed to initialize mockDB connection %v", err)
 			}
 
+			gormDB, _ := gorm.Open(postgres.New(postgres.Config{
+				Conn: mockDB,
+			}), &gorm.Config{})
+
+			tc.beforeTest(mockSQL)
+
+			ud := NewUserRepository(gormDB)
+			got, err := ud.FindUserByEmail(tc.input)
+			assert.Equal(t, tc.expectedErr, err)
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
