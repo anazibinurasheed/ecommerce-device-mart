@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetUserIdFromContext(c *gin.Context) (int, error) {
+func GetUserIDFromContext(c *gin.Context) (int, error) {
 	userIdStr := c.GetString("userId")
 	userId, err := strconv.Atoi(userIdStr)
 

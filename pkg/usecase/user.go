@@ -27,18 +27,18 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 func (u *userUseCase) SignUp(user request.SignUpData) error {
 	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
-		return fmt.Errorf("failed to find user by phone :%s", err)
+		return fmt.Errorf("Failed to find user by phone :%s", err)
 	}
 	if userData.Id != 0 {
-		return fmt.Errorf("user already exist with this phone number")
+		return fmt.Errorf("User already exist with this phone number")
 	}
 
 	userData, err = u.userRepo.FindUserByEmail(user.Email)
 	if err != nil {
-		return fmt.Errorf("failed to find user by email :%s", err)
+		return fmt.Errorf("Failed to find user by email :%s", err)
 	}
 	if userData.Id != 0 {
-		return fmt.Errorf("user already exist with this email address")
+		return fmt.Errorf("User already exist with this email address")
 	}
 
 	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
@@ -49,7 +49,7 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 	// user.Password = string(hashedPassword)
 
 	if _, err := u.userRepo.SaveUserOnDatabase(user); err != nil {
-		return fmt.Errorf("failed to save user on db, user sign up failed :%s", err)
+		return fmt.Errorf("Failed to save user on db, user sign up failed :%s", err)
 	}
 
 	return nil
@@ -60,9 +60,9 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 	if err != nil {
 		return response.UserData{}, err
 	} else if userData.Id == 0 {
-		return response.UserData{}, errors.New("user dont have an account")
+		return response.UserData{}, errors.New("User dont have an account")
 	} else if userData.IsBlocked {
-		return response.UserData{}, errors.New("user have been blocked")
+		return response.UserData{}, errors.New("User have been blocked")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(user.Password)); err != nil {
@@ -98,7 +98,7 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 		return nil, err
 	}
 	if len(ListOfStates) == 0 {
-		return nil, fmt.Errorf("no states found")
+		return nil, fmt.Errorf("No states found")
 	}
 
 	return ListOfStates, nil
@@ -107,11 +107,11 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 	createdAddress, err := u.userRepo.AddAdressToDatabase(userID, address)
 	if err != nil {
-		return fmt.Errorf("failed to add address to db :%s", err)
+		return fmt.Errorf("Failed to add address to db :%s", err)
 	}
 
 	if createdAddress.ID == 0 {
-		return fmt.Errorf("failed to verify created address")
+		return fmt.Errorf("Failed to verify created address")
 
 	}
 
@@ -128,7 +128,7 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 		}
 
 		if setDefaultAddress.ID == 0 {
-			return fmt.Errorf("failed to set default address as new address")
+			return fmt.Errorf("Failed to set default address as new address")
 		}
 	}
 	return nil
@@ -138,11 +138,11 @@ func (u *userUseCase) FindDefaultAddress(userId int) (response.Address, error) {
 	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userId)
 
 	if err != nil {
-		return response.Address{}, fmt.Errorf("failed to find default address :%s ", err)
+		return response.Address{}, fmt.Errorf("Failed to find default address :%s ", err)
 	}
 
 	if DefaultAddress.ID == 0 {
-		return response.Address{}, fmt.Errorf("failed to verify retrieved default address")
+		return response.Address{}, fmt.Errorf("Failed to verify retrieved default address")
 	}
 	return DefaultAddress, nil
 }
@@ -154,7 +154,7 @@ func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, 
 		return err
 	}
 	if UpdatedAddress.ID == 0 {
-		return errors.New("failed to update address")
+		return errors.New("Failed to update address")
 	}
 	return nil
 
@@ -230,8 +230,8 @@ func (u *userUseCase) GetProfile(userId int) (response.Profile, error) {
 }
 
 // profile
-func (u *userUseCase) ForgotPassword(userid int, c *gin.Context) error {
-	UserData, err := u.userRepo.FindUserById(userid)
+func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
+	UserData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func (u *userUseCase) ForgotPassword(userid int, c *gin.Context) error {
 	if err != nil {
 		return fmt.Errorf("Failed to send otp")
 	}
-	helper.SetToCookie(userid, "PasswordChange", c)
+	helper.SetToCookie(userID, "PasswordChange", c)
 
 	return nil
 }

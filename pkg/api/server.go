@@ -51,9 +51,6 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		user.POST("/logout", commonHandler.Logout)
 		user.POST("/webhook", orderHandler.WebhookHandler)
 
-		user.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
-		//changed route path //verirify login otp in this route
-		//it will send otp if the credentials are verified
 		user.Use(middleware.AuthenticateUserJwt)
 		{
 
@@ -111,7 +108,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				order.GET("/", orderHandler.UserOrderHistory)
 				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
 				order.POST("/return/:orderID", orderHandler.ReturnOrder)
-
+				order.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
 			}
 			referral := user.Group("/referral")
 			{

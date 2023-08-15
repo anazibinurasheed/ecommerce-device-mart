@@ -6,13 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	request "github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
 type CommonHandler struct {
@@ -37,11 +35,9 @@ var (
 	// Once the user completes all the authentication steps, the phone number will be deleted from the phoneDataMap, and the phone number,
 	//along with other user signup credentials, will be inserted into the database.
 	//Theme : To decrease the amount of database operations
-
-	//phoneDataMutex
+	phoneDataMap = make(map[string]string)
 	//Here we are using normal map instead of sync.Map so we should ensure  not to come  race condition .
 	//phoneDataMutex is for preventing from race condition.
-	phoneDataMap   = make(map[string]string)
 	phoneDataMutex = new(sync.Mutex)
 )
 
@@ -148,49 +144,50 @@ func (uh *CommonHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-func (uh *CommonHandler) RefreshToken(c *gin.Context) {
-	refreshToken, err := c.Cookie("RefreshToken")
+// func (uh *CommonHandler) RefreshToken(c *gin.Context) {
+// 	refreshToken, err := c.Cookie("RefreshToken")
 
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"StatusCode": 401,
-			"msg":        "Unauthorized User",
-		})
-		return
-	}
+// 	if err != nil {
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 			"StatusCode": 401,
+// 			"msg":        "Unauthorized User",
+// 		})
+// 		return
+// 	}
 
-	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-		if !ok {
-			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
-		}
-		return []byte(config.GetConfig().JwtSecret), nil
-	})
+// 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+// 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+// 		if !ok {
+// 			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
+// 		}
+// 		return []byte(config.GetConfig().JwtSecret), nil
+// 	})
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+// 	claims, ok := token.Claims.(jwt.MapClaims)
 
-	if !ok && !token.Valid {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"Statuscode": 401,
-			"Msg":        "Invalid claims",
-		})
-	}
+// 	if !ok && !token.Valid {
+// 		c.JSON(http.StatusUnauthorized, gin.H{
+// 			"Statuscode": 401,
+// 			"Msg":        "Invalid claims",
+// 		})
+// 	}
 
-	if claims["exp"].(float64) > float64(time.Now().Add(time.Minute*60).Unix()) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "Allocated refresh time expired",
-		})
-		return
-	}
-	userID, _ := helper.GetUserIdFromContext(c)
-	tokenString, _, err := helper.GenerateJwtToken(userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "Failed to generate access token",
-		})
-		return
-	}
-	MaxAge := time.Now().Add((time.Hour * 24 * 30)).Unix()
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("UserAuthorization", tokenString, int(MaxAge), "", "", false, true)
-}
+// 	if claims["exp"].(float64) > float64(time.Now().Add(time.Minute*60).Unix()) {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"msg": "Allocated refresh time expired",
+// 		})
+// 		return
+// 	}
+
+// 	userID, _ := helper.GetUserIDFromContext(c)
+// 	tokenString, _, err := helper.GenerateJwtToken(userID)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"msg": "Failed to generate access token",
+// 		})
+// 		return
+// 	}
+// 	MaxAge := time.Now().Add((time.Hour * 24 * 30)).Unix()
+// 	c.SetSameSite(http.SameSiteLaxMode)
+// 	c.SetCookie("UserAuthorization", tokenString, int(MaxAge), "", "", false, true)
+// }

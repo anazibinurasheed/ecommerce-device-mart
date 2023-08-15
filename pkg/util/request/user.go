@@ -27,3 +27,7 @@ type Address struct {
 	AlternativePhone string `json:"alternative_phone"`
 	IsDefault        bool   `json:"-"`
 }
+
+type Name struct {
+	Name string `json:"name"`
+}

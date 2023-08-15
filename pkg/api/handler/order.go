@@ -32,7 +32,7 @@ func NewOrderHandler(useCase services.OrderUseCase) *OrderHandler {
 //	@Failure		500	{object}	response.Response
 //	@Router			/checkout [get]
 func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
 	CheckOutDetails, err := oh.orderUseCase.CheckOutDetails(userID)
 	if err != nil {
@@ -57,7 +57,7 @@ func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
 //	@Router			/payment/order-cod-confirmed [post]
 func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 
-	UserID, _ := helper.GetUserIdFromContext(c)
+	UserID, _ := helper.GetUserIDFromContext(c)
 	err := oh.orderUseCase.ConfirmedOrder(UserID, 1) //1 is for  payment cash on delivery
 
 	if err != nil {
@@ -81,7 +81,7 @@ func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/payment/razorpay [get]
 func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 	PaymentDetails, err := oh.orderUseCase.GetRazorPayDetails(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
@@ -116,7 +116,7 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	err := oh.orderUseCase.VerifyRazorPayPayment(body.Signature, body.RazorpayOrderId, body.RazorPayPaymentId)
 	if err != nil {
@@ -162,7 +162,7 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	orderHistory, err := oh.orderUseCase.GetUserOrderHistory(userId, page, count)
 	if err != nil {
@@ -374,7 +374,7 @@ func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 //	@Success		200		{file}		application/pdf
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/download-invoice/{orderID} [get]
+//	@Router			/my-orders/download-invoice/{orderID} [get]
 func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
 	// Sample invoice data (you can replace this with your actual invoice data)
 	orderID, err := strconv.Atoi(c.Param("orderID"))
@@ -410,7 +410,7 @@ func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/wallet/create [post]
 func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
 	err := oh.orderUseCase.CreateUserWallet(userID)
 	if err != nil {
@@ -434,7 +434,7 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/wallet/ [get]
 func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
 	Wallet, err := oh.orderUseCase.GetUserWallet(userID)
 	if err != nil {
@@ -500,7 +500,7 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/payment/wallet [post]
 func (od *OrderHandler) WalletPayment(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 	err := od.orderUseCase.ValidateWalletPayment(userID)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())

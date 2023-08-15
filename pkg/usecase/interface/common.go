@@ -6,5 +6,4 @@ import (
 
 type CommonUseCase interface {
 	ValidateSignupRequest(phone request.Phone) (int, error)
-	// PhoneValidater(code string, c *gin.Context) (string, error)
 }

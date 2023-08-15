@@ -30,7 +30,7 @@ func NewRefferalHandler(useCase services.RefferalUseCase) *RefferalHandler {
 //	@Failure		500	{object}	response.Response	"Failed."
 //	@Router			/referral/get-code [get]
 func (rh *RefferalHandler) GetRefferalCode(c *gin.Context) {
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 	RefferalCode, err := rh.refferalUseCase.GetUserRefferalCode(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
@@ -65,7 +65,7 @@ func (rh *RefferalHandler) ApplyRefferalCode(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 	CodeOwnerID, err := rh.refferalUseCase.VerifyRefferalCode(body, userID)
 
 	if err != nil {
@@ -82,7 +82,7 @@ func (rh *RefferalHandler) ApplyRefferalCode(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success,bonus amount updated in wallet.", nil, nil)
+	response := response.ResponseMessage(200, "Success, bonus amount updated in wallet.", nil, nil)
 	c.JSON(http.StatusOK, response)
 
 }

@@ -173,7 +173,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	err := uh.userUseCase.AddNewAddress(userId, body)
 	if err != nil {
@@ -214,7 +214,7 @@ func (uh *UserHandler) UpdateAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	err = uh.userUseCase.UpdateUserAddress(body, addressID, userId)
 	if err != nil {
@@ -266,7 +266,7 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/addresses [get]
 func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	ListOfAddresses, err := uh.userUseCase.GetUserAddresses(userId)
 	if err != nil {
@@ -289,7 +289,7 @@ func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile [get]
 func (uh *UserHandler) Profile(c *gin.Context) {
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	UserProfile, err := uh.userUseCase.GetProfile(userId)
 	if err != nil {
@@ -323,7 +323,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	err := uh.userUseCase.CheckUserOldPassword(body, userId)
 	if err != nil {
@@ -367,7 +367,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
 	err := uh.userUseCase.ChangeUserPassword(body, userId, c)
 	if err != nil {
@@ -401,7 +401,7 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
 	err = uh.userUseCase.SetDefaultAddress(userID, addressID)
 	if err != nil {
@@ -428,22 +428,22 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 //	@Failure		500		{object}	response.Response
 //	@Router			/profile/edit-username [post]
 func (uh *UserHandler) EditUserName(c *gin.Context) {
-	var body string
+	var body request.Name
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	userId, _ := helper.GetUserIdFromContext(c)
+	userId, _ := helper.GetUserIDFromContext(c)
 
-	err := uh.userUseCase.UpdateUserName(body, userId)
+	err := uh.userUseCase.UpdateUserName(body.Name, userId)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to update username", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success, username has been changed", nil, err.Error())
+	response := response.ResponseMessage(200, "success, username has been changed", nil, nil)
 	c.JSON(http.StatusOK, response)
 }

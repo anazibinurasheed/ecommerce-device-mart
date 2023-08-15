@@ -480,7 +480,7 @@ func (pd *ProductHandler) ValidateRatingRequest(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 	err = pd.productUseCase.ValidateProductRatingRequest(userID, productID)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed, user is unauthorized to perform a rating", nil, err.Error())
@@ -528,7 +528,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 
 	}
 
-	userID, _ := helper.GetUserIdFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
 	err = pd.productUseCase.InsertNewProductRating(userID, productID, body)
 	if err != nil {

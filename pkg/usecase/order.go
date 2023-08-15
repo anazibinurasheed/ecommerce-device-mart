@@ -401,7 +401,7 @@ func (ou *orderUseCase) ValidateWalletPayment(userID int) error {
 		return fmt.Errorf("Failed to find user wallet : %s", err)
 	}
 	if wallet.ID == 0 {
-		return fmt.Errorf("User dont have wallet ")
+		return fmt.Errorf("User don't have a wallet ")
 	}
 
 	userCart, err := ou.cartUseCase.ViewCart(userID)

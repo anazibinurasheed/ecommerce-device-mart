@@ -49,23 +49,3 @@ func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error)
 
 	return phone.Phone, nil
 }
-
-// func (cu *commonUseCase) PhoneValidater(code string, c *gin.Context) (string, error) {
-// 	phone, _ := helper.GetFromCookie("UserPhoneForCheckOtp", c)
-// 	number := strconv.Itoa(phone)
-// 	fmt.Printf("NUMBER %#v ,CODE %#v", number, code)
-// 	status, err := otp.CheckOtp(number, code)
-
-// 	if err != nil {
-// 		return "", err
-// 	} else if status == "incorrect" {
-// 		return status, nil
-// 	}
-
-// 	tokenString, err := token.GenerateJwtToken(0)
-// 	maxAge := int(time.Now().Add(time.Minute * 30).Unix())
-// 	c.SetCookie("Verified", tokenString, maxAge, "", "", false, true)
-// 	c.SetSameSite(http.SameSiteLaxMode)
-// 	return status, nil
-
-// }
