@@ -39,6 +39,8 @@ func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error)
 	// users[helper.GenerateUniqueID()] = fmt.Sprintf("%d", phone)
 	// usersMutex.Unlock()
 
+	//below code is necessary commented out because defined a predefined otp
+
 	// number := strconv.Itoa(phone.Phone)
 	// err = helper.SendOtp(number)
 	// if err != nil {

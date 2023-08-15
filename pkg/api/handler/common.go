@@ -119,7 +119,7 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 		return
 	}
 
-	tokenString, _, err := helper.GenerateJwtToken(0)
+	tokenString, _, _ := helper.GenerateJwtToken(0)
 	maxAge := int(time.Now().Add(time.Minute * 30).Unix())
 	c.SetCookie("PhoneAuthorization", tokenString, maxAge, "", "", false, true)
 	c.SetSameSite(http.SameSiteLaxMode)
