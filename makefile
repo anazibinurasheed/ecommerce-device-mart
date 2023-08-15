@@ -19,11 +19,13 @@ build: ${BINARY_DIR} ## Compile the code, build Executable File
 run: ## Start application
 	$(GOCMD) run ./cmd/api
 
+
+
 test: ## Run tests
 	$(GOCMD) test ./... -cover
 
- mockgen: ## Generate mock repository and usecase functions 
-mockgen -source=pkg/repository/interface/user.go -destination=pkg/mock/repoMock/user_repo.go -package=mockD
+#  mockgen: ## Generate mock repository and usecase functions 
+# mockgen -source=pkg/repository/interface/user.go -destination=pkg/mock/repoMock/user_repo.go -package=mockD
 
 test-coverage: ## Run tests and generate coverage file
 	$(GOCMD) test ./... -coverprofile=$(CODE_COVERAGE).out

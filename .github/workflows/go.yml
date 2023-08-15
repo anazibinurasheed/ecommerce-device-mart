@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: CI/CD ecom-devicemart
 
 on:   # Events
   push:
@@ -24,20 +24,20 @@ jobs:
       with:
         go-version: 1.20.1
 
-    - name: 
-    - name: Build 
-      run: go build -v ./...
+    # - name: Build 
+    #   run: go build -v ./...
 
     - name: Test # Runnable commands 
       run: go test -v ./...
 
-    - name: Deploy to EC2 instance
+    - name: Deploy to AWS EC2 instance
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.PUBLIC_IP }}
+        host: ${{secrets.PUBLIC_IP}}
         username: ubuntu
-        key: ${{ secrets.SSH_KEY }}
+        key: ${{secrets.SSH_KEY}}
         script: |
+          echo "Connected to AWS EC2 instance"
           cd mainDevicemart/devicemart
           git pull
           go build ./cmd/api
