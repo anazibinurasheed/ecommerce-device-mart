@@ -60,8 +60,8 @@ func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Cat
 	return ListOfAllCategories, nil
 }
 
-func (pu *productUseCase) UpdateCategoryWithId(ParamId int, category request.Category) error {
-	UpdatedCategory, err := pu.productRepo.UpdateCategory(ParamId, category)
+func (pu *productUseCase) UpdateCategoryWithID(productID int, category request.Category) error {
+	UpdatedCategory, err := pu.productRepo.UpdateCategory(productID, category)
 	if err != nil {
 		return fmt.Errorf("Failed to update category :%s", err)
 	}
@@ -73,8 +73,8 @@ func (pu *productUseCase) UpdateCategoryWithId(ParamId int, category request.Cat
 	return nil
 }
 
-func (pu *productUseCase) BlockCategoryWithId(ParamId int) error {
-	BlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(ParamId)
+func (pu *productUseCase) BlockCategoryWithID(categoryID int) error {
+	BlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
@@ -86,8 +86,8 @@ func (pu *productUseCase) BlockCategoryWithId(ParamId int) error {
 	return nil
 }
 
-func (pu *productUseCase) UnBlockCategoryWithId(ParamId int) error {
-	UnBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(ParamId)
+func (pu *productUseCase) UnBlockCategoryWithID(categoryID int) error {
+	UnBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
@@ -167,8 +167,8 @@ func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]r
 	return ListOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductWithId(paramId int, updations request.Product) error {
-	UpdatedProduct, err := pu.productRepo.UpdateProductToDatabase(paramId, updations)
+func (pu *productUseCase) UpdateProductWithID(productID int, updations request.Product) error {
+	UpdatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, updations)
 	if err != nil {
 		return fmt.Errorf("Failed to update product :%s", err)
 	}
@@ -178,8 +178,8 @@ func (pu *productUseCase) UpdateProductWithId(paramId int, updations request.Pro
 	return nil
 }
 
-func (pu *productUseCase) BlockProductWithId(paramId int) error {
-	BlockedProduct, err := pu.productRepo.BlockProductFromDatabase(paramId)
+func (pu *productUseCase) BlockProductWithID(productID int) error {
+	BlockedProduct, err := pu.productRepo.BlockProductFromDatabase(productID)
 	if err != nil {
 		return fmt.Errorf("Failed to block product :%s", err)
 	}
@@ -189,8 +189,8 @@ func (pu *productUseCase) BlockProductWithId(paramId int) error {
 	return nil
 }
 
-func (pu *productUseCase) UnBlockProductWithId(paramId int) error {
-	unBlockedProduct, err := pu.productRepo.UnblockProductFromDatabase(paramId)
+func (pu *productUseCase) UnBlockProductWithID(productID int) error {
+	unBlockedProduct, err := pu.productRepo.UnblockProductFromDatabase(productID)
 	if err != nil {
 		return fmt.Errorf("Failed unblock product :%s", err)
 	}
@@ -200,8 +200,8 @@ func (pu *productUseCase) UnBlockProductWithId(paramId int) error {
 	return nil
 }
 
-func (pd *productUseCase) ViewProductById(productId int) (response.ProductItem, error) {
-	Product, err := pd.productRepo.FindProductById(productId)
+func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, error) {
+	Product, err := pd.productRepo.FindProductById(productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
@@ -209,7 +209,7 @@ func (pd *productUseCase) ViewProductById(productId int) (response.ProductItem, 
 		return response.ProductItem{}, fmt.Errorf("Failed to fetch product")
 	}
 
-	Ratings, err := pd.productRepo.GetProductReviews(productId)
+	Ratings, err := pd.productRepo.GetProductReviews(productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product reviews :%s", err)
 	}

@@ -2,12 +2,9 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
-	"sync"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 )
 
@@ -24,10 +21,10 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 
 }
 
-var (
-	users      = make(map[string]string)
-	usersMutex sync.Mutex
-)
+// var (
+// 	users      = make(map[string]string)
+// 	usersMutex sync.Mutex
+// )
 
 func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error) {
 	UserData, err := cu.userRepo.FindUserByPhone(phone.Phone)
@@ -38,9 +35,10 @@ func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error)
 		return 0, errors.New("User already exist with this phone number")
 	}
 
-	usersMutex.Lock()
-	users[helper.GenerateUniqueID()] = fmt.Sprintf("%d", phone)
-	usersMutex.Unlock()
+	// usersMutex.Lock()
+	// users[helper.GenerateUniqueID()] = fmt.Sprintf("%d", phone)
+	// usersMutex.Unlock()
+
 	// number := strconv.Itoa(phone.Phone)
 	// err = helper.SendOtp(number)
 	// if err != nil {

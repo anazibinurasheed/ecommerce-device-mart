@@ -60,13 +60,13 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 	if err != nil {
 		return response.UserData{}, err
 	} else if userData.Id == 0 {
-		return response.UserData{}, errors.New("User dont have an account")
+		return response.UserData{}, fmt.Errorf("User dont have an account")
 	} else if userData.IsBlocked {
-		return response.UserData{}, errors.New("User have been blocked")
+		return response.UserData{}, fmt.Errorf("User have been blocked")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(user.Password)); err != nil {
-		return response.UserData{}, errors.New("incorrect password")
+		return response.UserData{}, fmt.Errorf("incorrect password")
 	}
 
 	userData.Password = ""
@@ -74,8 +74,8 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 
 }
 
-func (u *userUseCase) FindUserById(id int) (response.UserData, error) {
-	UserData, err := u.userRepo.FindUserById(id)
+func (u *userUseCase) FindUserById(userID int) (response.UserData, error) {
+	UserData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return response.UserData{}, err
 	}
@@ -134,8 +134,8 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 	return nil
 }
 
-func (u *userUseCase) FindDefaultAddress(userId int) (response.Address, error) {
-	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userId)
+func (u *userUseCase) FindDefaultAddress(userID int) (response.Address, error) {
+	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
 
 	if err != nil {
 		return response.Address{}, fmt.Errorf("Failed to find default address :%s ", err)
@@ -160,8 +160,8 @@ func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, 
 
 }
 
-func (u *userUseCase) GetUserAddresses(userId int) ([]response.Address, error) {
-	ListOfAddresses, err := u.userRepo.GetAllUserAddresses(userId)
+func (u *userUseCase) GetUserAddresses(userID int) ([]response.Address, error) {
+	ListOfAddresses, err := u.userRepo.GetAllUserAddresses(userID)
 
 	if err != nil {
 		return nil, err
@@ -169,8 +169,8 @@ func (u *userUseCase) GetUserAddresses(userId int) ([]response.Address, error) {
 	return ListOfAddresses, nil
 }
 
-func (u *userUseCase) DeleteUserAddress(addressId int) error {
-	DeletedAddress, err := u.userRepo.DeleteAddressFromDatabase(addressId)
+func (u *userUseCase) DeleteUserAddress(addressID int) error {
+	DeletedAddress, err := u.userRepo.DeleteAddressFromDatabase(addressID)
 	if err != nil {
 		return err
 	}
@@ -205,23 +205,23 @@ func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 	}
 	return nil
 }
-func (u *userUseCase) GetProfile(userId int) (response.Profile, error) {
+func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
 	var profile response.Profile
 
-	UserData, err := u.userRepo.FindUserById(userId)
+	UserData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return response.Profile{}, fmt.Errorf("Failed to find user : %s", err)
 	}
 
 	if UserData.Id == 0 {
-		return response.Profile{}, errors.New("User not found .")
+		return response.Profile{}, fmt.Errorf("User not found")
 	}
 
 	profile.Id = UserData.Id
 	profile.UserName = UserData.UserName
 	profile.Email = UserData.Email
 	profile.Phone = UserData.Phone
-	profile.Addresses, err = u.userRepo.GetAllUserAddresses(userId)
+	profile.Addresses, err = u.userRepo.GetAllUserAddresses(userID)
 	if err != nil {
 		return response.Profile{}, fmt.Errorf("Failed to find user addresses:  %s", err)
 	}
@@ -249,28 +249,28 @@ func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
 	return nil
 }
 
-func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userId int, c *gin.Context) error {
+func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userID int, c *gin.Context) error {
 
 	if password.NewPassword != password.ReNewPassword {
-		return errors.New("Password is not matching")
+		return fmt.Errorf("Password is not matching")
 	}
 
 	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), 10)
 	if err != nil {
 		log.Println("FAILED TO HASH PASSWORD", err)
-		return errors.New("Unable to process the request ")
+		return fmt.Errorf("Unable to process the request ")
 	}
 
-	err = u.userRepo.ChangePassword(userId, string(HashedPassword))
+	err = u.userRepo.ChangePassword(userID, string(HashedPassword))
 	if err != nil {
-		return fmt.Errorf("Failed to change password %s", err)
+		return fmt.Errorf("Failed to change password :%s", err)
 	}
 	return nil
 }
 
-func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userId int) error {
+func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userID int) error {
 
-	UserData, err := u.userRepo.FindUserById(userId)
+	UserData, err := u.userRepo.FindUserById(userID)
 
 	err = bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(password.Password))
 	if err != nil {

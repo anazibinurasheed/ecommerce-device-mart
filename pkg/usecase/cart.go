@@ -97,16 +97,16 @@ func (cu *CartUseCase) RemoveFromCart(userID int, productID int) error {
 	return nil
 }
 func (cu *CartUseCase) IncrementQuantity(userID int, productID int) error {
-	CartItem, err := cu.cartRepo.GetCartItem(userID, productID)
-	if err != nil || CartItem.ID == 0 {
+	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
+	if err != nil || cartItem.ID == 0 {
 		return fmt.Errorf("Quantity updation  failed:%s", err)
 
 	}
-	qty := CartItem.Qty
+	qty := cartItem.Qty
 	newQty := qty + 1
 
-	CartItem, err = cu.cartRepo.IncrementQuantity(newQty, userID, productID)
-	if err != nil || CartItem.ID == 0 || newQty != CartItem.Qty {
+	cartItem, err = cu.cartRepo.IncrementQuantity(newQty, userID, productID)
+	if err != nil || cartItem.ID == 0 || newQty != cartItem.Qty {
 		return fmt.Errorf("Quantity updation failed : %s", err)
 	}
 	return nil

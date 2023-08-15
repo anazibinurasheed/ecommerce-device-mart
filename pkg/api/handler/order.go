@@ -91,7 +91,7 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 
 	c.HTML(200, "razorpay.html", gin.H{
 		"username":          PaymentDetails.Username,
-		"razorpay_order_id": PaymentDetails.RazorPayOrderId,
+		"razorpay_order_id": PaymentDetails.RazorPayOrderID,
 		"amount":            PaymentDetails.Amount * 100,
 	})
 }

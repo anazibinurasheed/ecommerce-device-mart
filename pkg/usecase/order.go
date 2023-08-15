@@ -73,19 +73,19 @@ func (ou *orderUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails,
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to find user  %s", err)
 	}
-	RazorPayOrderId, err := helper.MakeRazorPayPaymentId(int(CartData.Total * 100))
+	RazorPayOrderID, err := helper.MakeRazorPayPaymentId(int(CartData.Total * 100))
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to get razorpay id %s", err)
 	}
 	return response.PaymentDetails{
 		Username:        UserData.UserName,
-		RazorPayOrderId: RazorPayOrderId,
+		RazorPayOrderID: RazorPayOrderID,
 		Amount:          int(CartData.Total),
 	}, nil
 
 }
-func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderId string, paymentId string) error {
-	err := helper.VerifyRazorPayPayment(signature, razorpayOrderId, paymentId)
+func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID string, paymentID string) error {
+	err := helper.VerifyRazorPayPayment(signature, razorpayOrderID, paymentID)
 	if err != nil {
 		return fmt.Errorf("Failed payment not success : %s", err)
 	}
@@ -104,12 +104,12 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 	if err != nil {
 		return fmt.Errorf("Failed to get Cart data :  %s", err)
 	}
-	CouponDetails, err := ou.couponRepo.FindAppliedCouponByUserId(userID)
+	couponDetails, err := ou.couponRepo.FindAppliedCouponByUserId(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to retrieve the coupon tracking details  ;%s", err)
 	}
 
-	if CouponDetails.CouponID != 0 {
+	if couponDetails.CouponID != 0 {
 		UpdatedCouponTracking, err := ou.couponRepo.UpdateCouponUsage(userID)
 		if err != nil {
 			return fmt.Errorf("Failed to update coupon usage :%s", err)
@@ -118,8 +118,8 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 			return fmt.Errorf("Failed to verify inserted coupon record")
 		}
 	}
-	if CouponDetails.ID != 0 {
-		Coupon, err := ou.couponRepo.FindCouponById(CouponDetails.CouponID)
+	if couponDetails.ID != 0 {
+		Coupon, err := ou.couponRepo.FindCouponById(couponDetails.CouponID)
 		if err != nil {
 			return fmt.Errorf("Failed to find coupon by id : %s", err)
 		}
@@ -132,12 +132,11 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		return fmt.Errorf("Failed to get order status :%s", err)
 	}
 	statusID := status.ID
-	fmt.Println("COUPONDETAILS ::::::::ID ", CouponDetails.CouponID)
 
 	for _, productData := range cartData.Cart {
 		createdAt := time.Now()
 		updatedAt := time.Now()
-		newOrderLine, err := ou.orderRepo.InsertOrderLine(userID, int(productData.ProductID), int(addressID), productData.Qty, productData.Price, paymentMethodID, int(statusID), CouponDetails.CouponID, createdAt, updatedAt)
+		newOrderLine, err := ou.orderRepo.InsertOrderLine(userID, int(productData.ProductID), int(addressID), productData.Qty, productData.Price, paymentMethodID, int(statusID), couponDetails.CouponID, createdAt, updatedAt)
 		if err != nil || newOrderLine.ID == 0 {
 			return fmt.Errorf("Failed to insert order line : %s", err)
 		}

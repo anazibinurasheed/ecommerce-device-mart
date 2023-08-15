@@ -25,17 +25,14 @@ func NewRefferalUseCase(refferaluseCase interfaces.RefferalRepository, orderUseC
 func (ru *refferalUseCase) GetUserRefferalCode(userID int) (response.Referral, error) {
 
 	RefferalCode, err := ru.refferalRepo.FindRefferalCodeByUserId(userID)
-	fmt.Println("::::::::::1", RefferalCode)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to find refferal code by user id : %s", err)
 	} else if RefferalCode.ID != 0 {
-		fmt.Println(RefferalCode)
 		return RefferalCode, nil
 	}
 
 	Code := helper.GenerateReferralCode()
 	NewRefferalCode, err := ru.refferalRepo.InsertNewRefferalCode(userID, Code)
-	fmt.Println(":::::::::::2", NewRefferalCode)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to create new refferal code :%s", err)
 	} else if NewRefferalCode.ID == 0 || NewRefferalCode.Code == "" {

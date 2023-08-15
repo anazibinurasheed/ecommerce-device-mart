@@ -2,6 +2,6 @@ package response
 
 type PaymentDetails struct {
 	Username        string
-	RazorPayOrderId string
+	RazorPayOrderID string
 	Amount          int
 }

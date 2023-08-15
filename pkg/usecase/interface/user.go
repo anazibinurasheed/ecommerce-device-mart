@@ -12,16 +12,16 @@ import (
 type UserUseCase interface {
 	SignUp(user request.SignUpData) error
 	ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error)
-	FindUserById(id int) (response.UserData, error)
-	AddNewAddress(userId int, address request.Address) error
+	FindUserById(userID int) (response.UserData, error)
+	AddNewAddress(userID int, address request.Address) error
 	DisplayListOfStates() ([]response.States, error)
 	UpdateUserAddress(address request.Address, addressID int, userID int) error
-	GetUserAddresses(userId int) ([]response.Address, error)
-	DeleteUserAddress(addressId int) error
-	GetProfile(userId int) (response.Profile, error)
-	ForgotPassword(userId int, c *gin.Context) error
-	ChangeUserPassword(password request.ChangePassword, userId int, c *gin.Context) error
+	GetUserAddresses(userID int) ([]response.Address, error)
+	DeleteUserAddress(addressID int) error
+	GetProfile(userID int) (response.Profile, error)
+	ForgotPassword(userID int, c *gin.Context) error
+	ChangeUserPassword(password request.ChangePassword, userID int, c *gin.Context) error
 	SetDefaultAddress(userID, addressID int) error
-	CheckUserOldPassword(password request.OldPassword, userId int) error
+	CheckUserOldPassword(password request.OldPassword, userID int) error
 	UpdateUserName(username string, userID int) error
 }

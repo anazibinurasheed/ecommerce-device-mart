@@ -119,7 +119,7 @@ func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.UpdateCategoryWithId(categoryID, body)
+	err = ph.productUseCase.UpdateCategoryWithID(categoryID, body)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -149,7 +149,7 @@ func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.BlockCategoryWithId(categoryID)
+	err = ph.productUseCase.BlockCategoryWithID(categoryID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to block category", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -180,7 +180,7 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.BlockCategoryWithId(categoryID)
+	err = ph.productUseCase.BlockCategoryWithID(categoryID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to block category", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -312,7 +312,7 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.UpdateProductWithId(productID, body)
+	err = ph.productUseCase.UpdateProductWithID(productID, body)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)
@@ -343,7 +343,7 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.BlockProductWithId(productID)
+	err = ph.productUseCase.BlockProductWithID(productID)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)
@@ -373,7 +373,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 		return
 	}
 
-	err = ph.productUseCase.UnBlockProductWithId(productID)
+	err = ph.productUseCase.UnBlockProductWithID(productID)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed to block product", nil, err)
 		c.JSON(http.StatusServiceUnavailable, response)
@@ -449,7 +449,7 @@ func (pd *ProductHandler) ViewProductItem(c *gin.Context) {
 		return
 	}
 
-	product, err := pd.productUseCase.ViewProductById(productID)
+	product, err := pd.productUseCase.ViewProductByID(productID)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)

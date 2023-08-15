@@ -34,28 +34,28 @@ func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]respons
 	return ListOfAllCategories, err
 }
 
-func (pd *productDatabase) UpdateCategory(ParamId int, category request.Category) (response.Category, error) {
+func (pd *productDatabase) UpdateCategory(categoryID int, category request.Category) (response.Category, error) {
 	var UpdatedCategory response.Category
 
 	query := "UPDATE Categories SET Category_Name = $1 WHERE ID = $2 RETURNING *;"
 
-	err := pd.DB.Raw(query, category.CategoryName, ParamId).Scan(&UpdatedCategory).Error
+	err := pd.DB.Raw(query, category.CategoryName, categoryID).Scan(&UpdatedCategory).Error
 
 	return UpdatedCategory, err
 }
 
-func (pd *productDatabase) BlockCategoryFromDatabase(ParamId int) (response.Category, error) {
+func (pd *productDatabase) BlockCategoryFromDatabase(categoryID int) (response.Category, error) {
 	var BlockedCategory response.Category
 	query := "Update Categories SET Is_blocked = true WHERE ID = ? RETURNING *;"
-	err := pd.DB.Raw(query, ParamId).Scan(&BlockedCategory).Error
+	err := pd.DB.Raw(query, categoryID).Scan(&BlockedCategory).Error
 	return BlockedCategory, err
 
 }
 
-func (pd *productDatabase) UnBlockCategoryFromDatabase(ParamId int) (response.Category, error) {
+func (pd *productDatabase) UnBlockCategoryFromDatabase(categoryID int) (response.Category, error) {
 	var UnBlockedCategory response.Category
 	query := "Update Categories SET Is_blocked = false WHERE ID = ? RETURNING *;"
-	err := pd.DB.Raw(query, ParamId).Scan(&UnBlockedCategory).Error
+	err := pd.DB.Raw(query, categoryID).Scan(&UnBlockedCategory).Error
 	return UnBlockedCategory, err
 
 }
@@ -67,10 +67,10 @@ func (pd *productDatabase) FindCategoryByName(name string) (response.Category, e
 	return ResultOfFinding, err
 
 }
-func (pd *productDatabase) FindCategoryByID(ID int) (response.Category, error) {
+func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, error) {
 	var ResultOfFinding response.Category
 	query := "SELECT * FROM Categories WHERE Id = $1 "
-	err := pd.DB.Raw(query, ID).Scan(&ResultOfFinding).Error
+	err := pd.DB.Raw(query, categoryID).Scan(&ResultOfFinding).Error
 	return ResultOfFinding, err
 }
 
@@ -89,29 +89,29 @@ func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]r
 	return ListOfAllProducts, err
 }
 
-func (pd *productDatabase) UpdateProductToDatabase(paramId int, updations request.Product) (response.Product, error) {
+func (pd *productDatabase) UpdateProductToDatabase(productID int, updations request.Product) (response.Product, error) {
 	var UpdatedProduct response.Product
 	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 ,Product_Image = $4 , Price = $5 WHERE ID = $6 RETURNING *"
-	err := pd.DB.Raw(query, updations.CategoryID, updations.ProductName, updations.Product_Description, updations.ProductImage, updations.Price, paramId).Scan(&UpdatedProduct).Error
+	err := pd.DB.Raw(query, updations.CategoryID, updations.ProductName, updations.Product_Description, updations.ProductImage, updations.Price, productID).Scan(&UpdatedProduct).Error
 	return UpdatedProduct, err
 
 }
 
-func (pd *productDatabase) BlockProductFromDatabase(paramId int) (response.Product, error) {
+func (pd *productDatabase) BlockProductFromDatabase(productID int) (response.Product, error) {
 	var BlockedProduct response.Product
 	status := true
 	query := "UPDATE Products SET Is_Blocked = $1 WHERE ID = $2 RETURNING *;"
-	err := pd.DB.Raw(query, status, paramId).Scan(&BlockedProduct).Error
+	err := pd.DB.Raw(query, status, productID).Scan(&BlockedProduct).Error
 	fmt.Println(BlockedProduct)
 	return BlockedProduct, err
 
 }
 
-func (pd *productDatabase) UnblockProductFromDatabase(paramId int) (response.Product, error) {
+func (pd *productDatabase) UnblockProductFromDatabase(productID int) (response.Product, error) {
 	var Product response.Product
 	status := false
 	query := "UPDATE Products SET is_blocked = $1 WHERE id = $2 RETURNING *;"
-	err := pd.DB.Raw(query, status, paramId).Scan(&Product).Error
+	err := pd.DB.Raw(query, status, productID).Scan(&Product).Error
 	fmt.Println(Product)
 
 	return Product, err
@@ -135,10 +135,10 @@ func (pd *productDatabase) ViewAllProductsToUser(startIndex, endIndex int) ([]re
 
 //-------------------------------------------------------------------------------------------------------------------------
 
-func (pd *productDatabase) FindProductById(productid int) (response.Product, error) {
+func (pd *productDatabase) FindProductById(productID int) (response.Product, error) {
 	var Product response.Product
 	query := "SELECT * FROM Products WHERE Id = $1  FETCH FIRST 1 ROW ONLY"
-	err := pd.DB.Raw(query, productid).Scan(&Product).Error
+	err := pd.DB.Raw(query, productID).Scan(&Product).Error
 	return Product, err
 }
 
@@ -186,6 +186,7 @@ func (pd *productDatabase) SearchProducts(search string, startIndex, endIndex in
 	err := pd.DB.Raw(query, search, startIndex, endIndex).Scan(&Products).Error
 	return Products, err
 }
+
 func (pd *productDatabase) GetProductsByCategory(categoryID int, startIndex, endIndex int) ([]response.Product, error) {
 	var Products = make([]response.Product, 0)
 
