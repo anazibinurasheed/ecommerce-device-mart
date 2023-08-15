@@ -12,7 +12,6 @@ on:   # Events
      - main
 
 jobs:
-
 # Name
   build:
     runs-on: ubuntu-latest
