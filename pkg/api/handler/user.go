@@ -435,9 +435,9 @@ func (uh *UserHandler) EditUserName(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetUserIDFromContext(c)
 
-	err := uh.userUseCase.UpdateUserName(body.Name, userId)
+	err := uh.userUseCase.UpdateUserName(body.Name, userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to update username", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)

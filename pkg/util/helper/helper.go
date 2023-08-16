@@ -12,10 +12,9 @@ import (
 )
 
 func GetUserIDFromContext(c *gin.Context) (int, error) {
-	userIdStr := c.GetString("userId")
-	userId, err := strconv.Atoi(userIdStr)
-
-	return userId, err
+	userIDStr := c.GetString("userId")
+	userID, err := strconv.Atoi(userIDStr)
+	return userID, err
 }
 
 func SetToCookie(Data int, cookieName string, c *gin.Context) {
