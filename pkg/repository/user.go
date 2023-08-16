@@ -98,11 +98,8 @@ func (ud *userDatabase) GetAllUserAddresses(userID int) ([]response.Address, err
 
 	var ListOfUserAddress = make([]response.Address, 0)
 	query := `SELECT a.id,a.user_id,a.name  , a.phone_number , a.pincode ,a.locality , a.address_line,a.district , a.state_id , a.landmark ,a.alternative_phone,a.is_default ,s.name AS state FROM Addresses a  INNER JOIN states s ON a.state_id = s.id  WHERE a.user_id = $1 ORDER BY is_default ; `
-
 	err := ud.DB.Raw(query, userID).Scan(&ListOfUserAddress).Error
-	for key, val := range ListOfUserAddress {
-		fmt.Println("UserAddress ", key, "   :", val)
-	}
+
 	return ListOfUserAddress, err
 }
 
@@ -126,10 +123,8 @@ func (ud *userDatabase) DeleteAddressFromDatabase(adressId int) (response.Addres
 func (ud *userDatabase) ChangePassword(userId int, newPassword string) error {
 	var user response.UserData
 	query := `UPDATE users SET password = $1 WHERE Id = $2  ; `
-
 	err := ud.DB.Raw(query, newPassword, userId).Scan(&user).Error
 	return err
-
 }
 
 func (ud *userDatabase) FindAddressByAddressID(addressID int) (response.Address, error) {
@@ -141,6 +136,7 @@ func (ud *userDatabase) FindAddressByAddressID(addressID int) (response.Address,
 
 	return UserAddress, err
 }
+
 func (ud *userDatabase) FindUserAddress(userID int) (response.Address, error) {
 
 	var UserAddress response.Address
