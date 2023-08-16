@@ -109,6 +109,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
 				order.POST("/return/:orderID", orderHandler.ReturnOrder)
 				order.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
+
 			}
 			referral := user.Group("/referral")
 			{
