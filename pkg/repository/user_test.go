@@ -123,6 +123,7 @@ func TestFindUserByEmail(t *testing.T) {
 			if err != nil {
 				log.Fatalf("failed to initialize mockDB connection %v", err)
 			}
+			defer mockDB.Close()
 
 			gormDB, _ := gorm.Open(postgres.New(postgres.Config{
 				Conn: mockDB,
@@ -135,5 +136,54 @@ func TestFindUserByEmail(t *testing.T) {
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, tc.want, got)
 		})
+	}
+}
+
+func TestFindUserById(t *testing.T) {
+	type args struct {
+		ID int
+	}
+	testCases := []struct {
+		name        string
+		input       args
+		beforeTest  func(sqlmock.Sqlmock)
+		want        response.UserData
+		expectedErr error
+	}{{
+		name:  "success, find user by id",
+		input: args{ID: 1},
+		beforeTest: func(mockSQL sqlmock.Sqlmock) {
+			expectedQuery := `SELECT \* FROM users WHERE  ID\= \$1`
+			mockSQL.ExpectQuery(expectedQuery).WithArgs(1).WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "email", "phone"}).AddRow(1, "anaz", "anazibinurasheed@gmail.com", 8590138151))
+
+		},
+		want: response.UserData{
+			ID:       1,
+			UserName: "anaz",
+			Email:    "anazibinurasheed@gmail.com",
+			Phone:    8590138151,
+		},
+		expectedErr: nil,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDB, mockSQL, err := sqlmock.New()
+			if err != nil {
+				log.Fatalf("failed to initialize mockDB connection %#v", err)
+			}
+			gormDB, _ := gorm.Open(postgres.New(
+				postgres.Config{Conn: mockDB},
+			), &gorm.Config{})
+
+			tc.beforeTest(mockSQL)
+			ud := NewUserRepository(gormDB)
+			got, err := ud.FindUserById(tc.input.ID)
+
+			assert.Equal(t, tc.expectedErr, err)
+			assert.Equal(t, got, tc.want)
+
+		})
+
 	}
 }
