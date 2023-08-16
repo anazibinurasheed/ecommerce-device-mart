@@ -136,9 +136,9 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 // @Success		200	{object}	response.Response{}
 // @Router			/logout [post]
 func (uh *CommonHandler) Logout(c *gin.Context) {
-	c.SetCookie("AdminAuthorization", "", -1, "", "", false, true)
-	c.SetCookie("SudoAdminAuthorization", "", -1, "", "", false, true)
-	c.SetCookie("UserAuthorization", "", -1, "", "", false, true)
+	helper.DeleteCookie("AdminAuthorization", c)
+	helper.DeleteCookie("SudoAdminAuthorization", c)
+	helper.DeleteCookie("UserAuthorization", c)
 
 	response := response.ResponseMessage(200, "Logged out, success", nil, nil)
 	c.JSON(http.StatusAccepted, response)

@@ -35,7 +35,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "email", "phone"}).AddRow(1, "Anas", "anazibinurasheed@gmail.com", 8590138151))
 			},
 			want: response.UserData{
-				Id:       1,
+				ID:       1,
 				UserName: "Anas",
 				Email:    "anazibinurasheed@gmail.com",
 				Phone:    8590138151,
@@ -61,8 +61,8 @@ func TestSaveUserOnDatabase(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		// t.Parallel()
 		t.Run(tc.name, func(t *testing.T) {
-			// t.Parallel()
 			mockDB, mockSQL, err := sqlmock.New()
 			if err != nil {
 				t.Fatalf("failed to create mock database: %v", err)
@@ -109,13 +109,14 @@ func TestFindUserByEmail(t *testing.T) {
 		},
 
 		want: response.UserData{
-			Id:       1,
+			ID:       1,
 			UserName: "anaz",
 			Email:    "anazibinurasheed@gmail.com",
 			Phone:    8590138151,
 		},
 		expectedErr: nil,
 	}}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockDB, mockSQL, err := sqlmock.New()

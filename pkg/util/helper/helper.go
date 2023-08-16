@@ -24,18 +24,17 @@ func SetToCookie(Data int, cookieName string, c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 }
 
-func GetFromCookie(cookieName string, c *gin.Context) (int, error) {
-	cookieData, err := c.Cookie(cookieName)
-	if err != nil {
-		fmt.Println("FAILED TO GET ID FROM COOKIE", err)
-		return 0, err
-	}
+// func GetFromCookie(cookieName string, c *gin.Context) (int, error) {
+// 	cookieData, err := c.Cookie(cookieName)
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	data, err := strconv.Atoi(cookieData)
+// 	data, err := strconv.Atoi(cookieData)
 
-	return data, err
+// 	return data, err
 
-}
+// }
 
 func DeleteCookie(cookieName string, c *gin.Context) {
 

@@ -3,7 +3,7 @@ package response
 import "time"
 
 type UserData struct {
-	Id        int    `json:"user_id"`
+	ID        int    `json:"user_id"`
 	UserName  string `json:"user_name"`
 	Email     string `json:"email"`
 	Phone     int    `json:"phone"`
@@ -34,7 +34,7 @@ type States struct {
 }
 
 type Profile struct {
-	Id        int
+	ID        int
 	UserName  string
 	Email     string
 	Phone     int

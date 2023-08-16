@@ -31,7 +31,7 @@ func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error)
 	if err != nil {
 		return 0, err
 	}
-	if UserData.Id != 0 {
+	if UserData.ID != 0 {
 		return 0, errors.New("User already exist with this phone number")
 	}
 

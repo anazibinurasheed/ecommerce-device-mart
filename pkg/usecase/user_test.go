@@ -41,7 +41,7 @@ func TestSignup(t *testing.T) {
 					Phone:    8590138151,
 					Password: "123456789",
 				}).Return(response.UserData{
-					Id:       1,
+					ID:       1,
 					UserName: "Anaz",
 					Email:    "anazibinurasheed@gmail.com",
 					Phone:    8590138151,
@@ -84,7 +84,7 @@ func TestUpdateUserName(t *testing.T) {
 		},
 		beforeTest: func(userRepo *mockRepo.MockUserRepository) {
 			userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
-				Id:       1,
+				ID:       1,
 				UserName: "anaz",
 				Email:    "anazibinurasheed@gmail.com",
 			}, nil).Times(1)
@@ -99,7 +99,7 @@ func TestUpdateUserName(t *testing.T) {
 		},
 		beforeTest: func(userRepo *mockRepo.MockUserRepository) {
 			userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
-				Id:       1,
+				ID:       1,
 				UserName: "Anaz",
 				Email:    "anazibinurasheed@gmail.com",
 			}, nil).Times(1)

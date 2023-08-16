@@ -2,14 +2,15 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 type AdminHandler struct {
@@ -44,7 +45,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//usecase of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.Id]
+	Phone, ok := phoneDataMap[body.ID]
 	phoneDataMutex.Unlock()
 	if !ok {
 		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
@@ -69,7 +70,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 
 	//from here phone details from map not needed .
 	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.Id)
+	delete(phoneDataMap, body.ID)
 	phoneDataMutex.Unlock()
 
 	response := response.ResponseMessage(200, "Success", nil, nil)

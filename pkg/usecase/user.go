@@ -29,7 +29,7 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 	if err != nil {
 		return fmt.Errorf("Failed to find user by phone :%s", err)
 	}
-	if userData.Id != 0 {
+	if userData.ID != 0 {
 		return fmt.Errorf("User already exist with this phone number")
 	}
 
@@ -37,7 +37,7 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 	if err != nil {
 		return fmt.Errorf("Failed to find user by email :%s", err)
 	}
-	if userData.Id != 0 {
+	if userData.ID != 0 {
 		return fmt.Errorf("User already exist with this email address")
 	}
 
@@ -59,7 +59,7 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
 		return response.UserData{}, err
-	} else if userData.Id == 0 {
+	} else if userData.ID == 0 {
 		return response.UserData{}, fmt.Errorf("User dont have an account")
 	} else if userData.IsBlocked {
 		return response.UserData{}, fmt.Errorf("User have been blocked")
@@ -213,11 +213,11 @@ func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
 		return response.Profile{}, fmt.Errorf("Failed to find user : %s", err)
 	}
 
-	if UserData.Id == 0 {
+	if UserData.ID == 0 {
 		return response.Profile{}, fmt.Errorf("User not found")
 	}
 
-	profile.Id = UserData.Id
+	profile.ID = UserData.ID
 	profile.UserName = UserData.UserName
 	profile.Email = UserData.Email
 	profile.Phone = UserData.Phone
@@ -236,7 +236,7 @@ func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
 		return err
 	}
 
-	if UserData.Id == 0 {
+	if UserData.ID == 0 {
 		return fmt.Errorf("User not found.")
 	}
 

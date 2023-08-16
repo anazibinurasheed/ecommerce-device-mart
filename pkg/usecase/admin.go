@@ -35,7 +35,7 @@ func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
 	if err != nil {
 		return fmt.Errorf("Failed to create user :%s", err)
 	}
-	if AdminData.Id == 0 {
+	if AdminData.ID == 0 {
 		return fmt.Errorf("Failed to verify created user")
 	}
 

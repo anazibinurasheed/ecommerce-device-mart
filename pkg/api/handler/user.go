@@ -46,7 +46,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//use of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.Id]
+	Phone, ok := phoneDataMap[body.ID]
 	phoneDataMutex.Unlock()
 	if !ok {
 		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
@@ -72,7 +72,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	}
 
 	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.Id)
+	delete(phoneDataMap, body.ID)
 	phoneDataMutex.Unlock()
 
 	response := response.ResponseMessage(200, "Success, account created", nil, nil)
@@ -100,15 +100,14 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	UserData, err := uh.userUseCase.
-		ValidateUserLoginCredentials(body)
+	UserData, err := uh.userUseCase.ValidateUserLoginCredentials(body)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed", nil, err.Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
 
-	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.Id)
+	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.ID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -142,14 +141,14 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/add-address [get]
 func (u *UserHandler) GetAddAddressPage(c *gin.Context) {
-	ListOfStates, err := u.userUseCase.DisplayListOfStates()
+	listOfStates, err := u.userUseCase.DisplayListOfStates()
 	if err != nil {
 		response := response.ResponseMessage(500, "No states found", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success", ListOfStates, nil)
+	response := response.ResponseMessage(200, "Success", listOfStates, nil)
 	c.JSON(http.StatusOK, response)
 }
 
