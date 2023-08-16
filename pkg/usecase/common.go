@@ -21,11 +21,6 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 
 }
 
-// var (
-// 	users      = make(map[string]string)
-// 	usersMutex sync.Mutex
-// )
-
 func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error) {
 	userData, err := cu.userRepo.FindUserByPhone(phone.Phone)
 	if err != nil {
@@ -34,10 +29,6 @@ func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error)
 	if userData.ID != 0 {
 		return 0, fmt.Errorf("User already exist with this phone number")
 	}
-
-	// usersMutex.Lock()
-	// users[helper.GenerateUniqueID()] = fmt.Sprintf("%d", phone)
-	// usersMutex.Unlock()
 
 	//below code is necessary commented out because defined a predefined otp
 

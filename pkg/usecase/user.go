@@ -48,7 +48,7 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 
 	// user.Password = string(hashedPassword)
 
-	if _, err := u.userRepo.SaveUserOnDatabase(user); err != nil {
+	if _, err := u.userRepo.CreateUser(user); err != nil {
 		return fmt.Errorf("Failed to save user on db, user sign up failed :%s", err)
 	}
 
@@ -75,7 +75,7 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 }
 
 func (u *userUseCase) FindUserById(userID int) (response.UserData, error) {
-	userData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserByID(userID)
 	if err != nil {
 		return response.UserData{}, err
 	}
@@ -83,7 +83,7 @@ func (u *userUseCase) FindUserById(userID int) (response.UserData, error) {
 }
 
 func (u *userUseCase) ReadAllCategories() ([]response.Category, error) {
-	listOfAllCategories, err := u.userRepo.ReadCategory()
+	listOfAllCategories, err := u.userRepo.ReadCategories()
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
 }
 
 func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
-	createdAddress, err := u.userRepo.AddAdressToDatabase(userID, address)
+	createdAddress, err := u.userRepo.AddAddress(userID, address)
 	if err != nil {
 		return fmt.Errorf("Failed to add address to db :%s", err)
 	}
@@ -114,14 +114,14 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 
 	}
 
-	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
+	defaultAddress, err := u.userRepo.FindDefaultAddress(userID)
 	if err != nil {
 		return err
 	}
 
 	if defaultAddress.ID == 0 {
 
-		setDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(createdAddress.ID), userID)
+		setDefaultAddress, err := u.userRepo.SetDefaultAddressStatus(true, int(createdAddress.ID), userID)
 		if err != nil {
 			return fmt.Errorf("failed to set default address :%s", err)
 		}
@@ -134,7 +134,7 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 }
 
 func (u *userUseCase) FindDefaultAddress(userID int) (response.Address, error) {
-	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
+	defaultAddress, err := u.userRepo.FindDefaultAddress(userID)
 
 	if err != nil {
 		return response.Address{}, fmt.Errorf("Failed to find default address :%s ", err)
@@ -169,7 +169,7 @@ func (u *userUseCase) GetUserAddresses(userID int) ([]response.Address, error) {
 }
 
 func (u *userUseCase) DeleteUserAddress(addressID int) error {
-	deletedAddress, err := u.userRepo.DeleteAddressFromDatabase(addressID)
+	deletedAddress, err := u.userRepo.DeleteAddress(addressID)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (u *userUseCase) DeleteUserAddress(addressID int) error {
 		return fmt.Errorf("Failed to set default address %s", err)
 	}
 	if userAddress.ID != 0 {
-		_, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(userAddress.ID), int(userAddress.UserID))
+		_, err := u.userRepo.SetDefaultAddressStatus(true, int(userAddress.ID), int(userAddress.UserID))
 		if err != nil {
 			return fmt.Errorf("Failed to update default address :%s", err)
 		}
@@ -193,17 +193,17 @@ func (u *userUseCase) DeleteUserAddress(addressID int) error {
 }
 
 func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
-	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
+	defaultAddress, err := u.userRepo.FindDefaultAddress(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to find default address :%s", err)
 	}
 
-	address, err := u.userRepo.SetIsDefaultStatusOnAddress(false, int(defaultAddress.ID), userID)
+	address, err := u.userRepo.SetDefaultAddressStatus(false, int(defaultAddress.ID), userID)
 	if address.ID == 0 || address.IsDefault || err != nil {
 		return fmt.Errorf("Failed to change default address : %s", err)
 	}
 
-	newDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, addressID, userID)
+	newDefaultAddress, err := u.userRepo.SetDefaultAddressStatus(true, addressID, userID)
 	if err != nil || !newDefaultAddress.IsDefault {
 		return fmt.Errorf("Failed to set  address to default : %s", err)
 	}
@@ -211,7 +211,7 @@ func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 }
 
 func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
-	userData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserByID(userID)
 	if err != nil {
 		return response.Profile{}, fmt.Errorf("Failed to find user : %s", err)
 	}
@@ -236,7 +236,7 @@ func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
 
 // profile
 func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
-	userData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserByID(userID)
 	if err != nil {
 		return err
 	}
@@ -274,7 +274,7 @@ func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userID
 }
 
 func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userID int) error {
-	userData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserByID(userID)
 
 	err = bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(password.Password))
 	if err != nil {

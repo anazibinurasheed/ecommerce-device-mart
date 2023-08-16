@@ -29,7 +29,7 @@ func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
 	}
 
 	admin.Password = string(hashedPassword)
-	adminData, err := ac.adminRepo.SaveAdminOnDatabase(admin)
+	adminData, err := ac.adminRepo.CreateAdmin(admin)
 
 	if err != nil {
 		return fmt.Errorf("Failed to create user :%s", err)
@@ -42,7 +42,7 @@ func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
 }
 
 func (ac *adminUsecase) SudoAdminLogin(sudoData request.SudoLoginData) error {
-	adminCredentials, err := ac.adminRepo.FindAdminLoginCredentials()
+	adminCredentials, err := ac.adminRepo.FindAdminCredentials()
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (ac *adminUsecase) SudoAdminLogin(sudoData request.SudoLoginData) error {
 
 func (ac *adminUsecase) GetAllUserData() ([]response.UserData, error) {
 
-	listOfAllUserData, err := ac.adminRepo.GetAllUserDataFromDatabase()
+	listOfAllUserData, err := ac.adminRepo.FetchAllUserData()
 	if err != nil {
 		return []response.UserData{}, fmt.Errorf("Failed to get user data's :%s", err)
 	}
@@ -68,7 +68,7 @@ func (ac *adminUsecase) GetAllUserData() ([]response.UserData, error) {
 
 }
 func (ac *adminUsecase) BlockUserByID(ID int) error {
-	err := ac.adminRepo.BlockUserOnDatabase(ID)
+	err := ac.adminRepo.BlockUserByID(ID)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (ac *adminUsecase) BlockUserByID(ID int) error {
 }
 
 func (ac *adminUsecase) UnBlockUserByID(ID int) error {
-	err := ac.adminRepo.UnBlockUserOnDatabase(ID)
+	err := ac.adminRepo.UnblockUserByID(ID)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (ac *adminUsecase) UnBlockUserByID(ID int) error {
 }
 
 func (ac *adminUsecase) FindUsersByName(name string) ([]response.UserData, error) {
-	user, err := ac.adminRepo.FindUserByNameFromDatabase(name)
+	user, err := ac.adminRepo.FindUsersByName(name)
 	if err != nil {
 		return nil, err
 	}

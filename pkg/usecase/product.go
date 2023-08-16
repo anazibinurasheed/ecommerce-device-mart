@@ -167,8 +167,8 @@ func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]r
 	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductWithID(productID int, updations request.Product) error {
-	updatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, updations)
+func (pu *productUseCase) UpdateProductWithID(productID int, update request.Product) error {
+	updatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, update)
 	if err != nil {
 		return fmt.Errorf("Failed to update product :%s", err)
 	}

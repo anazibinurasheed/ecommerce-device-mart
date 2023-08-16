@@ -6,11 +6,20 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 )
 
+// type AdminRepository interface {
+// 	FindAdminLoginCredentials() (config.AdminCredentials, error)
+// 	GetAllUserData() ([]response.UserData, error)
+// 	BlockUser(ID int) error
+// 	UnBlockUser(ID int) error
+// 	FindUserByNameFromDatabase(name string) ([]response.UserData, error)
+// 	SaveAdminOnDatabase(admin request.SignUpData) (response.UserData, error)
+// }
+
 type AdminRepository interface {
-	FindAdminLoginCredentials() (config.AdminCredentials, error)
-	GetAllUserDataFromDatabase() ([]response.UserData, error)
-	BlockUserOnDatabase(id int) error
-	UnBlockUserOnDatabase(id int) error
-	FindUserByNameFromDatabase(name string) ([]response.UserData, error)
-	SaveAdminOnDatabase(admin request.SignUpData) (response.UserData, error)
+	FindAdminCredentials() (config.AdminCredentials, error)
+	FetchAllUserData() ([]response.UserData, error)
+	BlockUserByID(userID int) error
+	UnblockUserByID(userID int) error
+	FindUsersByName(name string) ([]response.UserData, error)
+	CreateAdmin(adminData request.SignUpData) (response.UserData, error)
 }

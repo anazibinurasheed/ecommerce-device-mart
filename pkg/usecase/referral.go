@@ -23,47 +23,48 @@ func NewRefferalUseCase(referraluseCase interfaces.ReferralRepository, orderUseC
 }
 
 func (ru *referralUseCase) GetUserReferralCode(userID int) (response.Referral, error) {
-	refferalCode, err := ru.referralRepo.FindRefferalCodeByUserId(userID)
+	referralCode, err := ru.referralRepo.FindRefferalCodeByUserId(userID)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to find refferal code by user id : %s", err)
 	}
-	if refferalCode.ID != 0 {
-		return refferalCode, nil
+	if referralCode.ID != 0 {
+		return referralCode, nil
 	}
 
 	code := helper.GenerateReferralCode()
 
-	newRefferalCode, err := ru.referralRepo.InsertNewRefferalCode(userID, code)
+	newReferralCode, err := ru.referralRepo.InsertNewRefferalCode(userID, code)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to create new refferal code :%s", err)
 	}
-	if newRefferalCode.ID == 0 || newRefferalCode.Code == "" {
+	if newReferralCode.ID == 0 || newReferralCode.Code == "" {
 		return response.Referral{}, fmt.Errorf("Failed to verify the refferal code ")
 
 	}
-	return newRefferalCode, nil
+	return newReferralCode, nil
 
 }
 
-func (ru *referralUseCase) VerifyReferralCode(refferalCode string, claimingUserID int) (int, error) {
-	if refferalCode == "" {
-		return -1, fmt.Errorf("No refferal code provided")
+func (ru *referralUseCase) VerifyReferralCode(referralCode string, claimingUserID int) (int, error) {
+	if referralCode == "" {
+		return -1, fmt.Errorf("No referral code provided")
 	}
-	refferalCodeDetails, err := ru.referralRepo.FindRefferalCodeByCode(refferalCode)
+
+	referralCodeDetails, err := ru.referralRepo.FindRefferalCodeByCode(referralCode)
 	if err != nil {
-		return -1, fmt.Errorf("Failed to find refferal code : %s", err)
+		return -1, fmt.Errorf("Failed to find referral code : %s", err)
 	}
 
-	if refferalCodeDetails.ID == 0 {
-		return -1, fmt.Errorf("Invalid, refferal code doesn't exist")
+	if referralCodeDetails.ID == 0 {
+		return -1, fmt.Errorf("Invalid, referral code doesn't exist")
 	}
 
-	if refferalCodeDetails.ID == uint(claimingUserID) {
+	if referralCodeDetails.ID == uint(claimingUserID) {
 		return -1, fmt.Errorf("Not allowed to use this coupon")
 	}
 
-	codeOwnerID := refferalCodeDetails.UserID
-	return int(codeOwnerID), nil
+	referralCodeOwnerID := referralCodeDetails.UserID
+	return int(referralCodeOwnerID), nil
 }
 
 func (ru *referralUseCase) ClaimReferralBonus(claimingUserID, codeOwnerID int) error {

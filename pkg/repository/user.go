@@ -35,7 +35,7 @@ func (ud *userDatabase) FindUserByEmail(email string) (response.UserData, error)
 	return UserData, err
 }
 
-func (ud *userDatabase) FindUserById(id int) (response.UserData, error) {
+func (ud *userDatabase) FindUserByID(id int) (response.UserData, error) {
 	var UserData response.UserData
 	query := `SELECT * FROM users WHERE  ID= $1`
 	err := ud.DB.Raw(query, id).Scan(&UserData).Error
@@ -43,7 +43,7 @@ func (ud *userDatabase) FindUserById(id int) (response.UserData, error) {
 	return UserData, err
 }
 
-func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) (response.UserData, error) {
+func (ud *userDatabase) CreateUser(user request.SignUpData) (response.UserData, error) {
 	query := `INSERT INTO users (user_name,  email, phone, password,created_at) VALUES ($1,$2,$3,$4) RETURNING id,user_name,email,phone;`
 	var userData response.UserData
 	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password).Scan(&userData).Error
@@ -51,7 +51,7 @@ func (ud *userDatabase) SaveUserOnDatabase(user request.SignUpData) (response.Us
 	return userData, err
 }
 
-func (ud *userDatabase) ReadCategory() ([]response.Category, error) {
+func (ud *userDatabase) ReadCategories() ([]response.Category, error) {
 	var ListOfAllCategories = make([]response.Category, 0)
 	query := `SELECT * FROM Categories WHERE Is_blocked = false  ORDER BY Category_Name;`
 	err := ud.DB.Raw(query).Scan(&ListOfAllCategories).Error
@@ -64,7 +64,7 @@ func (ud *userDatabase) GetListOfStates() ([]response.States, error) {
 	err := ud.DB.Raw(query).Scan(&ListOfStates).Error
 	return ListOfStates, err
 }
-func (ud *userDatabase) AddAdressToDatabase(userId int, address request.Address) (response.Address, error) {
+func (ud *userDatabase) AddAddress(userID int, address request.Address) (response.Address, error) {
 	var NewAddress response.Address
 
 	query := `INSERT INTO Addresses 
@@ -72,21 +72,21 @@ func (ud *userDatabase) AddAdressToDatabase(userId int, address request.Address)
 	VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING * ; `
 
 	err := ud.DB.Raw(query, address.Name, address.PhoneNumber, address.Pincode, address.Locality,
-		address.AddressLine, address.District, address.StateId, address.Landmark, address.AlternativePhone, userId).Scan(&NewAddress).Error
+		address.AddressLine, address.District, address.StateId, address.Landmark, address.AlternativePhone, userID).Scan(&NewAddress).Error
 
 	return NewAddress, err
 
 }
 
-func (ud *userDatabase) FindDefaultAddressById(userId int) (response.Address, error) {
+func (ud *userDatabase) FindDefaultAddress(userID int) (response.Address, error) {
 	var DefaultAdrress response.Address
 	query := `SELECT * FROM Addresses WHERE is_default = true AND user_id = $1 FETCH FIRST 1 ROW ONLY ; `
-	err := ud.DB.Raw(query, userId).Scan(&DefaultAdrress).Error
+	err := ud.DB.Raw(query, userID).Scan(&DefaultAdrress).Error
 	fmt.Println("DEFAULT ADDRESS ::", DefaultAdrress)
 	return DefaultAdrress, err
 }
 
-func (ud *userDatabase) SetIsDefaultStatusOnAddress(status bool, addressId int, userId int) (response.Address, error) {
+func (ud *userDatabase) SetDefaultAddressStatus(status bool, addressId int, userId int) (response.Address, error) {
 
 	var DefaultAddress response.Address
 	query := `UPDATE Addresses SET is_default = $1 WHERE user_id = $2  AND id = $3 RETURNING * ;`
@@ -116,7 +116,7 @@ func (ud *userDatabase) UpdateAddress(address request.Address, addressID int, us
 	return UpdatedAddress, err
 }
 
-func (ud *userDatabase) DeleteAddressFromDatabase(adressId int) (response.Address, error) {
+func (ud *userDatabase) DeleteAddress(adressId int) (response.Address, error) {
 	var DeletedAddress response.Address
 	query := `DELETE FROM Addresses WHERE Id = $1 RETURNING * ; `
 	err := ud.DB.Raw(query, adressId).Scan(&DeletedAddress).Error
@@ -132,7 +132,7 @@ func (ud *userDatabase) ChangePassword(userId int, newPassword string) error {
 
 }
 
-func (ud *userDatabase) FindAddressByAddressID(addressID int) (response.Address, error) {
+func (ud *userDatabase) FindAddressByID(addressID int) (response.Address, error) {
 
 	var UserAddress response.Address
 	query := `SELECT * FROM addresses WHERE id = $1 ;  `
@@ -141,6 +141,7 @@ func (ud *userDatabase) FindAddressByAddressID(addressID int) (response.Address,
 
 	return UserAddress, err
 }
+
 func (ud *userDatabase) FindUserAddress(userID int) (response.Address, error) {
 
 	var UserAddress response.Address

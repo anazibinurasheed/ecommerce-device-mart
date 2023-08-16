@@ -14,7 +14,7 @@ type ProductUseCase interface {
 	CreateNewProduct(product request.Product) error
 	DisplayAllProductsToAdmin(page, count int) ([]response.Product, error)
 	DisplayAllAvailabeProductsToUser(page, count int) ([]response.Product, error)
-	UpdateProductWithID(productID int, updations request.Product) error
+	UpdateProductWithID(productID int, updated request.Product) error
 	BlockProductWithID(productID int) error
 	UnBlockProductWithID(productID int) error
 	ViewProductByID(productID int) (response.ProductItem, error)

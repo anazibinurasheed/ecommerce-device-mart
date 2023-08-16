@@ -69,7 +69,7 @@ func (ou *orderUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails,
 		return response.PaymentDetails{}, fmt.Errorf("Failed to retrieve userCart :%s", err)
 	}
 
-	userData, err := ou.userRepo.FindUserById(userID)
+	userData, err := ou.userRepo.FindUserByID(userID)
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to find user  %s", err)
 	}
@@ -84,8 +84,8 @@ func (ou *orderUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails,
 		RazorPayOrderID: razorPayOrderID,
 		Amount:          int(userCart.Total),
 	}, nil
-
 }
+
 func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID string, paymentID string) error {
 	err := helper.VerifyRazorPayPayment(signature, razorpayOrderID, paymentID)
 	if err != nil {
@@ -96,7 +96,7 @@ func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID 
 
 func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 
-	address, err := ou.userRepo.FindDefaultAddressById(userID)
+	address, err := ou.userRepo.FindDefaultAddress(userID)
 	if err != nil || address.ID == 0 {
 		return fmt.Errorf("Failed to find default address : %s", err)
 	}
