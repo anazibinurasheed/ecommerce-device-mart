@@ -173,14 +173,14 @@ func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
 //	@Failure		500		{object}	response.Response
 //	@Router			/admin/user-management/block-user/{userID} [post]
 func (ah *AdminHandler) BlockUser(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("userID"))
+	userID, err := strconv.Atoi(c.Param("userID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = ah.adminUseCase.BlockUserById(id)
+	err = ah.adminUseCase.BlockUserByID(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to block user", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -203,14 +203,14 @@ func (ah *AdminHandler) BlockUser(c *gin.Context) {
 //	@Failure		500		{object}	response.Response
 //	@Router			/admin/user-management/unblock-user/{userID} [post]
 func (ah *AdminHandler) UnblockUser(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("userID"))
+	userID, err := strconv.Atoi(c.Param("userID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	err = ah.adminUseCase.UnBlockUserById(id)
+	err = ah.adminUseCase.UnBlockUserByID(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to unblock user", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)

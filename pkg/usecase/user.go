@@ -75,33 +75,32 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 }
 
 func (u *userUseCase) FindUserById(userID int) (response.UserData, error) {
-	UserData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return response.UserData{}, err
 	}
-	return UserData, nil
+	return userData, nil
 }
 
 func (u *userUseCase) ReadAllCategories() ([]response.Category, error) {
-	ListOfAllCategories, err := u.userRepo.ReadCategory()
+	listOfAllCategories, err := u.userRepo.ReadCategory()
 	if err != nil {
 		return nil, err
 	}
-	return ListOfAllCategories, nil
+	return listOfAllCategories, nil
 
 }
 
 func (u *userUseCase) DisplayListOfStates() ([]response.States, error) {
-	ListOfStates, err := u.userRepo.GetListOfStates()
-
+	listOfStates, err := u.userRepo.GetListOfStates()
 	if err != nil {
 		return nil, err
 	}
-	if len(ListOfStates) == 0 {
+	if len(listOfStates) == 0 {
 		return nil, fmt.Errorf("No states found")
 	}
 
-	return ListOfStates, nil
+	return listOfStates, nil
 }
 
 func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
@@ -135,25 +134,25 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 }
 
 func (u *userUseCase) FindDefaultAddress(userID int) (response.Address, error) {
-	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
+	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
 
 	if err != nil {
 		return response.Address{}, fmt.Errorf("Failed to find default address :%s ", err)
 	}
 
-	if DefaultAddress.ID == 0 {
+	if defaultAddress.ID == 0 {
 		return response.Address{}, fmt.Errorf("Failed to verify retrieved default address")
 	}
-	return DefaultAddress, nil
+	return defaultAddress, nil
 }
 
 func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, userID int) error {
-	UpdatedAddress, err := u.userRepo.UpdateAddress(address, addressID, userID)
+	updatedAddress, err := u.userRepo.UpdateAddress(address, addressID, userID)
 
 	if err != nil {
 		return err
 	}
-	if UpdatedAddress.ID == 0 {
+	if updatedAddress.ID == 0 {
 		return errors.New("Failed to update address")
 	}
 	return nil
@@ -161,107 +160,113 @@ func (u *userUseCase) UpdateUserAddress(address request.Address, addressID int, 
 }
 
 func (u *userUseCase) GetUserAddresses(userID int) ([]response.Address, error) {
-	ListOfAddresses, err := u.userRepo.GetAllUserAddresses(userID)
+	listOfAddresses, err := u.userRepo.GetAllUserAddresses(userID)
 
 	if err != nil {
 		return nil, err
 	}
-	return ListOfAddresses, nil
+	return listOfAddresses, nil
 }
 
 func (u *userUseCase) DeleteUserAddress(addressID int) error {
-	DeletedAddress, err := u.userRepo.DeleteAddressFromDatabase(addressID)
+	deletedAddress, err := u.userRepo.DeleteAddressFromDatabase(addressID)
 	if err != nil {
 		return err
 	}
-	if DeletedAddress.ID == 0 {
+	if deletedAddress.ID == 0 {
 		return errors.New("Address not found.")
 	}
-	userID := DeletedAddress.UserID
-	UserAddress, err := u.userRepo.FindUserAddress(int(userID))
+
+	userID := deletedAddress.UserID
+
+	userAddress, err := u.userRepo.FindUserAddress(int(userID))
 	if err != nil {
 		return fmt.Errorf("Failed to set default address %s", err)
 	}
-	if UserAddress.ID != 0 {
-		_, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(UserAddress.ID), int(UserAddress.UserID))
+	if userAddress.ID != 0 {
+		_, err := u.userRepo.SetIsDefaultStatusOnAddress(true, int(userAddress.ID), int(userAddress.UserID))
 		if err != nil {
 			return fmt.Errorf("Failed to update default address :%s", err)
 		}
 	}
 	return nil
 }
+
 func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
-	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
+	defaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to find default address :%s", err)
 	}
-	Address, err := u.userRepo.SetIsDefaultStatusOnAddress(false, int(DefaultAddress.ID), userID)
-	if Address.ID == 0 || Address.IsDefault || err != nil {
+
+	address, err := u.userRepo.SetIsDefaultStatusOnAddress(false, int(defaultAddress.ID), userID)
+	if address.ID == 0 || address.IsDefault || err != nil {
 		return fmt.Errorf("Failed to change default address : %s", err)
 	}
-	NewDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, addressID, userID)
-	if err != nil || !NewDefaultAddress.IsDefault {
+
+	newDefaultAddress, err := u.userRepo.SetIsDefaultStatusOnAddress(true, addressID, userID)
+	if err != nil || !newDefaultAddress.IsDefault {
 		return fmt.Errorf("Failed to set  address to default : %s", err)
 	}
 	return nil
 }
-func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
-	var profile response.Profile
 
-	UserData, err := u.userRepo.FindUserById(userID)
+func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
+	userData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return response.Profile{}, fmt.Errorf("Failed to find user : %s", err)
 	}
 
-	if UserData.ID == 0 {
+	if userData.ID == 0 {
 		return response.Profile{}, fmt.Errorf("User not found")
 	}
 
-	profile.ID = UserData.ID
-	profile.UserName = UserData.UserName
-	profile.Email = UserData.Email
-	profile.Phone = UserData.Phone
-	profile.Addresses, err = u.userRepo.GetAllUserAddresses(userID)
+	userAddresses, err := u.userRepo.GetAllUserAddresses(userID)
 	if err != nil {
-		return response.Profile{}, fmt.Errorf("Failed to find user addresses:  %s", err)
+		return response.Profile{}, fmt.Errorf("Failed to find user addresses :%s", err)
 	}
 
-	return profile, nil
+	return response.Profile{
+		ID:        userData.ID,
+		UserName:  userData.UserName,
+		Email:     userData.Email,
+		Phone:     userData.Phone,
+		Addresses: userAddresses,
+	}, nil
 }
 
 // profile
 func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
-	UserData, err := u.userRepo.FindUserById(userID)
+	userData, err := u.userRepo.FindUserById(userID)
 	if err != nil {
 		return err
 	}
 
-	if UserData.ID == 0 {
+	if userData.ID == 0 {
 		return fmt.Errorf("User not found.")
 	}
 
-	err = helper.SendOtp(fmt.Sprint(UserData.Phone))
+	err = helper.SendOtp(fmt.Sprint(userData.Phone))
 	if err != nil {
 		return fmt.Errorf("Failed to send otp")
 	}
+
 	helper.SetToCookie(userID, "PasswordChange", c)
 
 	return nil
 }
 
 func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userID int, c *gin.Context) error {
-
 	if password.NewPassword != password.ReNewPassword {
 		return fmt.Errorf("Password is not matching")
 	}
 
-	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password.NewPassword), 10)
 	if err != nil {
 		log.Println("FAILED TO HASH PASSWORD", err)
 		return fmt.Errorf("Unable to process the request ")
 	}
 
-	err = u.userRepo.ChangePassword(userID, string(HashedPassword))
+	err = u.userRepo.ChangePassword(userID, string(hashedPassword))
 	if err != nil {
 		return fmt.Errorf("Failed to change password :%s", err)
 	}
@@ -269,10 +274,9 @@ func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userID
 }
 
 func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userID int) error {
+	userData, err := u.userRepo.FindUserById(userID)
 
-	UserData, err := u.userRepo.FindUserById(userID)
-
-	err = bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(password.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(password.Password))
 	if err != nil {
 		return fmt.Errorf("Entered wrong password : %s", err)
 	}
@@ -281,14 +285,11 @@ func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userID 
 }
 
 func (u *userUseCase) UpdateUserName(username string, userID int) error {
-
-	UserData, err := u.userRepo.UpdateUserName(username, userID)
+	userData, err := u.userRepo.UpdateUserName(username, userID)
 	if err != nil {
-
 		return fmt.Errorf("Failed to update username : %s", err)
 	}
-
-	if UserData.UserName != username {
+	if userData.UserName != username {
 		return fmt.Errorf("Failed to update username")
 	}
 	return nil

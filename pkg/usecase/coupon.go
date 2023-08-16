@@ -23,15 +23,15 @@ func NewCouponUseCase(couponRepo interfaces.CouponRepository) services.CouponUse
 }
 
 func (cu *couponUseCase) CreateCoupons(couponData request.Coupon) error {
-	Days := couponData.ValidityDays
+	validDays := couponData.ValidityDays
 	couponData.ValidFrom = time.Now()
-	couponData.ValidTill = time.Now().AddDate(0, 0, Days)
+	couponData.ValidTill = time.Now().AddDate(0, 0, validDays)
 
-	InsertedCoupon, err := cu.couponRepo.InsertNewCoupon(couponData)
+	insertedCoupon, err := cu.couponRepo.InsertNewCoupon(couponData)
 	if err != nil {
 		return fmt.Errorf("Failed to insert coupon :%s", err)
 	}
-	if InsertedCoupon.ID == 0 {
+	if insertedCoupon.ID == 0 {
 		return fmt.Errorf("Failed to verify inserted coupon ")
 
 	}
@@ -39,24 +39,25 @@ func (cu *couponUseCase) CreateCoupons(couponData request.Coupon) error {
 }
 
 func (cu *couponUseCase) ViewAllCoupons() ([]response.Coupon, error) {
-	Coupons, err := cu.couponRepo.VeiwAllCoupons()
+	coupons, err := cu.couponRepo.VeiwAllCoupons()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to insert coupon :%s", err)
 	}
 
-	return Coupons, nil
+	return coupons, nil
 }
 func (cu *couponUseCase) UpdateCoupon(couponData request.Coupon, couponID int) error {
-	Days := couponData.ValidityDays
+	validDays := couponData.ValidityDays
 	couponData.ValidFrom = time.Now()
-	couponData.ValidTill = time.Now().AddDate(0, 0, Days)
+	couponData.ValidTill = time.Now().AddDate(0, 0, validDays)
 	couponData.ID = uint(couponID)
-	UpdatedCoupon, err := cu.couponRepo.UpdateCoupon(couponData)
+
+	updatedCoupon, err := cu.couponRepo.UpdateCoupon(couponData)
 	if err != nil {
 		return fmt.Errorf("Failed to update coupon : %s", err)
 	}
 
-	if UpdatedCoupon.ID == 0 {
+	if updatedCoupon.ID == 0 {
 		return fmt.Errorf("Failed to verify updated coupon by id ")
 	}
 
@@ -64,22 +65,22 @@ func (cu *couponUseCase) UpdateCoupon(couponData request.Coupon, couponID int) e
 }
 
 func (cu *couponUseCase) BlockCoupon(couponID int) error {
-	BlockedCoupon, err := cu.couponRepo.BlockCoupon(couponID)
+	blockedCoupon, err := cu.couponRepo.BlockCoupon(couponID)
 	if err != nil {
 		return fmt.Errorf("Failed to block coupon : %s ", err)
 	}
-	if BlockedCoupon.ID == 0 {
+	if blockedCoupon.ID == 0 {
 		return fmt.Errorf("Failed to verify blocked coupon by id ")
 	}
 	return nil
 
 }
 func (cu *couponUseCase) UnBlockCoupon(couponID int) error {
-	UnBlockedCoupon, err := cu.couponRepo.UnblockCoupon(couponID)
+	unBlockedCoupon, err := cu.couponRepo.UnblockCoupon(couponID)
 	if err != nil {
 		return fmt.Errorf("Failed to unblock coupon : %s ", err)
 	}
-	if UnBlockedCoupon.ID == 0 {
+	if unBlockedCoupon.ID == 0 {
 		return fmt.Errorf("Failed to verify unblocked coupon by id ")
 	}
 	return nil
@@ -88,42 +89,46 @@ func (cu *couponUseCase) UnBlockCoupon(couponID int) error {
 
 func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error {
 
-	Coupon, err := cu.couponRepo.FindCouponByCode(couponCode)
+	coupon, err := cu.couponRepo.FindCouponByCode(couponCode)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find coupon  :%s", err)
 	}
 
-	if Coupon.IsBlocked || !helper.IsCouponValid(Coupon.ValidTill) || Coupon.ID == 0 {
+	if coupon.IsBlocked || !helper.IsCouponValid(coupon.ValidTill) || coupon.ID == 0 {
 		return fmt.Errorf("coupon cant use ,invalid coupon")
 	}
 
-	TrackingDetails, err := cu.couponRepo.FindCouponTracking(userID, Coupon.ID)
+	couponTrackingDetails, err := cu.couponRepo.FindCouponTracking(userID, coupon.ID)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find coupon tracking details : %s", err)
 	}
 
-	if TrackingDetails.CouponID == Coupon.ID && TrackingDetails.IsUsed {
+	if couponTrackingDetails.CouponID == coupon.ID && couponTrackingDetails.IsUsed {
 		return fmt.Errorf("Failed coupon already used")
-	} else if TrackingDetails.CouponID == Coupon.ID && !TrackingDetails.IsUsed {
+	} else if couponTrackingDetails.CouponID == coupon.ID && !couponTrackingDetails.IsUsed {
 		return nil
 	}
-	PreviousCoupon, err := cu.couponRepo.CheckForAppliedCoupon(userID)
+
+	previousCoupon, err := cu.couponRepo.CheckForAppliedCoupon(userID)
 
 	if err != nil {
 		return fmt.Errorf("Failed to find  previous coupon details from coupon tracking ")
 	}
-	if PreviousCoupon.ID != 0 && !PreviousCoupon.IsUsed {
-		ChangedCoupon, err := cu.couponRepo.ChangeCoupon(Coupon.ID, userID)
+	if previousCoupon.ID != 0 && !previousCoupon.IsUsed {
+
+		changedCoupon, err := cu.couponRepo.ChangeCoupon(coupon.ID, userID)
 		if err != nil {
 			return fmt.Errorf("Failed to change coupon : %s", err)
 
-		} else if ChangedCoupon.ID == 0 {
+		}
+		if changedCoupon.ID == 0 {
 			return fmt.Errorf("Failed to verify changed coupon from coupon tracking")
 		}
+
 	} else {
-		InsertedRecord, err := cu.couponRepo.InsertIntoCouponTracking(userID, Coupon.ID)
+		InsertedRecord, err := cu.couponRepo.InsertIntoCouponTracking(userID, coupon.ID)
 		if err != nil {
 			return fmt.Errorf("Failed to insert tracking record : %s", err)
 		}
@@ -137,21 +142,21 @@ func (cu *couponUseCase) ProcessApplyCoupon(couponCode string, userID int) error
 
 func (cu *couponUseCase) ListOutAvailableCouponsToUser(userID int) ([]response.Coupon, error) {
 	currentTime := time.Now()
-	AllCoupons, err := cu.couponRepo.FetchAvailabeCouponsForUser(userID, currentTime)
+	allCoupons, err := cu.couponRepo.FetchAvailabeCouponsForUser(userID, currentTime)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch available  coupons")
 	}
-	return AllCoupons, nil
+	return allCoupons, nil
 
 }
 
 func (cu *couponUseCase) RemoveFromCouponTracking(couponID, userID int) error {
-	RemovedCoupon, err := cu.couponRepo.RemoveCouponFromCouponTracking(couponID, userID)
+	removedCoupon, err := cu.couponRepo.RemoveCouponFromCouponTracking(couponID, userID)
 	if err != nil {
 		return fmt.Errorf("Failed to remove coupon from coupon tracking :%s", err)
 	}
-	if RemovedCoupon.ID == 0 {
-		return fmt.Errorf("Failed to verify the removed coupon  ")
+	if removedCoupon.ID == 0 {
+		return fmt.Errorf("Failed to verify the removed coupon")
 	}
 	return nil
 }

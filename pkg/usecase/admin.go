@@ -23,19 +23,18 @@ func NewAdminUseCase(adminUseCase interfaces.AdminRepository, userUseCase interf
 }
 
 func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
-
-	HashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 10)
 	if err != nil {
 		return fmt.Errorf("Failed to generate hash from password :%s", err)
 	}
 
-	admin.Password = string(HashedPassword)
-	AdminData, err := ac.adminRepo.SaveAdminOnDatabase(admin)
+	admin.Password = string(hashedPassword)
+	adminData, err := ac.adminRepo.SaveAdminOnDatabase(admin)
 
 	if err != nil {
 		return fmt.Errorf("Failed to create user :%s", err)
 	}
-	if AdminData.ID == 0 {
+	if adminData.ID == 0 {
 		return fmt.Errorf("Failed to verify created user")
 	}
 
@@ -60,24 +59,24 @@ func (ac *adminUsecase) SudoAdminLogin(sudoData request.SudoLoginData) error {
 
 func (ac *adminUsecase) GetAllUserData() ([]response.UserData, error) {
 
-	ListOfAllUserData, err := ac.adminRepo.GetAllUserDataFromDatabase()
+	listOfAllUserData, err := ac.adminRepo.GetAllUserDataFromDatabase()
 	if err != nil {
 		return []response.UserData{}, fmt.Errorf("Failed to get user data's :%s", err)
 	}
 
-	return ListOfAllUserData, nil
+	return listOfAllUserData, nil
 
 }
-func (ac *adminUsecase) BlockUserById(id int) error {
-	err := ac.adminRepo.BlockUserOnDatabase(id)
+func (ac *adminUsecase) BlockUserByID(ID int) error {
+	err := ac.adminRepo.BlockUserOnDatabase(ID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ac *adminUsecase) UnBlockUserById(id int) error {
-	err := ac.adminRepo.UnBlockUserOnDatabase(id)
+func (ac *adminUsecase) UnBlockUserByID(ID int) error {
+	err := ac.adminRepo.UnBlockUserOnDatabase(ID)
 	if err != nil {
 		return err
 	}

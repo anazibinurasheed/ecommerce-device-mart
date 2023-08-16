@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"errors"
+	"fmt"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
@@ -27,12 +27,12 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 // )
 
 func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error) {
-	UserData, err := cu.userRepo.FindUserByPhone(phone.Phone)
+	userData, err := cu.userRepo.FindUserByPhone(phone.Phone)
 	if err != nil {
 		return 0, err
 	}
-	if UserData.ID != 0 {
-		return 0, errors.New("User already exist with this phone number")
+	if userData.ID != 0 {
+		return 0, fmt.Errorf("User already exist with this phone number")
 	}
 
 	// usersMutex.Lock()

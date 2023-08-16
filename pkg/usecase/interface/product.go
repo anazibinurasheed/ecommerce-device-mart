@@ -7,7 +7,7 @@ import (
 
 type ProductUseCase interface {
 	CreateNewCategory(category request.Category) error
-	ReadAllCategories(page int, count int) ([]response.Category, error)
+	ReadAllCategories(page, count int) ([]response.Category, error)
 	UpdateCategoryWithID(categoryID int, category request.Category) error
 	BlockCategoryWithID(categoryID int) error
 	UnBlockCategoryWithID(categoryID int) error
@@ -19,7 +19,7 @@ type ProductUseCase interface {
 	UnBlockProductWithID(productID int) error
 	ViewProductByID(productID int) (response.ProductItem, error)
 	ValidateProductRatingRequest(userID, productID int) error
-	InsertNewProductRating(userID int, productID int, rating request.Rating) error
+	InsertNewProductRating(userID, productID int, rating request.Rating) error
 	SearchProducts(search string, page, count int) ([]response.Product, error)
-	GetProductsByCategory(categoryID int, page, count int) ([]response.Product, error)
+	GetProductsByCategory(categoryID, page, count int) ([]response.Product, error)
 }

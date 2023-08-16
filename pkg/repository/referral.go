@@ -10,7 +10,7 @@ type refferalDatabase struct {
 	DB *gorm.DB
 }
 
-func NewRefferalRepository(DB *gorm.DB) interfaces.RefferalRepository {
+func NewRefferalRepository(DB *gorm.DB) interfaces.ReferralRepository {
 	return &refferalDatabase{
 		DB: DB,
 	}

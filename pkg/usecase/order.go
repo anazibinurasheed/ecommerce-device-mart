@@ -35,7 +35,7 @@ func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services
 //safe for concurrent use by multiple goroutines without additional locking or coordination. Loads, stores, and deletes run in amortized constant time.
 
 func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
-	var CheckOutDetails response.CheckOut
+	var checkOutDetails response.CheckOut
 
 	addresses, err := ou.userRepo.GetAllUserAddresses(userID)
 	if err != nil {
@@ -54,33 +54,35 @@ func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
 	if err != nil || paymentMethods == nil {
 		return response.CheckOut{}, fmt.Errorf("Failed to get payment methods %s", err)
 	}
-	CheckOutDetails.Address = addresses
-	CheckOutDetails.Cart = cartItems.Cart
-	CheckOutDetails.Total = cartItems.Total
-	CheckOutDetails.Discount = cartItems.Discount
-	CheckOutDetails.PaymentOptions = paymentMethods
+	checkOutDetails.Address = addresses
+	checkOutDetails.Cart = cartItems.Cart
+	checkOutDetails.Total = cartItems.Total
+	checkOutDetails.Discount = cartItems.Discount
+	checkOutDetails.PaymentOptions = paymentMethods
 
-	return CheckOutDetails, nil
+	return checkOutDetails, nil
 }
 
 func (ou *orderUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails, error) {
-	CartData, err := ou.cartUseCase.ViewCart(userID)
+	userCart, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
-		return response.PaymentDetails{}, fmt.Errorf("Failed to retrieve cartitems %s", err)
+		return response.PaymentDetails{}, fmt.Errorf("Failed to retrieve userCart :%s", err)
 	}
 
-	UserData, err := ou.userRepo.FindUserById(userID)
+	userData, err := ou.userRepo.FindUserById(userID)
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to find user  %s", err)
 	}
-	RazorPayOrderID, err := helper.MakeRazorPayPaymentId(int(CartData.Total * 100))
+
+	razorPayOrderID, err := helper.MakeRazorPayPaymentId(int(userCart.Total * 100))
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to get razorpay id %s", err)
 	}
+
 	return response.PaymentDetails{
-		Username:        UserData.UserName,
-		RazorPayOrderID: RazorPayOrderID,
-		Amount:          int(CartData.Total),
+		Username:        userData.UserName,
+		RazorPayOrderID: razorPayOrderID,
+		Amount:          int(userCart.Total),
 	}, nil
 
 }
@@ -177,7 +179,9 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 	}
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
-	var Datas response.OrderManagement
+
+	var orderManagementDetails response.OrderManagement
+
 	orderHistory, err := ou.orderRepo.AllOrderData(startIndex, endIndex)
 	if err != nil {
 		return response.OrderManagement{}, fmt.Errorf("Failed to get order history : %s", err)
@@ -186,10 +190,9 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 	if err != nil {
 		return response.OrderManagement{}, fmt.Errorf("Failed to retrieve order statuses : %s", err)
 	}
-	Datas.Orders = orderHistory
-	fmt.Println("USECASE ORDERHISTORY ::", orderHistory)
-	Datas.OrderStatuses = orderStatuses
-	return Datas, nil
+	orderManagementDetails.Orders = orderHistory
+	orderManagementDetails.OrderStatuses = orderStatuses
+	return orderManagementDetails, nil
 }
 
 func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, error) {
@@ -202,15 +205,14 @@ func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, er
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
 
-	AllOrders, err := ou.orderRepo.AllOrderData(startIndex, endIndex)
+	allOrders, err := ou.orderRepo.AllOrderData(startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get order history : %s", err)
 	}
-	return AllOrders, nil
+	return allOrders, nil
 }
 
 func (ou *orderUseCase) UpdateOrderStatus(statusID int, orderID int) error {
-	fmt.Println(statusID, orderID)
 	updatedOrder, err := ou.orderRepo.ChangeOrderStatus(statusID, orderID)
 	if err != nil {
 		return fmt.Errorf("Failed to update order : %s", err)
@@ -263,7 +265,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	if cancellingOrder.ID == 0 {
 		return fmt.Errorf("Failed to verify order by id")
 	}
-	PaymentMethodUsed, err := ou.paymentRepo.FindPaymentMethodById(cancellingOrder.PaymentMethodID)
+	paymentMethodUsed, err := ou.paymentRepo.FindPaymentMethodById(cancellingOrder.PaymentMethodID)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch payment method :%s", err)
 	}
@@ -274,30 +276,33 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 
 	//checking user has used coupon or not
 	//reduct coupon percentage and insert money into wallet
-	if cancellingOrder.CouponID != 0 && PaymentMethodUsed.MethodName == "online payment" || PaymentMethodUsed.MethodName == "Wallet" || orderStatus == "Returned" {
-		CouponUsedOrders, err := ou.orderRepo.FindOrdersUsedByCoupon(int(cancellingOrder.CouponID))
+	if cancellingOrder.CouponID != 0 && paymentMethodUsed.MethodName == "online payment" || paymentMethodUsed.MethodName == "Wallet" || orderStatus == "Returned" {
+		couponClaimedOrders, err := ou.orderRepo.FindOrdersUsedByCoupon(int(cancellingOrder.CouponID))
 		if err != nil {
 			return fmt.Errorf("Failed to fetch orders purchased using coupon : %s", err)
 		}
-		if len(CouponUsedOrders) == 0 {
+		if len(couponClaimedOrders) == 0 {
 			return fmt.Errorf("Failed to get coupon used orders")
 		}
-		var TotalPriceOfOrder float32
-		for _, order := range CouponUsedOrders {
-			TotalPriceOfOrder += order.Price
+
+		var totalPriceOfOrder float32
+		for _, order := range couponClaimedOrders {
+			totalPriceOfOrder += order.Price
 		}
-		Coupon, err := ou.couponRepo.FindCouponById(int(cancellingOrder.CouponID))
+
+		coupon, err := ou.couponRepo.FindCouponById(int(cancellingOrder.CouponID))
 
 		if err != nil {
 			return fmt.Errorf("Failed to fetch coupon details :%s", err)
 		}
 
-		var DiscountAllowedPerOrder float32
-		if Coupon.ID != 0 {
+		var discountedAmountPerOrderUsingCoupon float32
+		if coupon.ID != 0 {
 
-			TotalDiscountedAmountOnOrders := (TotalPriceOfOrder * float32(Coupon.DiscountPercent)) / 100
-			DiscountAllowedPerOrder = TotalDiscountedAmountOnOrders / float32(len(CouponUsedOrders))
+			TotalDiscountedAmountOnOrders := (totalPriceOfOrder * float32(coupon.DiscountPercent)) / 100
+			discountedAmountPerOrderUsingCoupon = TotalDiscountedAmountOnOrders / float32(len(couponClaimedOrders))
 		}
+
 		if orderStatus != "Returned" {
 			Status, err := ou.orderRepo.GetStatusCancelled()
 			if err != nil {
@@ -306,72 +311,75 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 			if Status.ID == 0 {
 				return fmt.Errorf("Failed to verify the status")
 			}
-			UpdatedOrder, err := ou.orderRepo.ChangeOrderStatus(int(Status.ID), orderID)
+
+			updatedOrder, err := ou.orderRepo.ChangeOrderStatus(int(Status.ID), orderID)
 			if err != nil {
 				return fmt.Errorf("Failed to update order status :%s", err)
 			}
-			if UpdatedOrder.ID == 0 {
+			if updatedOrder.ID == 0 {
 				return fmt.Errorf("Failed to verify the orderline")
 			}
 
 		}
 
-		RefundingAmount := (cancellingOrder.Price - DiscountAllowedPerOrder)
-		Wallet, err := ou.orderRepo.FindUserWallet(int(cancellingOrder.UserID))
+		refundingAmount := (cancellingOrder.Price - discountedAmountPerOrderUsingCoupon)
+		wallet, err := ou.orderRepo.FindUserWallet(int(cancellingOrder.UserID))
 		if err != nil {
 			return fmt.Errorf("Failed to find user wallet : %s", err)
 		}
-		if Wallet.ID == 0 {
-			NewWallet, err := ou.orderRepo.InitializeNewWallet(int(cancellingOrder.UserID))
+		if wallet.ID == 0 {
+			newWallet, err := ou.orderRepo.InitializeNewWallet(int(cancellingOrder.UserID))
 			if err != nil {
 				return fmt.Errorf("Failed to initialize wallet for user id %d", cancellingOrder.UserID)
 			}
-			if NewWallet.ID == 0 {
+			if newWallet.ID == 0 {
 				return fmt.Errorf("Failed to verify initialized wallet")
 			}
 		}
-		NewWalletBalance := (Wallet.Amount + RefundingAmount)
-		UpdatedWalletDetails, err := ou.orderRepo.UpdateUserWallet(int(cancellingOrder.UserID), NewWalletBalance)
+
+		newWalletBalance := (wallet.Amount + refundingAmount)
+		updatedWalletDetails, err := ou.orderRepo.UpdateUserWallet(int(cancellingOrder.UserID), newWalletBalance)
 		if err != nil {
 			if cancellingOrder.ID == 0 {
-				return fmt.Errorf("Failed to veirfy order by id")
+				return fmt.Errorf("Failed to verify cancelling product")
 			}
-
 			return fmt.Errorf("order-cancelled failed to add amount to wallet : %s", err)
 		}
-		if UpdatedWalletDetails.ID == 0 {
+
+		if updatedWalletDetails.ID == 0 {
 			return fmt.Errorf("Failed to verify the wallet info by id")
 		}
 	}
 
-	if PaymentMethodUsed.MethodName == "cash on delivery" && orderStatus != "Returned" {
-		Status, err := ou.orderRepo.GetStatusCancelled()
+	if paymentMethodUsed.MethodName == "cash on delivery" && orderStatus != "Returned" {
+		status, err := ou.orderRepo.GetStatusCancelled()
 		if err != nil {
 			return fmt.Errorf("Failed to procceed cancellation :%s", err)
 		}
-		if Status.ID == 0 {
+		if status.ID == 0 {
 			return fmt.Errorf("Failed to verify the status")
 		}
-		UpdatedOrder, err := ou.orderRepo.ChangeOrderStatus(int(Status.ID), orderID)
+
+		updatedOrder, err := ou.orderRepo.ChangeOrderStatus(int(status.ID), orderID)
 		if err != nil {
 			return fmt.Errorf("Failed to update order status :%s", err)
 		}
-		if UpdatedOrder.ID == 0 {
-			return fmt.Errorf("Failed to verify the orderline")
+		if updatedOrder.ID == 0 {
+			return fmt.Errorf("Failed to verify updated order")
 		}
 	}
 	return nil
 }
 
 func (ou *orderUseCase) GetUserWallet(userID int) (response.Wallet, error) {
-	Wallet, err := ou.orderRepo.FindUserWallet(userID)
+	wallet, err := ou.orderRepo.FindUserWallet(userID)
 	if err != nil {
 		return response.Wallet{}, fmt.Errorf("Failed to get user wallet :%s", err)
 	}
-	if Wallet.ID == 0 {
-		return response.Wallet{}, fmt.Errorf("User dont have an wallet")
+	if wallet.ID == 0 {
+		return response.Wallet{}, fmt.Errorf("User don't have an wallet")
 	}
-	return Wallet, nil
+	return wallet, nil
 }
 
 func (ou *orderUseCase) CreateUserWallet(userID int) error {
@@ -384,11 +392,12 @@ func (ou *orderUseCase) CreateUserWallet(userID int) error {
 	if wallet.ID != 0 {
 		return fmt.Errorf("User already have wallet")
 	}
-	Wallet, err := ou.orderRepo.InitializeNewWallet(userID)
+
+	newWallet, err := ou.orderRepo.InitializeNewWallet(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to initialize wallet for user %d : %s", userID, err)
 	}
-	if Wallet.ID == 0 {
+	if newWallet.ID == 0 {
 		return fmt.Errorf("Failed to verify new wallet for user id  %d", userID)
 	}
 	return nil
