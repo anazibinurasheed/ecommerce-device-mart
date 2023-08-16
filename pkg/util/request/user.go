@@ -5,7 +5,7 @@ type SignUpData struct {
 	Email    string `json:"email" binding:"required,email"`
 	Phone    int    `json:"-"`
 	Password string `json:"password" binding:"required"`
-	ID       string `json:"uuid"` //for retrieve user phone
+	UUID     string `json:"uuid"` //for retrieve user phone from the map
 }
 
 type LoginData struct {

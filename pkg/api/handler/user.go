@@ -46,7 +46,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//use of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.ID]
+	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
 		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
@@ -72,7 +72,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	}
 
 	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.ID)
+	delete(phoneDataMap, body.UUID)
 	phoneDataMutex.Unlock()
 
 	response := response.ResponseMessage(200, "Success, account created", nil, nil)

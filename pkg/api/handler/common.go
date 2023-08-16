@@ -98,7 +98,7 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 	}
 
 	phoneDataMutex.Lock()
-	number, ok := phoneDataMap[body.ID]
+	number, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
 		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
@@ -124,7 +124,7 @@ func (ch *CommonHandler) OtpValidater(c *gin.Context) {
 	c.SetCookie("PhoneAuthorization", tokenString, maxAge, "", "", false, true)
 	c.SetSameSite(http.SameSiteLaxMode)
 
-	response := response.ResponseMessage(202, "Success, verified phone number", body.ID, nil)
+	response := response.ResponseMessage(202, "Success, verified phone number", body.UUID, nil)
 	c.JSON(http.StatusAccepted, response)
 }
 

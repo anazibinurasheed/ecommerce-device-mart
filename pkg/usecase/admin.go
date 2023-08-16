@@ -42,7 +42,7 @@ func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
 	return nil
 }
 
-func (ac *adminUsecase) SudoAdminLogin(sudoData request.LoginSudoAdmin) error {
+func (ac *adminUsecase) SudoAdminLogin(sudoData request.SudoLoginData) error {
 	adminCredentials, err := ac.adminRepo.FindAdminLoginCredentials()
 	if err != nil {
 		return err

@@ -6,7 +6,7 @@ import (
 )
 
 type AdminUseCase interface {
-	SudoAdminLogin(sudoData request.LoginSudoAdmin) error
+	SudoAdminLogin(sudoData request.SudoLoginData) error
 	GetAllUserData() ([]response.UserData, error)
 	BlockUserById(id int) error
 	UnBlockUserById(id int) error

@@ -35,7 +35,7 @@ func TestUserSignup(t *testing.T) {
 				Email:    "anazibinurasheed@gmail.com",
 				Phone:    8590138151,
 				Password: "123456789",
-				ID:       "key",
+				UUID:     "key",
 			}).Return(nil).Times(1)
 
 		},

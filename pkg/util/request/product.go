@@ -18,6 +18,6 @@ type Product struct {
 type Rating struct {
 	UserID      int    `json:"-"`
 	ProductID   int    `json:"-"`
-	Rating      int    `json:"rating"`
-	Description string `json:"description"`
+	Rating      int    `json:"rating" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }

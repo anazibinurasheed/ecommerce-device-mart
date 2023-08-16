@@ -45,7 +45,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//usecase of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.ID]
+	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
 		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
@@ -70,7 +70,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 
 	//from here phone details from map not needed .
 	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.ID)
+	delete(phoneDataMap, body.UUID)
 	phoneDataMutex.Unlock()
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
@@ -92,7 +92,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 //	@Failure		500		{object}	response.Response
 //	@Router			/admin/sudo/login [post]
 func (ah *AdminHandler) SudoAdminLogin(c *gin.Context) {
-	var body request.LoginSudoAdmin
+	var body request.SudoLoginData
 	if err := c.BindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
