@@ -15,8 +15,8 @@ func TestSignup(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockRepository := mockRepo.NewMockUserRepository(ctrl)
-	userUseCase := NewUserUseCase(mockRepository)
+	mockUserRepo := mockRepo.NewMockUserRepository(ctrl)
+	userUseCase := NewUserUseCase(mockUserRepo)
 
 	testCases := []struct {
 		name        string
@@ -52,7 +52,7 @@ func TestSignup(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.beforeTest(mockRepository)
+			tc.beforeTest(mockUserRepo)
 			err := userUseCase.SignUp(tc.input)
 			assert.Equal(t, tc.expectedErr, err)
 		})
@@ -60,12 +60,11 @@ func TestSignup(t *testing.T) {
 }
 
 func TestUpdateUserName(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockRepository := mockRepo.NewMockUserRepository(ctrl)
-	userUseCase := NewUserUseCase(mockRepository)
+	mockUserRepo := mockRepo.NewMockUserRepository(ctrl)
+	userUseCase := NewUserUseCase(mockUserRepo)
 
 	type args struct {
 		name string
@@ -110,7 +109,7 @@ func TestUpdateUserName(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.beforeTest(mockRepository)
+			tc.beforeTest(mockUserRepo)
 			err := userUseCase.UpdateUserName(tc.input.name, tc.input.ID)
 
 			assert.Equal(t, err, tc.expectedErr)

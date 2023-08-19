@@ -122,7 +122,7 @@ func (ud *userDatabase) DeleteAddressFromDatabase(adressId int) (response.Addres
 
 func (ud *userDatabase) ChangePassword(userId int, newPassword string) error {
 	var user response.UserData
-	query := `UPDATE users SET password = $1 WHERE Id = $2  ; `
+	query := `UPDATE users SET password = $1 WHERE Id = $2;`
 	err := ud.DB.Raw(query, newPassword, userId).Scan(&user).Error
 	return err
 }

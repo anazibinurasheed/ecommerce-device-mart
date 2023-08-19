@@ -136,7 +136,6 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 
 func (u *userUseCase) FindDefaultAddress(userID int) (response.Address, error) {
 	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
-
 	if err != nil {
 		return response.Address{}, fmt.Errorf("Failed to find default address :%s ", err)
 	}
@@ -190,6 +189,7 @@ func (u *userUseCase) DeleteUserAddress(addressID int) error {
 	}
 	return nil
 }
+
 func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 	DefaultAddress, err := u.userRepo.FindDefaultAddressById(userID)
 	if err != nil {
@@ -205,6 +205,7 @@ func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 	}
 	return nil
 }
+
 func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
 	var profile response.Profile
 
@@ -269,25 +270,19 @@ func (u *userUseCase) ChangeUserPassword(password request.ChangePassword, userID
 }
 
 func (u *userUseCase) CheckUserOldPassword(password request.OldPassword, userID int) error {
-
 	UserData, err := u.userRepo.FindUserById(userID)
-
 	err = bcrypt.CompareHashAndPassword([]byte(UserData.Password), []byte(password.Password))
 	if err != nil {
 		return fmt.Errorf("Entered wrong password : %s", err)
 	}
-
 	return nil
 }
 
 func (u *userUseCase) UpdateUserName(username string, userID int) error {
-
 	UserData, err := u.userRepo.UpdateUserName(username, userID)
 	if err != nil {
-
 		return fmt.Errorf("Failed to update username : %s", err)
 	}
-
 	if UserData.UserName != username {
 		return fmt.Errorf("Failed to update username")
 	}

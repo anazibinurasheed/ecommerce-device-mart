@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -18,8 +19,10 @@ import (
 func TestUserSignup(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+
 	mockUseCase := mock.NewMockUserUseCase(ctrl)
 	userHandler := NewUserHandler(mockUseCase)
+
 	testCases := []struct {
 		name        string
 		response    response.Response
@@ -77,51 +80,76 @@ func TestUserSignup(t *testing.T) {
 	}
 }
 
-// func TestEditUserName(t *testing.T) {
-// 	ctrl := gomock.NewController(t)
-// 	defer ctrl.Finish()
-// 	mockUseCase := mock.NewMockUserUseCase(ctrl)
-// 	userHandler := NewUserHandler(mockUseCase)
+func TestEditUserName(t *testing.T) {
+	// Creating new controller
+	ctrl := gomock.NewController(t)
+	// Closing the ctrl not necessary
+	defer ctrl.Finish()
 
-// 	testCases := []struct {
-// 		name        string
-// 		response    response.Response
-// 		beforeTest  func(userUseCase *mock.MockUserUseCase)
-// 		expectedErr error
-// 	}{{
-// 		name:     "success, username changed",
-// 		response: response.ResponseMessage(200, "success, username has been changed", nil, nil),
-// 		beforeTest: func(userUserCase *mock.MockUserUseCase) {
-// 			userUserCase.EXPECT().UpdateUserName("anaz", 1).Return(nil).Times(1)
-// 		},
-// 		expectedErr: nil,
-// 	}}
+	//creating new mockUseCase instance by passing the ctrl to the constructor and the returning value has all the methods of userUseCase
+	mockUseCase := mock.NewMockUserUseCase(ctrl)
+	// Passing it into userHandler constructor
+	userHandler := NewUserHandler(mockUseCase)
 
-// 	for _, tc := range testCases {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			router := gin.Default()
-// 			URL := "/profile/edit-username"
+	testCases := []struct {
+		name        string
+		response    response.Response
+		beforeTest  func(userUseCase *mock.MockUserUseCase)
+		expectedErr error
+	}{{
+		name:     "success, username changed",
+		response: response.ResponseMessage(200, "success, username has been changed", nil, nil),
+		// Setting up expectations
+		beforeTest: func(userUserCase *mock.MockUserUseCase) {
+			userUserCase.EXPECT().UpdateUserName("anaz", 1).Return(nil).Times(1)
+		},
+		expectedErr: nil,
+	}}
 
-// 			router.POST(URL, userHandler.EditUserName)
-// 			data := `{"name:"anaz"}`
-// 			req, _ := http.NewRequest("POST", URL, strings.NewReader(data))
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Creating a new Gin engine instance
+			router := gin.Default()
 
-// 			req.Header.Set("Content-Type", "application/json")
-// 			responseRecorder := httptest.NewRecorder()
-// 			tc.beforeTest(mockUseCase)
-// 			router.ServeHTTP(responseRecorder, req)
+			// Defining the URL path for the request
+			URL := "/profile/edit-username"
 
-// 			var actual response.Response
+			// Setting up the route path and handler
+			router.POST(URL, func(c *gin.Context) {
+				c.Set("userId", "1")
+				c.Next()
+			}, userHandler.EditUserName)
 
-// 			json.Unmarshal(responseRecorder.Body.Bytes(), &actual)
+			// Input data for the request in JSON format
+			data := `{"name":"anaz"}`
 
-// 			assert.Equal(t, tc.response.StatusCode, actual.StatusCode)
+			// Creating a new HTTP request "req"
+			req, _ := http.NewRequest("POST", URL, strings.NewReader(data))
 
-// 			assert.Equal(t, tc.response.Message, actual.Message)
-// 			assert.Equal(t, tc.response.Error, actual.Error)
+			// Setting the request header for JSON content
+			req.Header.Set("Content-Type", "application/json")
 
-// 		})
+			// Creating a recorder to capture the HTTP response
+			responseRecorder := httptest.NewRecorder()
 
-// 	}
+			// Setting up expectations using the "beforeTest" function
+			tc.beforeTest(mockUseCase)
 
-// }
+			// Handling the request with the Gin router
+			router.ServeHTTP(responseRecorder, req)
+
+			var actual response.Response
+
+			// Parsing the response body to make check
+			err := json.Unmarshal(responseRecorder.Body.Bytes(), &actual)
+
+			if err != nil {
+				log.Fatalf("failed to parse the response body : %s", err)
+			}
+			assert.Equal(t, tc.response.StatusCode, actual.StatusCode)
+			assert.Equal(t, tc.response.Message, actual.Message)
+			assert.Equal(t, tc.response.Error, actual.Error)
+		})
+	}
+
+}

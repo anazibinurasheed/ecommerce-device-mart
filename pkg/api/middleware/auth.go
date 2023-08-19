@@ -88,7 +88,6 @@ func JwtAuth(c *gin.Context, name string) {
 		}
 
 		c.Set("userId", fmt.Sprint(claims["sub"]))
-		fmt.Println("MIDDLEWARE ::::", claims["sub"])
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"Statuscode": 401,

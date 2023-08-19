@@ -31,6 +31,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 			},
 			beforeTest: func(mockSQL sqlmock.Sqlmock) {
 				expectedQuery := `^INSERT INTO users (.+)$`
+
 				mockSQL.ExpectQuery(expectedQuery).WithArgs("Anas", "anazibinurasheed@gmail.com", 8590138151, "password123").
 					WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "email", "phone"}).AddRow(1, "Anas", "anazibinurasheed@gmail.com", 8590138151))
 			},
@@ -61,9 +62,9 @@ func TestSaveUserOnDatabase(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		// t.Parallel()
 		t.Run(tc.name, func(t *testing.T) {
 			mockDB, mockSQL, err := sqlmock.New()
+
 			if err != nil {
 				t.Fatalf("failed to create mock database: %v", err)
 			}
@@ -74,7 +75,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 			}), &gorm.Config{})
 
 			if err != nil {
-				t.Fatalf("failed to create GORM database: %v", err)
+				t.Fatalf("failed to create gorm database connection: %v", err)
 			}
 
 			tc.beforeTest(mockSQL)
@@ -85,9 +86,6 @@ func TestSaveUserOnDatabase(t *testing.T) {
 
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, got, tc.want)
-			// if !reflect.DeepEqual(got, tc.want) {
-			// 	t.Errorf("Expected UserData: %v, but got: %v", tc.want, got)
-			// }
 
 		})
 	}
@@ -170,7 +168,7 @@ func TestFindUserById(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			mockDB, mockSQL, err := sqlmock.New()
 			if err != nil {
-				log.Fatalf("failed to initialize mockDB connection %#v", err)
+				log.Fatalf("failed to initialize mockDB connection %v", err)
 			}
 			gormDB, _ := gorm.Open(postgres.New(
 				postgres.Config{Conn: mockDB},
@@ -187,3 +185,50 @@ func TestFindUserById(t *testing.T) {
 
 	}
 }
+
+// func TestChangePassword(t *testing.T) {
+// 	type args struct {
+// 		ID          int
+// 		newPassword string
+// 	}
+// 	testCases := []struct {
+// 		name        string
+// 		input       args
+// 		beforeTest  func(sqlmock.Sqlmock)
+// 		expectedErr error
+// 	}{{
+// 		name:  "change password",
+// 		input: args{ID: 1, newPassword: "anas1234"},
+// 		beforeTest: func(mockSQL sqlmock.Sqlmock) {
+
+// 			expectedQuery := ``
+// 			mockSQL.ExpectQuery(expectedQuery).WithArgs("anas1234", 1).WillReturnError(nil)
+// 		},
+// 		expectedErr: nil,
+// 	}}
+
+// 	for _, tc := range testCases {
+// 		t.Run(tc.name, func(t *testing.T) {
+
+// 			mockDB, mockSQL, err := sqlmock.New()
+// 			if err != nil {
+// 				log.Fatalf("failed to create a mockDB connection %v", err)
+// 			}
+
+// 			gormDB, err := gorm.Open(postgres.New(postgres.Config{
+// 				Conn: mockDB,
+// 			}))
+
+// 			if err != nil {
+// 				log.Fatalf("failed to establish connection with postgres :%v", err)
+// 			}
+
+// 			tc.beforeTest(mockSQL)
+
+// 			ud := NewUserRepository(gormDB)
+// 			err = ud.ChangePassword(tc.input.ID, tc.input.newPassword)
+// 			assert.Equal(t, err, tc.expectedErr)
+
+// 		})
+// 	}
+// }
