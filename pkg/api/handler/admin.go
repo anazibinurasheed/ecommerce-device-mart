@@ -47,7 +47,6 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 	phoneDataMutex.Lock()
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
-
 	if !ok {
 		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
 		c.JSON(http.StatusInternalServerError, response)
