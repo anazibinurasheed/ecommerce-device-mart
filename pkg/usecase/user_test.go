@@ -24,6 +24,7 @@ func TestSignup(t *testing.T) {
 		beforeTest  func(userRepo *mockRepo.MockUserRepository)
 		expectedErr error
 	}{
+
 		{name: "success sign up",
 			input: request.SignUpData{
 				UserName: "Anaz",
@@ -75,37 +76,38 @@ func TestUpdateUserName(t *testing.T) {
 		input       args
 		beforeTest  func(*mockRepo.MockUserRepository)
 		expectedErr error
-	}{{
-		name: "success, username",
-		input: args{
-			name: "anaz",
-			ID:   1,
-		},
-		beforeTest: func(userRepo *mockRepo.MockUserRepository) {
-			userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
-				ID:       1,
-				UserName: "anaz",
-				Email:    "anazibinurasheed@gmail.com",
-			}, nil).Times(1)
+	}{
+		{
+			name: "success, username",
+			input: args{
+				name: "anaz",
+				ID:   1,
+			},
+			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
+				userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
+					ID:       1,
+					UserName: "anaz",
+					Email:    "anazibinurasheed@gmail.com",
+				}, nil).Times(1)
 
-		},
-		expectedErr: nil,
-	}, {
-		name: "success, username",
-		input: args{
-			name: "anaz",
-			ID:   1,
-		},
-		beforeTest: func(userRepo *mockRepo.MockUserRepository) {
-			userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
-				ID:       1,
-				UserName: "Anaz",
-				Email:    "anazibinurasheed@gmail.com",
-			}, nil).Times(1)
+			},
+			expectedErr: nil,
+		}, {
+			name: "success, username",
+			input: args{
+				name: "anaz",
+				ID:   1,
+			},
+			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
+				userRepo.EXPECT().UpdateUserName("anaz", 1).Return(response.UserData{
+					ID:       1,
+					UserName: "Anaz",
+					Email:    "anazibinurasheed@gmail.com",
+				}, nil).Times(1)
 
-		},
-		expectedErr: fmt.Errorf("Failed to update username"),
-	}}
+			},
+			expectedErr: fmt.Errorf("Failed to update username"),
+		}}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
