@@ -21,7 +21,7 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 
 }
 
-func (cu *commonUseCase) ValidateSignupRequest(phone request.Phone) (int, error) {
+func (cu *commonUseCase) ValidateSignUpRequest(phone request.Phone) (int, error) {
 	userData, err := cu.userRepo.FindUserByPhone(phone.Phone)
 	if err != nil {
 		return 0, err
