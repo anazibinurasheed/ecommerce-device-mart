@@ -5,10 +5,12 @@ name: CI/CD ecom-devicemart
 
 on:   # Events
   push:
-    branches:[main] 
+    branches:
+     - main 
 
   pull_request:
-    branches: [main]
+    branches:
+     - main
 
 jobs:
 # Name
