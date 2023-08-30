@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15.4-alpine3.18
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: store
+    networks:
+      - back-end
+    volumes:
+      - database-postgres:/var/lib/postgresql/data
+
+  devicemart:
+    image: anazibinurasheed/devicemart
+    restart: on-failure
+    environment:
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_PORT: 5432
+      DB_NAME: store
+    depends_on:
+      - postgres
+    networks:
+      - front-end
+    ports:
+      - 3000:3000
+
+volumes:
+  database-postgres:
+
+networks:
+  front-end:
+  back-end:
