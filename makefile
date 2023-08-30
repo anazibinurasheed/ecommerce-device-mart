@@ -8,6 +8,7 @@ BUILD_DIR=build
 BINARY_DIR=$(BUILD_DIR)/bin
 CODE_COVERAGE=code-coverage
 
+
 all: test build
 
 ${BINARY_DIR}:
