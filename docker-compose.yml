@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15.4-alpine3.18
+    restart: always ##docker-compose file restarts the postgres container automatically, regardless of the exit code
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: store
+    networks: ## defining it because the postgres is a back-end network and it also has the connection with the front-end network else we cant connect with the different network without having any link
+      - back-end 
+      - front-end 
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  devicemart:
+    image: anazibinurasheed/devicemart
+    restart: on-failure ##docker-compose file restarts the postgres container automatically if it exits with a non-zero exit code
+    environment:
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_PORT: 5432
+      DB_NAME: store
+    depends_on:
+      - postgres
+    networks:
+      - back-end
+      - front-end
+    ports:
+      - 3000:3000
+
+volumes:
+  postgres-data:
+
+networks:
+  back-end:
+  front-end:
+
+  

@@ -11,4 +11,6 @@ doc.txt
 app.html
 app1.html
 codeTrash.txt
-.github
+postgres-secret.yml
+postgres-configmap.yml
+docker-compose.yml
