@@ -44,7 +44,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 	{
 
 		user.POST("/send-otp", commonHandler.SendOtpToPhone) //sign up otp
-		user.POST("/verify-otp", commonHandler.OtpValidater) // otp for verify signup phone number
+		user.POST("/verify-otp", commonHandler.VerifyOtp)    // otp for verify signup phone number
 		user.POST("/sign-up", middleware.IsVerified, userHandler.UserSignUp)
 		user.POST("/login", userHandler.UserLogin)
 		// user.GET("/refresh_token", commonHandler.RefreshToken)

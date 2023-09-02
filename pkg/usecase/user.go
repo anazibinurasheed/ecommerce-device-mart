@@ -234,7 +234,6 @@ func (u *userUseCase) GetProfile(userID int) (response.Profile, error) {
 	}, nil
 }
 
-// profile
 func (u *userUseCase) ForgotPassword(userID int, c *gin.Context) error {
 	userData, err := u.userRepo.FindUserByID(userID)
 	if err != nil {
