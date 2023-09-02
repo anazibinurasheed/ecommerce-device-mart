@@ -79,11 +79,10 @@ func (ud *userDatabase) AddAddress(userID int, address request.Address) (respons
 }
 
 func (ud *userDatabase) FindDefaultAddress(userID int) (response.Address, error) {
-	var DefaultAdrress response.Address
+	var DefaultAddress response.Address
 	query := `SELECT * FROM Addresses WHERE is_default = true AND user_id = $1 FETCH FIRST 1 ROW ONLY ; `
-	err := ud.DB.Raw(query, userID).Scan(&DefaultAdrress).Error
-	fmt.Println("DEFAULT ADDRESS ::", DefaultAdrress)
-	return DefaultAdrress, err
+	err := ud.DB.Raw(query, userID).Scan(&DefaultAddress).Error
+	return DefaultAddress, err
 }
 
 func (ud *userDatabase) SetDefaultAddressStatus(status bool, addressId int, userId int) (response.Address, error) {
@@ -116,10 +115,10 @@ func (ud *userDatabase) UpdateAddress(address request.Address, addressID int, us
 	return UpdatedAddress, err
 }
 
-func (ud *userDatabase) DeleteAddress(adressId int) (response.Address, error) {
+func (ud *userDatabase) DeleteAddress(addressID int) (response.Address, error) {
 	var DeletedAddress response.Address
 	query := `DELETE FROM Addresses WHERE Id = $1 RETURNING * ; `
-	err := ud.DB.Raw(query, adressId).Scan(&DeletedAddress).Error
+	err := ud.DB.Raw(query, addressID).Scan(&DeletedAddress).Error
 	return DeletedAddress, err
 }
 
@@ -154,7 +153,7 @@ func (ud *userDatabase) FindUserAddress(userID int) (response.Address, error) {
 
 func (ud *userDatabase) UpdateUserName(name string, userID int) (response.UserData, error) {
 	var user response.UserData
-	query := `UPDATE users SET user_name = $1 WHERE Id = $2  RETURNING *; `
+	query := `UPDATE users SET user_name = $1 WHERE Id = $2  RETURNING * ; `
 
 	err := ud.DB.Raw(query, name, userID).Scan(&user).Error
 	return user, err

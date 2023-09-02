@@ -81,7 +81,7 @@ func TestSaveUserOnDatabase(t *testing.T) {
 
 			ud := NewUserRepository(gormDB)
 
-			got, err := ud.SaveUserOnDatabase(tc.input)
+			got, err := ud.CreateUser(tc.input)
 
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, got, tc.want)

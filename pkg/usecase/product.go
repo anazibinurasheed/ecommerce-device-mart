@@ -238,14 +238,14 @@ func (pu *productUseCase) ValidateProductRatingRequest(userID, productID int) er
 		return fmt.Errorf("User already done rating on this product")
 	}
 
-	orderData, err := pu.orderRepo.FindOrderDataByUseridAndProductid(userID, productID)
+	orderData, err := pu.orderRepo.FindOrderDataByUserIDAndProductID(userID, productID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order details")
 	}
 	if orderData.ID == 0 {
 		return fmt.Errorf("User have not purchased the product")
 	}
-	status, err := pu.orderRepo.FindOrderStatusById(orderData.OrderStatusId)
+	status, err := pu.orderRepo.FindOrderStatusByID(orderData.OrderStatusId)
 	if err != nil {
 		return fmt.Errorf("Failed to find order status")
 	}

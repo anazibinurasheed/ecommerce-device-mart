@@ -11,19 +11,18 @@ import (
 
 type CartUseCase struct {
 	cartRepo   interfaces.CartRepository
-	coupenRepo interfaces.CouponRepository
+	couponRepo interfaces.CouponRepository
 }
 
-func NewCartUseCase(cartUseCase interfaces.CartRepository, coupenUseCase interfaces.CouponRepository) services.CartUseCase {
+func NewCartUseCase(cartUseCase interfaces.CartRepository, couponUseCase interfaces.CouponRepository) services.CartUseCase {
 	return &CartUseCase{
 		cartRepo:   cartUseCase,
-		coupenRepo: coupenUseCase,
+		couponRepo: couponUseCase,
 	}
 }
 
 func (cu *CartUseCase) AddToCart(userID, productID int) error {
 	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
-	fmt.Println("user id :", userID)
 	if err != nil {
 		return fmt.Errorf("Failed to add to cart :%s", err)
 	}
@@ -55,7 +54,7 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 		cartItems.Total += float32(item.Qty) * float32(item.Price)
 	}
 
-	couponDetails, err := cu.coupenRepo.CheckForAppliedCoupon(userID)
+	couponDetails, err := cu.couponRepo.CheckAppliedCoupon(userID)
 	if err != nil {
 		return response.CartItems{}, fmt.Errorf("Failed to fetch coupon details")
 	}
@@ -63,7 +62,7 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 	var discountPrize float64
 
 	if couponDetails.ID != 0 && couponDetails.CouponID != 0 {
-		Coupon, err := cu.coupenRepo.FindCouponById(couponDetails.CouponID)
+		Coupon, err := cu.couponRepo.FindCouponByID(couponDetails.CouponID)
 		fmt.Println(Coupon)
 		if err != nil {
 			return response.CartItems{}, fmt.Errorf("Failed to find coupon :%s", err)

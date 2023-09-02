@@ -3,7 +3,7 @@ package response
 import "time"
 
 type CheckOut struct {
-	Address        []Address       `json:"delivey_address"`
+	Address        []Address       `json:"delivery_address"`
 	Cart           []Cart          `json:"items"`
 	Discount       float32         `json:"discount"`
 	Total          float32         `json:"total"`
@@ -15,6 +15,7 @@ type PaymentMethod struct {
 	MethodName string `json:"method"`
 }
 
+// No external connections
 type OrderLine struct {
 	ID              uint      `json:""`
 	UserID          uint      `json:""`

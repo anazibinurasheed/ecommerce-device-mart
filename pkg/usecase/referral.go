@@ -68,13 +68,13 @@ func (ru *referralUseCase) VerifyReferralCode(referralCode string, claimingUserI
 }
 
 func (ru *referralUseCase) ClaimReferralBonus(claimingUserID, codeOwnerID int) error {
-	referredUserWallet, err := ru.orderUseCase.FindUserWallet(int(codeOwnerID))
+	referredUserWallet, err := ru.orderUseCase.FindUserWalletByID(int(codeOwnerID))
 	if err != nil {
 		return fmt.Errorf("Failed to find user wallet : %s", err)
 	}
 	if referredUserWallet.ID == 0 {
 
-		newReferredUserWallet, err := ru.orderUseCase.InitializeNewWallet(int(codeOwnerID))
+		newReferredUserWallet, err := ru.orderUseCase.InitializeNewUserWallet(int(codeOwnerID))
 		if err != nil {
 			return fmt.Errorf("Failed to initialize wallet for code owner: %s", err)
 		}
@@ -83,22 +83,22 @@ func (ru *referralUseCase) ClaimReferralBonus(claimingUserID, codeOwnerID int) e
 		}
 	}
 
-	bonusClaimingUser, err := ru.orderUseCase.FindUserWallet(int(claimingUserID))
+	bonusClaimingUserWallet, err := ru.orderUseCase.FindUserWalletByID(int(claimingUserID))
 	if err != nil {
 		return fmt.Errorf("Failed to find user wallet : %s", err)
 	}
-	if bonusClaimingUser.ID == 0 {
-		newClamingUserWallet, err := ru.orderUseCase.InitializeNewWallet(claimingUserID)
+	if bonusClaimingUserWallet.ID == 0 {
+		bonusClaimingUserWallet, err := ru.orderUseCase.InitializeNewUserWallet(claimingUserID)
 		if err != nil {
 			return fmt.Errorf("Failed to initialize wallet for code owner: %s", err)
 		}
-		if newClamingUserWallet.ID == 0 {
+		if bonusClaimingUserWallet.ID == 0 {
 			return fmt.Errorf("Failed to verify code owner new wallet")
 		}
 
 	}
 
-	referredUserWallet, err = ru.orderUseCase.UpdateUserWallet(int(codeOwnerID), (referredUserWallet.Amount + 50))
+	referredUserWallet, err = ru.orderUseCase.UpdateUserWalletBalance(int(codeOwnerID), (referredUserWallet.Amount + 50))
 	if err != nil {
 		return fmt.Errorf("Failed update bonus on  : %s", err)
 	}
@@ -106,7 +106,7 @@ func (ru *referralUseCase) ClaimReferralBonus(claimingUserID, codeOwnerID int) e
 		return fmt.Errorf("Failed to verify bonus updated wallet")
 	}
 
-	bonusClaimingUser, err = ru.orderUseCase.UpdateUserWallet(int(claimingUserID), (bonusClaimingUser.Amount + 50))
+	bonusClaimingUserWallet, err = ru.orderUseCase.UpdateUserWalletBalance(int(claimingUserID), (bonusClaimingUserWallet.Amount + 50))
 	if err != nil {
 		return fmt.Errorf("Failed update bonus  : %s", err)
 	}
