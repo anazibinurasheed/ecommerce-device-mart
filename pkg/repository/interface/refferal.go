@@ -3,7 +3,7 @@ package interfaces
 import "github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 
 type ReferralRepository interface {
-	InsertNewRefferalCode(userID int, refferalCode string) (response.Referral, error)
-	FindRefferalCodeByCode(refferalCode string) (response.Referral, error)
-	FindRefferalCodeByUserId(userID int) (response.Referral, error)
+	InsertNewReferralCode(userID int, referralCode string) (response.Referral, error)
+	FindReferralCodeByCode(referralCode string) (response.Referral, error)
+	FindReferralCodeByUserID(userID int) (response.Referral, error)
 }

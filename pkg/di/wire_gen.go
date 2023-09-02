@@ -43,7 +43,7 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	orderHandler := handler.NewOrderHandler(orderUseCase)
 	couponUseCase := usecase.NewCouponUseCase(couponRepository)
 	couponHandler := handler.NewCouponHandler(couponUseCase)
-	refferalRepository := repository.NewRefferalRepository(gormDB)
+	refferalRepository := repository.NewReferralRepository(gormDB)
 	refferalUseCase := usecase.NewRefferalUseCase(refferalRepository, orderRepository)
 	refferalHandler := handler.NewReferralHandler(refferalUseCase)
 	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, refferalHandler)

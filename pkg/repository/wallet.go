@@ -23,3 +23,5 @@ func (wd *walletDatabase) InsertIntoWallet(userID int, amount float32) (response
 	err := wd.DB.Raw(query, userID, amount).Scan(&InsertedRecord).Error
 	return InsertedRecord, err
 }
+
+//not using this file

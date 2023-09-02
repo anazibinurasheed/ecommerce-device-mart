@@ -22,7 +22,7 @@ type Address struct {
 	Locality         string `json:"locality" `
 	AddressLine      string `json:"address_line" binding:"required"`
 	District         string `json:"district"`
-	StateId          int    `json:"state_id"`
+	StateID          int    `json:"state_id"`
 	Landmark         string `json:"landmark"`
 	AlternativePhone string `json:"alternative_phone"`
 	IsDefault        bool   `json:"-"`

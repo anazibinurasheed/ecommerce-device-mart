@@ -23,7 +23,7 @@ func NewRefferalUseCase(referraluseCase interfaces.ReferralRepository, orderUseC
 }
 
 func (ru *referralUseCase) GetUserReferralCode(userID int) (response.Referral, error) {
-	referralCode, err := ru.referralRepo.FindRefferalCodeByUserId(userID)
+	referralCode, err := ru.referralRepo.FindReferralCodeByUserID(userID)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to find refferal code by user id : %s", err)
 	}
@@ -33,7 +33,7 @@ func (ru *referralUseCase) GetUserReferralCode(userID int) (response.Referral, e
 
 	code := helper.GenerateReferralCode()
 
-	newReferralCode, err := ru.referralRepo.InsertNewRefferalCode(userID, code)
+	newReferralCode, err := ru.referralRepo.InsertNewReferralCode(userID, code)
 	if err != nil {
 		return response.Referral{}, fmt.Errorf("Failed to create new refferal code :%s", err)
 	}
@@ -50,7 +50,7 @@ func (ru *referralUseCase) VerifyReferralCode(referralCode string, claimingUserI
 		return -1, fmt.Errorf("No referral code provided")
 	}
 
-	referralCodeDetails, err := ru.referralRepo.FindRefferalCodeByCode(referralCode)
+	referralCodeDetails, err := ru.referralRepo.FindReferralCodeByCode(referralCode)
 	if err != nil {
 		return -1, fmt.Errorf("Failed to find referral code : %s", err)
 	}
