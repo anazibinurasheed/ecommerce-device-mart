@@ -19,7 +19,7 @@ func NewCouponRepository(DB *gorm.DB) interfaces.CouponRepository {
 	}
 }
 
-func (cd *couponDatabase) InsertNewCoupon(couponData request.Coupon) (response.Coupon, error) {
+func (cd *couponDatabase) CreateCoupon(couponData request.Coupon) (response.Coupon, error) {
 	var InsertedCoupon response.Coupon
 
 	query := `INSERT INTO coupons (coupon_name,code,min_order_value,discount_percent,discount_max_amount,valid_till,valid_from,valid_days)VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *;`
@@ -28,14 +28,14 @@ func (cd *couponDatabase) InsertNewCoupon(couponData request.Coupon) (response.C
 	return InsertedCoupon, err
 }
 
-func (cd *couponDatabase) UpdateCoupon(couponData request.Coupon) (response.Coupon, error) {
+func (cd *couponDatabase) UpdateCouponDetails(couponData request.Coupon) (response.Coupon, error) {
 	var UpdatedCoupon response.Coupon
 	query := `UPDATE coupons SET coupon_name = $1 ,code = $2 ,min_order_value = $3 ,discount_percent = $4 ,discount_max_amount = $5,valid_till= $6 ,valid_from= $7,valid_days = $8 WHERE id = $9  RETURNING *;`
 	err := cd.DB.Raw(query, couponData.CouponName, couponData.Code, couponData.MinOrderValue, couponData.DiscountPercent, couponData.DiscountMaxAmount, couponData.ValidTill, couponData.ValidFrom, couponData.ValidityDays, couponData.ID).Scan(&UpdatedCoupon).Error
 
 	return UpdatedCoupon, err
 }
-func (cd *couponDatabase) BlockCoupon(couponID int) (response.Coupon, error) {
+func (cd *couponDatabase) BlockCouponByID(couponID int) (response.Coupon, error) {
 	var BlockedCoupon response.Coupon
 	IsBlocked := true
 	query := `UPDATE coupons SET Is_blocked = $1 WHERE id = $2 RETURNING *;`
@@ -43,14 +43,16 @@ func (cd *couponDatabase) BlockCoupon(couponID int) (response.Coupon, error) {
 
 	return BlockedCoupon, err
 }
-func (cd *couponDatabase) UnblockCoupon(couponID int) (response.Coupon, error) {
+
+func (cd *couponDatabase) UnblockCouponByID(couponID int) (response.Coupon, error) {
 	var BlockedCoupon response.Coupon
 	IsBlocked := false
 	query := `UPDATE coupons SET Is_blocked = $1 WHERE id = $2 RETURNING *;`
 	err := cd.DB.Raw(query, IsBlocked, couponID).Scan(&BlockedCoupon).Error
 	return BlockedCoupon, err
 }
-func (cd *couponDatabase) VeiwAllCoupons() ([]response.Coupon, error) {
+
+func (cd *couponDatabase) GetAllCoupons() ([]response.Coupon, error) {
 	var Coupons = make([]response.Coupon, 0)
 
 	query := `SELECT * FROM coupons ORDER BY id DESC`
@@ -67,7 +69,8 @@ func (cd *couponDatabase) FindCouponByCode(couponCode string) (response.Coupon, 
 	return Coupon, err
 
 }
-func (cd *couponDatabase) FindCouponById(couponID int) (response.Coupon, error) {
+
+func (cd *couponDatabase) FindCouponByID(couponID int) (response.Coupon, error) {
 	var Coupon response.Coupon
 	query := `SELECT * FROM coupons WHERE id = $1 ;`
 	err := cd.DB.Raw(query, couponID).Scan(&Coupon).Error
@@ -76,7 +79,7 @@ func (cd *couponDatabase) FindCouponById(couponID int) (response.Coupon, error) 
 
 }
 
-func (cd *couponDatabase) InsertIntoCouponTracking(userID, couponID int) (response.CouponTracking, error) {
+func (cd *couponDatabase) AddCouponTracking(userID, couponID int) (response.CouponTracking, error) {
 	var TrackedCoupon response.CouponTracking
 
 	query := `INSERT INTO coupon_trackings (coupon_id,user_id)VALUES($1,$2) RETURNING * ;`
@@ -92,14 +95,14 @@ func (cd *couponDatabase) UpdateCouponUsage(userID int) (response.CouponTracking
 	return UpdatedCouponTracking, err
 }
 
-func (cd *couponDatabase) FindCouponTracking(userID, couponID int) (response.CouponTracking, error) {
-	var FindedCouponTracking response.CouponTracking
+func (cd *couponDatabase) FindTrackingCoupon(userID, couponID int) (response.CouponTracking, error) {
+	var coupon response.CouponTracking
 	query := `SELECT * FROM coupon_trackings WHERE coupon_id = $1 AND user_id = $2;`
-	err := cd.DB.Raw(query, couponID, userID).Scan(&FindedCouponTracking).Error
-	return FindedCouponTracking, err
+	err := cd.DB.Raw(query, couponID, userID).Scan(&coupon).Error
+	return coupon, err
 }
 
-func (cd *couponDatabase) CheckForAppliedCoupon(userID int) (response.CouponTracking, error) {
+func (cd *couponDatabase) CheckAppliedCoupon(userID int) (response.CouponTracking, error) {
 	var AppliedCoupon response.CouponTracking
 	IsUsed := false
 	query := `SELECT * FROM coupon_trackings WHERE user_id = $1 AND is_used = $2;`
@@ -107,23 +110,23 @@ func (cd *couponDatabase) CheckForAppliedCoupon(userID int) (response.CouponTrac
 	return AppliedCoupon, err
 }
 
-func (cd *couponDatabase) ChangeCoupon(couponID, userID int) (response.CouponTracking, error) {
+// func (cd *couponDatabase) FindAppliedCouponByUserID(userID int) (response.CouponTracking, error) {
+// 	var Coupon response.CouponTracking
+// 	query := `SELECT * FROM coupon_trackings WHERE user_id = $1 AND is_used !=true ;`
+// 	err := cd.DB.Raw(query, userID).Scan(&Coupon).Error
+
+// 	return Coupon, err
+
+// }
+
+func (cd *couponDatabase) ChangeUserCoupon(couponID, userID int) (response.CouponTracking, error) {
 	var ChangedCoupon response.CouponTracking
 	query := `UPDATE coupon_trackings SET coupon_id = $1 WHERE user_id = $2 RETURNING *;`
 	err := cd.DB.Raw(query, couponID, userID).Scan(&ChangedCoupon).Error
 	return ChangedCoupon, err
 }
 
-func (cd *couponDatabase) FindAppliedCouponByUserId(userID int) (response.CouponTracking, error) {
-	var Coupon response.CouponTracking
-	query := `SELECT * FROM coupon_trackings WHERE user_id = $1 AND is_used !=true ;`
-	err := cd.DB.Raw(query, userID).Scan(&Coupon).Error
-
-	return Coupon, err
-
-}
-
-func (cd *couponDatabase) FetchAvailabeCouponsForUser(userID int, currentTime time.Time) ([]response.Coupon, error) {
+func (cd *couponDatabase) GetAvailableCouponsForUser(userID int, currentTime time.Time) ([]response.Coupon, error) {
 	var Coupons = make([]response.Coupon, 0)
 	query := `SELECT *
 	FROM coupons c
@@ -137,7 +140,7 @@ func (cd *couponDatabase) FetchAvailabeCouponsForUser(userID int, currentTime ti
 
 }
 
-func (cd *couponDatabase) RemoveCouponFromCouponTracking(couponID, userID int) (response.CouponTracking, error) {
+func (cd *couponDatabase) RemoveCouponFromTracking(couponID, userID int) (response.CouponTracking, error) {
 	var RemovedCoupon response.CouponTracking
 	query := `DELETE FROM coupon_trackings WHERE coupon_id = $1 AND user_id = $2 RETURNING *;`
 	err := cd.DB.Raw(query, couponID, userID).Scan(&RemovedCoupon).Error

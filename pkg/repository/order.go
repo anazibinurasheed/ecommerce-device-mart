@@ -1,10 +1,8 @@
 package repository
 
 import (
-	"fmt"
-	"time"
-
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"gorm.io/gorm"
 )
@@ -19,12 +17,13 @@ func NewOrderRepository(DB *gorm.DB) interfaces.OrderRepository {
 	}
 }
 
-func (od *orderDatabase) InsertOrderLine(userID int, productID int, addressID int, qty int, price int, paymentMethodID int, orderStatusID int, couponID int, createdAt time.Time, updatedAt time.Time) (response.OrderLine, error) {
+func (od *orderDatabase) InsertOrder(order request.NewOrder) (response.OrderLine, error) {
 	var NewOrderLine response.OrderLine
 	query := `INSERT INTO order_lines (user_id,product_id,addresses_id,qty,price,payment_method_id,order_status_id,coupon_id,created_at,updated_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING * ;`
-	err := od.DB.Raw(query, userID, productID, addressID, qty, price, paymentMethodID, orderStatusID, couponID, createdAt, updatedAt).Scan(&NewOrderLine).Error
+	err := od.DB.Raw(query, order.UserID, order.ProductID, order.AddressID, order.Qty, order.Price, order.PaymentMethodID, order.OrderStatusID, order.CouponID, order.CreatedAt, order.UpdatedAt).Scan(&NewOrderLine).Error
 	return NewOrderLine, err
 }
+
 func (od *orderDatabase) GetStatusPending() (response.OrderStatus, error) {
 	var OrderStatus response.OrderStatus
 	query := `SELECT * FROM order_statuses WHERE status = 'Pending';`
@@ -46,7 +45,7 @@ func (od *orderDatabase) GetStatusReturned() (response.OrderStatus, error) {
 	return OrderStatus, err
 }
 
-func (od *orderDatabase) UserOrderHistory(userID, startIndex, endIndex int) ([]response.Orders, error) {
+func (od *orderDatabase) GetUserOrderHistory(userID, startIndex, endIndex int) ([]response.Orders, error) {
 	var OrderHistory = make([]response.Orders, 0)
 	query := `SELECT
     o.id AS order_id,
@@ -73,7 +72,7 @@ ORDER BY o.id DESC OFFSET $2 FETCH NEXT $3 ROW ONLY;`
 	return OrderHistory, err
 }
 
-func (od *orderDatabase) GetInvoiceData(orderID int) (response.Orders, error) {
+func (od *orderDatabase) GetInvoiceDataByID(orderID int) (response.Orders, error) {
 	var OrderData response.Orders
 	query := `SELECT
     o.id AS order_id,
@@ -101,7 +100,7 @@ WHERE  o.id = $1;`
 	return OrderData, err
 }
 
-func (od *orderDatabase) AllOrderData(startIndex, endIndex int) ([]response.Orders, error) {
+func (od *orderDatabase) GetAllOrderData(startIndex, endIndex int) ([]response.Orders, error) {
 	var OrderHistory = make([]response.Orders, 0)
 	query := `SELECT
     o.id AS order_id,
@@ -125,12 +124,7 @@ INNER JOIN states states ON a.state_id = states.id
 ORDER BY o.id DESC OFFSET $1 FETCH NEXT $2 ROW ONLY;
 `
 	err := od.DB.Raw(query, startIndex, endIndex).Scan(&OrderHistory).Error
-	fmt.Println("ORDER HISTORY")
-	// for key, value := range OrderHistory {
-	// 	fmt.Println(key)
-	// 	fmt.Println("PRODUCT IMG", value.OrderID, "->", value.ProductImage, "<-")
-	// 	fmt.Println(value)
-	// }
+
 	return OrderHistory, err
 }
 
@@ -142,14 +136,14 @@ func (od *orderDatabase) GetOrderStatuses() ([]response.OrderStatus, error) {
 
 }
 
-func (od *orderDatabase) ChangeOrderStatus(statusID int, orderID int) (response.OrderLine, error) {
+func (od *orderDatabase) ChangeOrderStatusByID(statusID int, orderID int) (response.OrderLine, error) {
 	var UpdatedOrder response.OrderLine
 	query := `UPDATE order_lines SET order_status_id = $1 WHERE id = $2 RETURNING * ;`
 	err := od.DB.Raw(query, statusID, orderID).Scan(&UpdatedOrder).Error
 	return UpdatedOrder, err
 }
 
-func (od *orderDatabase) FindOrderDataByUseridAndProductid(userID, productID int) (response.OrderLine, error) {
+func (od *orderDatabase) FindOrderDataByUserIDAndProductID(userID, productID int) (response.OrderLine, error) {
 	var OrderData response.OrderLine
 
 	query := `SELECT * FROM order_lines WHERE user_id= $1 AND product_id=$2 ;`
@@ -157,7 +151,7 @@ func (od *orderDatabase) FindOrderDataByUseridAndProductid(userID, productID int
 	return OrderData, err
 }
 
-func (od *orderDatabase) FindOrderStatusById(statusID int) (string, error) {
+func (od *orderDatabase) FindOrderStatusByID(statusID int) (string, error) {
 	var status string
 	query := `SELECT status FROM order_statuses WHERE id = $1 ;`
 	err := od.DB.Raw(query, statusID).Scan(&status).Error
@@ -165,20 +159,20 @@ func (od *orderDatabase) FindOrderStatusById(statusID int) (string, error) {
 	return status, err
 }
 
-func (od *orderDatabase) FindOrderById(orderID int) (response.OrderLine, error) {
+func (od *orderDatabase) FindOrderByID(orderID int) (response.OrderLine, error) {
 	var Order response.OrderLine
 	query := `SELECT * FROM order_lines WHERE id = $1 ;`
 	err := od.DB.Raw(query, orderID).Scan(&Order).Error
 	return Order, err
 }
-func (od *orderDatabase) FindOrdersUsedByCoupon(couponID int) ([]response.OrderLine, error) {
+func (od *orderDatabase) FindOrdersBoughtUsingCoupon(couponID int) ([]response.OrderLine, error) {
 	var Orders = make([]response.OrderLine, 0)
 	query := `SELECT * FROM order_lines WHERE coupon_id = $1 ; `
 	err := od.DB.Raw(query, couponID).Scan(&Orders).Error
 	return Orders, err
 }
 
-func (od *orderDatabase) InitializeNewWallet(userID int) (response.Wallet, error) {
+func (od *orderDatabase) InitializeNewUserWallet(userID int) (response.Wallet, error) {
 	var NewWallet response.Wallet
 
 	query := `INSERT INTO wallets (user_id,amount)VALUES($1,$2) RETURNING *;`
@@ -186,7 +180,7 @@ func (od *orderDatabase) InitializeNewWallet(userID int) (response.Wallet, error
 	return NewWallet, err
 }
 
-func (od *orderDatabase) FindUserWallet(userID int) (response.Wallet, error) {
+func (od *orderDatabase) FindUserWalletByID(userID int) (response.Wallet, error) {
 	var Wallet response.Wallet
 
 	query := `SELECT * FROM wallets WHERE user_id = $1 ;`
@@ -194,7 +188,7 @@ func (od *orderDatabase) FindUserWallet(userID int) (response.Wallet, error) {
 	return Wallet, err
 }
 
-func (od *orderDatabase) UpdateUserWallet(userID int, amount float32) (response.Wallet, error) {
+func (od *orderDatabase) UpdateUserWalletBalance(userID int, amount float32) (response.Wallet, error) {
 	var UpdatedWallet response.Wallet
 
 	query := `UPDATE wallets SET amount = $1 WHERE user_id = $2 RETURNING *;`
@@ -202,11 +196,11 @@ func (od *orderDatabase) UpdateUserWallet(userID int, amount float32) (response.
 	return UpdatedWallet, err
 }
 
-func (od *orderDatabase) UpdateWalletTransactionHistory(updations response.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
+func (od *orderDatabase) UpdateWalletTransactionHistory(update response.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
 	var updatedHistory response.WalletTransactionHistory
 	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type,amount_display) 
 			VALUES($1,$2,$3,$4,$5) RETURNING *;`
-	err := od.DB.Raw(query, updations.TransactionTime, updations.UserID, updations.Amount, updatedHistory.TransactionType, updations.AmountDisplay).Scan(&updatedHistory).Error
+	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType, update.AmountDisplay).Scan(&updatedHistory).Error
 
 	return updatedHistory, err
 

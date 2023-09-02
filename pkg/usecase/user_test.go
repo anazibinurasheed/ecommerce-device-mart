@@ -11,7 +11,7 @@ import (
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestSignup(t *testing.T) {
+func TestSignUp(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -60,7 +60,6 @@ func TestSignup(t *testing.T) {
 }
 
 func TestUpdateUserName(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

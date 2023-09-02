@@ -10,11 +10,11 @@ import (
 )
 
 type RefferalHandler struct {
-	refferalUseCase services.RefferalUseCase
+	refferalUseCase services.ReferralUseCase
 }
 
 // for wire
-func NewRefferalHandler(useCase services.RefferalUseCase) *RefferalHandler {
+func NewRefferalHandler(useCase services.ReferralUseCase) *RefferalHandler {
 	return &RefferalHandler{
 		refferalUseCase: useCase,
 	}
@@ -31,7 +31,7 @@ func NewRefferalHandler(useCase services.RefferalUseCase) *RefferalHandler {
 //	@Router			/referral/get-code [get]
 func (rh *RefferalHandler) GetRefferalCode(c *gin.Context) {
 	userID, _ := helper.GetUserIDFromContext(c)
-	RefferalCode, err := rh.refferalUseCase.GetUserRefferalCode(userID)
+	RefferalCode, err := rh.refferalUseCase.GetUserReferralCode(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -66,7 +66,7 @@ func (rh *RefferalHandler) ApplyRefferalCode(c *gin.Context) {
 	}
 
 	userID, _ := helper.GetUserIDFromContext(c)
-	CodeOwnerID, err := rh.refferalUseCase.VerifyRefferalCode(body, userID)
+	CodeOwnerID, err := rh.refferalUseCase.VerifyReferralCode(body, userID)
 
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed.", nil, err.Error())
@@ -74,7 +74,7 @@ func (rh *RefferalHandler) ApplyRefferalCode(c *gin.Context) {
 		return
 	}
 
-	err = rh.refferalUseCase.ClaimRefferalBonus(userID, CodeOwnerID)
+	err = rh.refferalUseCase.ClaimReferralBonus(userID, CodeOwnerID)
 
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed.", nil, err.Error())

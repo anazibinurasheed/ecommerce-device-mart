@@ -18,6 +18,46 @@ type MockUserRepository struct {
 	recorder *MockUserRepositoryMockRecorder
 }
 
+// AddAddress implements interfaces.UserRepository.
+func (*MockUserRepository) AddAddress(userID int, address request.Address) (response.Address, error) {
+	panic("unimplemented")
+}
+
+// CreateUser implements interfaces.UserRepository.
+func (*MockUserRepository) CreateUser(user request.SignUpData) (response.UserData, error) {
+	panic("unimplemented")
+}
+
+// DeleteAddress implements interfaces.UserRepository.
+func (*MockUserRepository) DeleteAddress(addressID int) (response.Address, error) {
+	panic("unimplemented")
+}
+
+// FindAddressByID implements interfaces.UserRepository.
+func (*MockUserRepository) FindAddressByID(addressID int) (response.Address, error) {
+	panic("unimplemented")
+}
+
+// FindDefaultAddress implements interfaces.UserRepository.
+func (*MockUserRepository) FindDefaultAddress(userID int) (response.Address, error) {
+	panic("unimplemented")
+}
+
+// FindUserByID implements interfaces.UserRepository.
+func (*MockUserRepository) FindUserByID(id int) (response.UserData, error) {
+	panic("unimplemented")
+}
+
+// ReadCategories implements interfaces.UserRepository.
+func (*MockUserRepository) ReadCategories() ([]response.Category, error) {
+	panic("unimplemented")
+}
+
+// SetDefaultAddressStatus implements interfaces.UserRepository.
+func (*MockUserRepository) SetDefaultAddressStatus(status bool, addressID int, userID int) (response.Address, error) {
+	panic("unimplemented")
+}
+
 // MockUserRepositoryMockRecorder is the mock recorder for MockUserRepository.
 type MockUserRepositoryMockRecorder struct {
 	mock *MockUserRepository

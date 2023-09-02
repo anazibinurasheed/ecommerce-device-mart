@@ -5,5 +5,5 @@ import (
 )
 
 type CommonUseCase interface {
-	ValidateSignupRequest(phone request.Phone) (int, error)
+	ValidateSignUpRequest(phone request.Phone) (int, error)
 }

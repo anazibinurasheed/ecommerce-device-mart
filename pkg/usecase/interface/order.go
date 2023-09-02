@@ -7,7 +7,7 @@ type OrderUseCase interface {
 	ConfirmedOrder(userID int, paymentMethodID int) error
 	GetUserOrderHistory(userID, page, count int) ([]response.Orders, error)
 	GetOrderManagement(page, count int) (response.OrderManagement, error)
-	UpdateOrderStatus(statusID int, orderID int) error
+	UpdateOrderStatus(statusID, orderID int) error
 	AllOrderOverView(page, count int) ([]response.Orders, error)
 	GetRazorPayDetails(userID int) (response.PaymentDetails, error)
 	VerifyRazorPayPayment(signature string, razorpayOrderId string, paymentId string) error

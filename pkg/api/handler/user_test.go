@@ -27,7 +27,7 @@ func TestUserSignup(t *testing.T) {
 		want        error
 		expectedErr error
 	}{{
-		name:     "success signup",
+		name:     "success sign up",
 		response: response.Response{StatusCode: 200, Message: "Success, account created", Data: nil, Error: nil},
 		beforeTest: func(userUseCase *mock.MockUserUseCase) {
 			userUseCase.EXPECT().SignUp(request.SignUpData{

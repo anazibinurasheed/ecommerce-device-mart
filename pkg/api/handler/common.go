@@ -27,13 +27,13 @@ func NewCommonHandler(useCase services.CommonUseCase) *CommonHandler {
 var (
 	//phoneDataMap
 	// The phoneDataMap is a map used to store users' phone numbers retrieved from an API.
-	// The stored phone number will be used for OTP verification and to fill up signup credentials without asking the user to enter
+	// The stored phone number will be used for OTP verification and to fill up sign up credentials without asking the user to enter
 	// the phone number again.
 	// It is stored in the map with a unique key.
 	// The unique key will be passed to the frontend.
 	//From the frontend, the key will then be passed to the next API that requires the phone number.
 	// Once the user completes all the authentication steps, the phone number will be deleted from the phoneDataMap, and the phone number,
-	//along with other user signup credentials, will be inserted into the database.
+	//along with other user sign up credentials, will be inserted into the database.
 	//Theme : To decrease the amount of database operations
 	phoneDataMap = make(map[string]string)
 	//Here we are using normal map instead of sync.Map so we should ensure  not to come  race condition .
@@ -60,7 +60,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 		return
 	}
 
-	Phone, err := ch.commonUseCase.ValidateSignupRequest(body)
+	Phone, err := ch.commonUseCase.ValidateSignUpRequest(body)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -76,9 +76,9 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-// OtpValidater godoc
+// VerifyOtp godoc
 //
-//	@Summary		Verify signup  OTP
+//	@Summary		Verify sign up  OTP
 //	@Description	Validates the provided OTP for a phone number.
 //	@Tags			common
 //	@Accept			json
@@ -88,7 +88,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Router			/verify-otp [post]
-func (ch *CommonHandler) OtpValidater(c *gin.Context) {
+func (ch *CommonHandler) VerifyOtp(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {

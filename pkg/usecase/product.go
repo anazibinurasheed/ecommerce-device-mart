@@ -24,8 +24,8 @@ func NewProductUseCase(productRepo interfaces.ProductRepository, orderRepo inter
 }
 
 func (pu *productUseCase) CreateNewCategory(category request.Category) error {
-	DoCategoryExist, err := pu.productRepo.FindCategoryByName(category.CategoryName)
-	if DoCategoryExist.ID != 0 {
+	doCategoryExist, err := pu.productRepo.FindCategoryByName(category.CategoryName)
+	if doCategoryExist.ID != 0 {
 		return fmt.Errorf("Category already exist with this name")
 	}
 
@@ -52,21 +52,21 @@ func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Cat
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
 
-	ListOfAllCategories, err := pu.productRepo.ReadCategory(startIndex, endIndex)
+	listOfAllCategories, err := pu.productRepo.ReadCategory(startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to find categories :%s", err)
 	}
 
-	return ListOfAllCategories, nil
+	return listOfAllCategories, nil
 }
 
 func (pu *productUseCase) UpdateCategoryWithID(productID int, category request.Category) error {
-	UpdatedCategory, err := pu.productRepo.UpdateCategory(productID, category)
+	updatedCategory, err := pu.productRepo.UpdateCategory(productID, category)
 	if err != nil {
 		return fmt.Errorf("Failed to update category :%s", err)
 	}
 
-	if UpdatedCategory.ID == 0 {
+	if updatedCategory.ID == 0 {
 		return fmt.Errorf("Failed to verify updated category")
 	}
 
@@ -74,12 +74,12 @@ func (pu *productUseCase) UpdateCategoryWithID(productID int, category request.C
 }
 
 func (pu *productUseCase) BlockCategoryWithID(categoryID int) error {
-	BlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
+	blockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	if BlockedCategory.ID == 0 {
+	if blockedCategory.ID == 0 {
 		return fmt.Errorf("Failed to verify the blocked category")
 	}
 
@@ -87,12 +87,12 @@ func (pu *productUseCase) BlockCategoryWithID(categoryID int) error {
 }
 
 func (pu *productUseCase) UnBlockCategoryWithID(categoryID int) error {
-	UnBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
+	unBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	if UnBlockedCategory.ID == 0 {
+	if unBlockedCategory.ID == 0 {
 		return fmt.Errorf("Failed to verify blocked category")
 	}
 
@@ -140,12 +140,12 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
 
-	ListOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
+	listOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
 
-	return ListOfAllProducts, nil
+	return listOfAllProducts, nil
 }
 
 func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]response.Product, error) {
@@ -159,31 +159,31 @@ func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]r
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
 
-	ListOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
+	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
 
-	return ListOfAllProducts, nil
+	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductWithID(productID int, updations request.Product) error {
-	UpdatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, updations)
+func (pu *productUseCase) UpdateProductWithID(productID int, update request.Product) error {
+	updatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, update)
 	if err != nil {
 		return fmt.Errorf("Failed to update product :%s", err)
 	}
-	if UpdatedProduct.ID == 0 {
+	if updatedProduct.ID == 0 {
 		return fmt.Errorf("Failed to verify the updated product")
 	}
 	return nil
 }
 
 func (pu *productUseCase) BlockProductWithID(productID int) error {
-	BlockedProduct, err := pu.productRepo.BlockProductFromDatabase(productID)
+	blockedProduct, err := pu.productRepo.BlockProductFromDatabase(productID)
 	if err != nil {
 		return fmt.Errorf("Failed to block product :%s", err)
 	}
-	if BlockedProduct.ID == 0 {
+	if blockedProduct.ID == 0 {
 		return fmt.Errorf("Failed to verify updated product")
 	}
 	return nil
@@ -201,51 +201,51 @@ func (pu *productUseCase) UnBlockProductWithID(productID int) error {
 }
 
 func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, error) {
-	Product, err := pd.productRepo.FindProductById(productID)
+	product, err := pd.productRepo.FindProductById(productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
-	if Product.ID == 0 {
+	if product.ID == 0 {
 		return response.ProductItem{}, fmt.Errorf("Failed to fetch product")
 	}
 
-	Ratings, err := pd.productRepo.GetProductReviews(productID)
+	ratings, err := pd.productRepo.GetProductReviews(productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product reviews :%s", err)
 	}
 
 	return response.ProductItem{
-		ID:                  Product.ID,
-		CategoryID:          Product.CategoryID,
-		Product_Name:        Product.ProductName,
-		Price:               Product.Price,
-		SKU:                 Product.SKU,
-		Brand:               Product.Brand,
-		Product_Description: Product.Product_Description,
-		Product_Image:       Product.Product_Image,
-		Is_Blocked:          Product.IsBlocked,
-		RatingAndReviews:    Ratings,
+		ID:                  product.ID,
+		CategoryID:          product.CategoryID,
+		Product_Name:        product.ProductName,
+		Price:               product.Price,
+		SKU:                 product.SKU,
+		Brand:               product.Brand,
+		Product_Description: product.Product_Description,
+		Product_Image:       product.Product_Image,
+		Is_Blocked:          product.IsBlocked,
+		RatingAndReviews:    ratings,
 	}, nil
 
 }
 
 func (pu *productUseCase) ValidateProductRatingRequest(userID, productID int) error {
-	Rating, err := pu.productRepo.FindUserRatingOnProduct(userID, productID)
+	rating, err := pu.productRepo.FindUserRatingOnProduct(userID, productID)
 	if err != nil {
 		return fmt.Errorf("Failed to find user rating")
 	}
-	if Rating.ID != 0 {
+	if rating.ID != 0 {
 		return fmt.Errorf("User already done rating on this product")
 	}
 
-	OrderData, err := pu.orderRepo.FindOrderDataByUseridAndProductid(userID, productID)
+	orderData, err := pu.orderRepo.FindOrderDataByUserIDAndProductID(userID, productID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order details")
 	}
-	if OrderData.ID == 0 {
+	if orderData.ID == 0 {
 		return fmt.Errorf("User have not purchased the product")
 	}
-	status, err := pu.orderRepo.FindOrderStatusById(OrderData.OrderStatusId)
+	status, err := pu.orderRepo.FindOrderStatusByID(orderData.OrderStatusId)
 	if err != nil {
 		return fmt.Errorf("Failed to find order status")
 	}
@@ -264,12 +264,12 @@ func (pu *productUseCase) InsertNewProductRating(userID int, productID int, rati
 		return fmt.Errorf("Failed to insert product rating :%s", err)
 	}
 
-	Rating, err := pu.productRepo.FindUserRatingOnProduct(userID, productID)
+	userRating, err := pu.productRepo.FindUserRatingOnProduct(userID, productID)
 	if err != nil {
 		return fmt.Errorf("Failed to find product rating :%s", err)
 	}
 
-	if Rating.ID == 0 {
+	if userRating.ID == 0 {
 		return fmt.Errorf("Inserted product rating not found ")
 	}
 	return nil
@@ -284,15 +284,16 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 	}
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
-	Products, err := pu.productRepo.SearchProducts(search, startIndex, endIndex)
+
+	products, err := pu.productRepo.SearchProducts(search, startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to search products  :%s", err)
 	}
-	if len(Products) == 0 {
+	if len(products) == 0 {
 		return nil, fmt.Errorf("Product not found")
 	}
 
-	return Products, nil
+	return products, nil
 }
 
 func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int) ([]response.Product, error) {

@@ -11,26 +11,26 @@ import (
 
 type CartUseCase struct {
 	cartRepo   interfaces.CartRepository
-	coupenRepo interfaces.CouponRepository
+	couponRepo interfaces.CouponRepository
 }
 
-func NewCartUseCase(cartUseCase interfaces.CartRepository, coupenUseCase interfaces.CouponRepository) services.CartUseCase {
+func NewCartUseCase(cartUseCase interfaces.CartRepository, couponUseCase interfaces.CouponRepository) services.CartUseCase {
 	return &CartUseCase{
 		cartRepo:   cartUseCase,
-		coupenRepo: coupenUseCase,
+		couponRepo: couponUseCase,
 	}
 }
 
-func (cu *CartUseCase) AddToCart(userID int, productID int) error {
+func (cu *CartUseCase) AddToCart(userID, productID int) error {
 	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
-	fmt.Println("user id :", userID)
 	if err != nil {
-		return fmt.Errorf("Failed to add to cart : %s", err)
+		return fmt.Errorf("Failed to add to cart :%s", err)
 	}
+
 	if cartItem.ID != 0 {
 		err = cu.IncrementQuantity(userID, productID)
 		if err != nil {
-			return fmt.Errorf("Failed %s", err)
+			return fmt.Errorf("Failed to increment quantity :%s", err)
 		}
 		return nil
 	}
@@ -44,15 +44,17 @@ func (cu *CartUseCase) AddToCart(userID int, productID int) error {
 
 func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 	cart, err := cu.cartRepo.ViewCart(userID)
+	if err != nil {
+		return response.CartItems{}, fmt.Errorf("Failed to fetch user cart :%s", err)
+	}
 
 	var cartItems response.CartItems
-
 	for _, item := range cart {
 		cartItems.Cart = append(cartItems.Cart, item)
 		cartItems.Total += float32(item.Qty) * float32(item.Price)
 	}
 
-	couponDetails, err := cu.coupenRepo.CheckForAppliedCoupon(userID)
+	couponDetails, err := cu.couponRepo.CheckAppliedCoupon(userID)
 	if err != nil {
 		return response.CartItems{}, fmt.Errorf("Failed to fetch coupon details")
 	}
@@ -60,13 +62,12 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 	var discountPrize float64
 
 	if couponDetails.ID != 0 && couponDetails.CouponID != 0 {
-		Coupon, err := cu.coupenRepo.FindCouponById(couponDetails.CouponID)
+		Coupon, err := cu.couponRepo.FindCouponByID(couponDetails.CouponID)
 		fmt.Println(Coupon)
 		if err != nil {
 			return response.CartItems{}, fmt.Errorf("Failed to find coupon :%s", err)
 		}
-		fmt.Println(Coupon.ValidTill)
-		fmt.Println(helper.IsCouponValid(Coupon.ValidTill))
+
 		if !helper.IsCouponValid(Coupon.ValidTill) {
 			return response.CartItems{}, fmt.Errorf("Expired coupon")
 		}
@@ -81,27 +82,26 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 	cartItems.Discount = float32(discountPrize)
 	cartItems.Total = cartItems.Total - float32(discountPrize)
 
-	fmt.Println("CART ITEMS PRIZES :::", cartItems.Discount, cartItems.Total)
-
 	return cartItems, err
 }
 
-func (cu *CartUseCase) RemoveFromCart(userID int, productID int) error {
-	CartItem, err := cu.cartRepo.RemoveFromCart(userID, productID)
-	fmt.Println("CART ITEM:::", CartItem)
-	fmt.Println(userID, productID)
+func (cu *CartUseCase) RemoveFromCart(userID, productID int) error {
+	cartItem, err := cu.cartRepo.RemoveFromCart(userID, productID)
 	if err != nil {
-		return fmt.Errorf("Remove from cart failed:%s", err)
-
+		return fmt.Errorf("Remove from cart failed :%s", err)
+	}
+	if cartItem.ID == 0 {
+		return fmt.Errorf("Failed to verify removed product")
 	}
 	return nil
 }
-func (cu *CartUseCase) IncrementQuantity(userID int, productID int) error {
+
+func (cu *CartUseCase) IncrementQuantity(userID, productID int) error {
 	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
 	if err != nil || cartItem.ID == 0 {
-		return fmt.Errorf("Quantity updation  failed:%s", err)
-
+		return fmt.Errorf("Quantity updation failed :%s", err)
 	}
+
 	qty := cartItem.Qty
 	newQty := qty + 1
 
@@ -112,21 +112,21 @@ func (cu *CartUseCase) IncrementQuantity(userID int, productID int) error {
 	return nil
 }
 
-func (cu *CartUseCase) DecrementQuantity(userID int, productID int) error {
-	CartItem, err := cu.cartRepo.GetCartItem(userID, productID)
-	if err != nil || CartItem.ID == 0 {
-		return fmt.Errorf("Quantity updation  failed:%s", err)
+func (cu *CartUseCase) DecrementQuantity(userID, productID int) error {
+	cartItem, err := cu.cartRepo.GetCartItem(userID, productID)
+	if err != nil || cartItem.ID == 0 {
+		return fmt.Errorf("Quantity updation failed :%s", err)
 
-	} else if CartItem.Qty == 1 {
+	} else if cartItem.Qty == 1 {
 		return nil
 	}
 
-	qty := CartItem.Qty
+	qty := cartItem.Qty
 	newQty := qty - 1
 
-	CartItem, err = cu.cartRepo.DecrementQuantity(newQty, userID, productID)
-	if err != nil || CartItem.ID == 0 || newQty != CartItem.Qty {
-		return fmt.Errorf("Quantity updation failes : %s", err)
+	cartItem, err = cu.cartRepo.DecrementQuantity(newQty, userID, productID)
+	if err != nil || cartItem.ID == 0 || newQty != cartItem.Qty {
+		return fmt.Errorf("Quantity updation failed :%s", err)
 	}
 	return nil
 }
