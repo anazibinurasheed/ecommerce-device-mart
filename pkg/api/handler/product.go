@@ -45,7 +45,7 @@ func (ph *ProductHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(400, "Success, created new category", nil, nil)
+	response := response.ResponseMessage(200, "Success, created new category", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 

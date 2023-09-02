@@ -193,7 +193,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			addressID	path		int				true	"Address ID"
-//	@Param			body		body		request.Address	true	"Address updation details"
+//	@Param			body		body		request.Address	true	"Address update details"
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
@@ -264,7 +264,7 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/addresses [get]
-func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
+func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
 	userId, _ := helper.GetUserIDFromContext(c)
 
 	ListOfAddresses, err := uh.userUseCase.GetUserAddresses(userId)

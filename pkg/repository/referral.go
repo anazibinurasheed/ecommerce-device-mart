@@ -16,21 +16,21 @@ func NewRefferalRepository(DB *gorm.DB) interfaces.ReferralRepository {
 	}
 }
 
-func (rd *refferalDatabase) InsertNewRefferalCode(userID int, refferalCode string) (response.Referral, error) {
+func (rd *refferalDatabase) InsertNewReferralCode(userID int, refferalCode string) (response.Referral, error) {
 	var InsertedDetails response.Referral
 	query := `INSERT INTO referrals (user_id,code)VALUES($1,$2) RETURNING * ;`
 	err := rd.DB.Raw(query, userID, refferalCode).Scan(&InsertedDetails).Error
 	return InsertedDetails, err
 }
 
-func (rd *refferalDatabase) FindRefferalCodeByCode(refferalCode string) (response.Referral, error) {
+func (rd *refferalDatabase) FindReferralCodeByCode(refferalCode string) (response.Referral, error) {
 	var ReferrelDetails response.Referral
 	query := `SELECT * FROM referrals WHERE code = $1 ;`
 	err := rd.DB.Raw(query, refferalCode).Scan(&ReferrelDetails).Error
 	return ReferrelDetails, err
 }
 
-func (rd *refferalDatabase) FindRefferalCodeByUserId(userID int) (response.Referral, error) {
+func (rd *refferalDatabase) FindReferralCodeByUserID(userID int) (response.Referral, error) {
 	var ReferrelDetails response.Referral
 	query := `SELECT * FROM referrals WHERE user_id = $1 ;`
 	err := rd.DB.Raw(query, userID).Scan(&ReferrelDetails).Error

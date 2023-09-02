@@ -25,17 +25,17 @@ func (pd *paymentDatabase) GetPaymentMethods() ([]response.PaymentMethod, error)
 }
 
 func (pd *paymentDatabase) GetPaymentMethodCodId() (int, error) {
-	var CodId int
+	var codID int
 	query := `SELECT id FROM  payment_methods WHERE method_name = cash on delivery ;`
-	err := pd.DB.Raw(query).Scan(&CodId).Error
-	return CodId, err
+	err := pd.DB.Raw(query).Scan(&codID).Error
+	return codID, err
 }
 
 func (pd *paymentDatabase) GetPaymentMethodRazorpayId() (int, error) {
-	var RazorpayId int
+	var razorpayID int
 	query := `SELECT id FROM  payment_methods WHERE method_name = online payment ;`
-	err := pd.DB.Raw(query).Scan(&RazorpayId).Error
-	return RazorpayId, err
+	err := pd.DB.Raw(query).Scan(&razorpayID).Error
+	return razorpayID, err
 
 }
 
