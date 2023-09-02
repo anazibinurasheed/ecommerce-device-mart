@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	//config is only related to the config package
+
 	config, configErr := config.LoadConfig()
 	if configErr != nil {
 		log.Fatal("cannot load config: ", configErr)

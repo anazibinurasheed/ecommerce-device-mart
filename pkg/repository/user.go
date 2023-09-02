@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
