@@ -13,7 +13,7 @@ on:   # Events
 
 jobs:
 # Name
-  build:
+  Device-mart:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -23,21 +23,21 @@ jobs:
       with:
         go-version: 1.20.1
 
-    # - name: Build 
-    #   run: go build -v ./...
+    - name: Build 
+      run: go build -v ./...
 
     - name: Test # Runnable commands 
       run: go test -v ./...
 
-    - name: Deploy to AWS EC2 instance
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{secrets.PUBLIC_IP}}
-        username: ubuntu
-        key: ${{secrets.SSH_KEY}}
-        script: |
-          echo "Connected to AWS EC2 instance"
-          cd mainDevicemart/devicemart
-          git pull
-          go build ./cmd/api
-          sudo systemctl restart mainDevicemart.service
+    # - name: Deploy to AWS EC2 instance
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{secrets.PUBLIC_IP}}
+    #     username: ubuntu
+    #     key: ${{secrets.SSH_KEY}}
+    #     script: |
+    #       echo "Connected to AWS EC2 instance"
+    #       cd mainDevicemart/devicemart
+    #       git pull
+    #       go build ./cmd/api
+    #       sudo systemctl restart mainDevicemart.service
