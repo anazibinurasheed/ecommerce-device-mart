@@ -283,7 +283,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	if err != nil {
 		return fmt.Errorf("Failed to fetch payment method :%s", err)
 	}
-	orderStatus, err := ou.orderRepo.FindOrderStatusByID(cancellingOrder.OrderStatusId)
+	orderStatus, err := ou.orderRepo.FindOrderStatusByID(cancellingOrder.OrderStatusID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order statuses :%s", err)
 	}

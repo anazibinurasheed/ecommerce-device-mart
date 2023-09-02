@@ -22,7 +22,7 @@ type OrderLine struct {
 	AddressesID     uint      `json:""`
 	ProductID       uint      `json:""`
 	PaymentMethodID int       `json:""`
-	OrderStatusId   int       `json:""`
+	OrderStatusID   int       `json:""`
 	Qty             int       `json:""`
 	Price           float32   `json:""`
 	CouponID        uint      `json:""`

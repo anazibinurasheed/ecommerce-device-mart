@@ -78,7 +78,7 @@ func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, 
 func (pd *productDatabase) InsertNewProductToDatabase(product request.Product) (response.Product, error) {
 	var NewProduct response.Product
 	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *"
-	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.Product_Description, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&NewProduct).Error
+	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&NewProduct).Error
 	return NewProduct, err
 }
 
@@ -92,7 +92,7 @@ func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]r
 func (pd *productDatabase) UpdateProductToDatabase(productID int, updations request.Product) (response.Product, error) {
 	var UpdatedProduct response.Product
 	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 ,Product_Image = $4 , Price = $5 WHERE ID = $6 RETURNING *"
-	err := pd.DB.Raw(query, updations.CategoryID, updations.ProductName, updations.Product_Description, updations.ProductImage, updations.Price, productID).Scan(&UpdatedProduct).Error
+	err := pd.DB.Raw(query, updations.CategoryID, updations.ProductName, updations.ProductDescription, updations.ProductImage, updations.Price, productID).Scan(&UpdatedProduct).Error
 	return UpdatedProduct, err
 
 }

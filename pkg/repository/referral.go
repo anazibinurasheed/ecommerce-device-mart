@@ -6,33 +6,33 @@ import (
 	"gorm.io/gorm"
 )
 
-type refferalDatabase struct {
+type referralDatabase struct {
 	DB *gorm.DB
 }
 
-func NewRefferalRepository(DB *gorm.DB) interfaces.ReferralRepository {
-	return &refferalDatabase{
+func NewReferralRepository(DB *gorm.DB) interfaces.ReferralRepository {
+	return &referralDatabase{
 		DB: DB,
 	}
 }
 
-func (rd *refferalDatabase) InsertNewRefferalCode(userID int, refferalCode string) (response.Referral, error) {
-	var InsertedDetails response.Referral
+func (rd *referralDatabase) InsertNewReferralCode(userID int, referralCode string) (response.Referral, error) {
+	var insertedDetails response.Referral
 	query := `INSERT INTO referrals (user_id,code)VALUES($1,$2) RETURNING * ;`
-	err := rd.DB.Raw(query, userID, refferalCode).Scan(&InsertedDetails).Error
-	return InsertedDetails, err
+	err := rd.DB.Raw(query, userID, referralCode).Scan(&insertedDetails).Error
+	return insertedDetails, err
 }
 
-func (rd *refferalDatabase) FindRefferalCodeByCode(refferalCode string) (response.Referral, error) {
-	var ReferrelDetails response.Referral
+func (rd *referralDatabase) FindReferralCodeByCode(referralCode string) (response.Referral, error) {
+	var referralDetails response.Referral
 	query := `SELECT * FROM referrals WHERE code = $1 ;`
-	err := rd.DB.Raw(query, refferalCode).Scan(&ReferrelDetails).Error
-	return ReferrelDetails, err
+	err := rd.DB.Raw(query, referralCode).Scan(&referralDetails).Error
+	return referralDetails, err
 }
 
-func (rd *refferalDatabase) FindRefferalCodeByUserId(userID int) (response.Referral, error) {
-	var ReferrelDetails response.Referral
+func (rd *referralDatabase) FindReferralCodeByUserID(userID int) (response.Referral, error) {
+	var referralDetails response.Referral
 	query := `SELECT * FROM referrals WHERE user_id = $1 ;`
-	err := rd.DB.Raw(query, userID).Scan(&ReferrelDetails).Error
-	return ReferrelDetails, err
+	err := rd.DB.Raw(query, userID).Scan(&referralDetails).Error
+	return referralDetails, err
 }

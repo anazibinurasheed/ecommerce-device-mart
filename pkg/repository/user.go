@@ -71,7 +71,7 @@ func (ud *userDatabase) AddAddress(userID int, address request.Address) (respons
 	VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING * ; `
 
 	err := ud.DB.Raw(query, address.Name, address.PhoneNumber, address.Pincode, address.Locality,
-		address.AddressLine, address.District, address.StateId, address.Landmark, address.AlternativePhone, userID).Scan(&NewAddress).Error
+		address.AddressLine, address.District, address.StateID, address.Landmark, address.AlternativePhone, userID).Scan(&NewAddress).Error
 
 	return NewAddress, err
 
@@ -107,7 +107,7 @@ func (ud *userDatabase) UpdateAddress(address request.Address, addressID int, us
 
 	query := `UPDATE addresses SET name = $1 ,phone_number = $2 , pincode = $3 ,locality = $4 , address_line = $5 ,district = $6 , state_id = $7 , landmark = $8 , alternative_phone = $9 WHERE id = $10 AND user_id = $11 RETURNING *;`
 
-	err := ud.DB.Raw(query, address.Name, address.PhoneNumber, address.Pincode, address.Locality, address.AddressLine, address.District, address.StateId, address.Landmark, address.AddressLine, addressID, userID).Scan(&UpdatedAddress).Error
+	err := ud.DB.Raw(query, address.Name, address.PhoneNumber, address.Pincode, address.Locality, address.AddressLine, address.District, address.StateID, address.Landmark, address.AddressLine, addressID, userID).Scan(&UpdatedAddress).Error
 
 	return UpdatedAddress, err
 }
