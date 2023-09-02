@@ -18,46 +18,6 @@ type MockUserRepository struct {
 	recorder *MockUserRepositoryMockRecorder
 }
 
-// AddAddress implements interfaces.UserRepository.
-func (*MockUserRepository) AddAddress(userID int, address request.Address) (response.Address, error) {
-	panic("unimplemented")
-}
-
-// CreateUser implements interfaces.UserRepository.
-func (*MockUserRepository) CreateUser(user request.SignUpData) (response.UserData, error) {
-	panic("unimplemented")
-}
-
-// DeleteAddress implements interfaces.UserRepository.
-func (*MockUserRepository) DeleteAddress(addressID int) (response.Address, error) {
-	panic("unimplemented")
-}
-
-// FindAddressByID implements interfaces.UserRepository.
-func (*MockUserRepository) FindAddressByID(addressID int) (response.Address, error) {
-	panic("unimplemented")
-}
-
-// FindDefaultAddress implements interfaces.UserRepository.
-func (*MockUserRepository) FindDefaultAddress(userID int) (response.Address, error) {
-	panic("unimplemented")
-}
-
-// FindUserByID implements interfaces.UserRepository.
-func (*MockUserRepository) FindUserByID(id int) (response.UserData, error) {
-	panic("unimplemented")
-}
-
-// ReadCategories implements interfaces.UserRepository.
-func (*MockUserRepository) ReadCategories() ([]response.Category, error) {
-	panic("unimplemented")
-}
-
-// SetDefaultAddressStatus implements interfaces.UserRepository.
-func (*MockUserRepository) SetDefaultAddressStatus(status bool, addressID int, userID int) (response.Address, error) {
-	panic("unimplemented")
-}
-
 // MockUserRepositoryMockRecorder is the mock recorder for MockUserRepository.
 type MockUserRepositoryMockRecorder struct {
 	mock *MockUserRepository
@@ -75,78 +35,93 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 	return m.recorder
 }
 
-// AddAdressToDatabase mocks base method.
-func (m *MockUserRepository) AddAdressToDatabase(userId int, address request.Address) (response.Address, error) {
+// AddAddress mocks base method.
+func (m *MockUserRepository) AddAddress(userID int, address request.Address) (response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddAdressToDatabase", userId, address)
+	ret := m.ctrl.Call(m, "AddAddress", userID, address)
 	ret0, _ := ret[0].(response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AddAdressToDatabase indicates an expected call of AddAdressToDatabase.
-func (mr *MockUserRepositoryMockRecorder) AddAdressToDatabase(userId, address interface{}) *gomock.Call {
+// AddAddress indicates an expected call of AddAddress.
+func (mr *MockUserRepositoryMockRecorder) AddAddress(userID, address interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAdressToDatabase", reflect.TypeOf((*MockUserRepository)(nil).AddAdressToDatabase), userId, address)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAddress", reflect.TypeOf((*MockUserRepository)(nil).AddAddress), userID, address)
 }
 
 // ChangePassword mocks base method.
-func (m *MockUserRepository) ChangePassword(userId int, newPassword string) error {
+func (m *MockUserRepository) ChangePassword(userID int, newPassword string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ChangePassword", userId, newPassword)
+	ret := m.ctrl.Call(m, "ChangePassword", userID, newPassword)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ChangePassword indicates an expected call of ChangePassword.
-func (mr *MockUserRepositoryMockRecorder) ChangePassword(userId, newPassword interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) ChangePassword(userID, newPassword interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockUserRepository)(nil).ChangePassword), userId, newPassword)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockUserRepository)(nil).ChangePassword), userID, newPassword)
 }
 
-// DeleteAddressFromDatabase mocks base method.
-func (m *MockUserRepository) DeleteAddressFromDatabase(adressId int) (response.Address, error) {
+// CreateUser mocks base method.
+func (m *MockUserRepository) CreateUser(user request.SignUpData) (response.UserData, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAddressFromDatabase", adressId)
+	ret := m.ctrl.Call(m, "CreateUser", user)
+	ret0, _ := ret[0].(response.UserData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockUserRepositoryMockRecorder) CreateUser(user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), user)
+}
+
+// DeleteAddress mocks base method.
+func (m *MockUserRepository) DeleteAddress(addressID int) (response.Address, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAddress", addressID)
 	ret0, _ := ret[0].(response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// DeleteAddressFromDatabase indicates an expected call of DeleteAddressFromDatabase.
-func (mr *MockUserRepositoryMockRecorder) DeleteAddressFromDatabase(adressId interface{}) *gomock.Call {
+// DeleteAddress indicates an expected call of DeleteAddress.
+func (mr *MockUserRepositoryMockRecorder) DeleteAddress(addressID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAddressFromDatabase", reflect.TypeOf((*MockUserRepository)(nil).DeleteAddressFromDatabase), adressId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAddress", reflect.TypeOf((*MockUserRepository)(nil).DeleteAddress), addressID)
 }
 
-// FindAddressByAddressID mocks base method.
-func (m *MockUserRepository) FindAddressByAddressID(addressID int) (response.Address, error) {
+// FindAddressByID mocks base method.
+func (m *MockUserRepository) FindAddressByID(addressID int) (response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAddressByAddressID", addressID)
+	ret := m.ctrl.Call(m, "FindAddressByID", addressID)
 	ret0, _ := ret[0].(response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindAddressByAddressID indicates an expected call of FindAddressByAddressID.
-func (mr *MockUserRepositoryMockRecorder) FindAddressByAddressID(addressID interface{}) *gomock.Call {
+// FindAddressByID indicates an expected call of FindAddressByID.
+func (mr *MockUserRepositoryMockRecorder) FindAddressByID(addressID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAddressByAddressID", reflect.TypeOf((*MockUserRepository)(nil).FindAddressByAddressID), addressID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAddressByID", reflect.TypeOf((*MockUserRepository)(nil).FindAddressByID), addressID)
 }
 
-// FindDefaultAddressById mocks base method.
-func (m *MockUserRepository) FindDefaultAddressById(userId int) (response.Address, error) {
+// FindDefaultAddress mocks base method.
+func (m *MockUserRepository) FindDefaultAddress(userID int) (response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindDefaultAddressById", userId)
+	ret := m.ctrl.Call(m, "FindDefaultAddress", userID)
 	ret0, _ := ret[0].(response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindDefaultAddressById indicates an expected call of FindDefaultAddressById.
-func (mr *MockUserRepositoryMockRecorder) FindDefaultAddressById(userId interface{}) *gomock.Call {
+// FindDefaultAddress indicates an expected call of FindDefaultAddress.
+func (mr *MockUserRepositoryMockRecorder) FindDefaultAddress(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindDefaultAddressById", reflect.TypeOf((*MockUserRepository)(nil).FindDefaultAddressById), userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindDefaultAddress", reflect.TypeOf((*MockUserRepository)(nil).FindDefaultAddress), userID)
 }
 
 // FindUserAddress mocks base method.
@@ -179,19 +154,19 @@ func (mr *MockUserRepositoryMockRecorder) FindUserByEmail(email interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserByEmail", reflect.TypeOf((*MockUserRepository)(nil).FindUserByEmail), email)
 }
 
-// FindUserById mocks base method.
-func (m *MockUserRepository) FindUserById(id int) (response.UserData, error) {
+// FindUserByID mocks base method.
+func (m *MockUserRepository) FindUserByID(id int) (response.UserData, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindUserById", id)
+	ret := m.ctrl.Call(m, "FindUserByID", id)
 	ret0, _ := ret[0].(response.UserData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindUserById indicates an expected call of FindUserById.
-func (mr *MockUserRepositoryMockRecorder) FindUserById(id interface{}) *gomock.Call {
+// FindUserByID indicates an expected call of FindUserByID.
+func (mr *MockUserRepositoryMockRecorder) FindUserByID(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserById", reflect.TypeOf((*MockUserRepository)(nil).FindUserById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserByID", reflect.TypeOf((*MockUserRepository)(nil).FindUserByID), id)
 }
 
 // FindUserByPhone mocks base method.
@@ -210,18 +185,18 @@ func (mr *MockUserRepositoryMockRecorder) FindUserByPhone(phone interface{}) *go
 }
 
 // GetAllUserAddresses mocks base method.
-func (m *MockUserRepository) GetAllUserAddresses(userId int) ([]response.Address, error) {
+func (m *MockUserRepository) GetAllUserAddresses(userID int) ([]response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllUserAddresses", userId)
+	ret := m.ctrl.Call(m, "GetAllUserAddresses", userID)
 	ret0, _ := ret[0].([]response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllUserAddresses indicates an expected call of GetAllUserAddresses.
-func (mr *MockUserRepositoryMockRecorder) GetAllUserAddresses(userId interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) GetAllUserAddresses(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUserAddresses", reflect.TypeOf((*MockUserRepository)(nil).GetAllUserAddresses), userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUserAddresses", reflect.TypeOf((*MockUserRepository)(nil).GetAllUserAddresses), userID)
 }
 
 // GetListOfStates mocks base method.
@@ -239,49 +214,34 @@ func (mr *MockUserRepositoryMockRecorder) GetListOfStates() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListOfStates", reflect.TypeOf((*MockUserRepository)(nil).GetListOfStates))
 }
 
-// ReadCategory mocks base method.
-func (m *MockUserRepository) ReadCategory() ([]response.Category, error) {
+// ReadCategories mocks base method.
+func (m *MockUserRepository) ReadCategories() ([]response.Category, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadCategory")
+	ret := m.ctrl.Call(m, "ReadCategories")
 	ret0, _ := ret[0].([]response.Category)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ReadCategory indicates an expected call of ReadCategory.
-func (mr *MockUserRepositoryMockRecorder) ReadCategory() *gomock.Call {
+// ReadCategories indicates an expected call of ReadCategories.
+func (mr *MockUserRepositoryMockRecorder) ReadCategories() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadCategory", reflect.TypeOf((*MockUserRepository)(nil).ReadCategory))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadCategories", reflect.TypeOf((*MockUserRepository)(nil).ReadCategories))
 }
 
-// SaveUserOnDatabase mocks base method.
-func (m *MockUserRepository) SaveUserOnDatabase(user request.SignUpData) (response.UserData, error) {
+// SetDefaultAddressStatus mocks base method.
+func (m *MockUserRepository) SetDefaultAddressStatus(status bool, addressID, userID int) (response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveUserOnDatabase", user)
-	ret0, _ := ret[0].(response.UserData)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SaveUserOnDatabase indicates an expected call of SaveUserOnDatabase.
-func (mr *MockUserRepositoryMockRecorder) SaveUserOnDatabase(user interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUserOnDatabase", reflect.TypeOf((*MockUserRepository)(nil).SaveUserOnDatabase), user)
-}
-
-// SetIsDefaultStatusOnAddress mocks base method.
-func (m *MockUserRepository) SetIsDefaultStatusOnAddress(status bool, addressId, userId int) (response.Address, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetIsDefaultStatusOnAddress", status, addressId, userId)
+	ret := m.ctrl.Call(m, "SetDefaultAddressStatus", status, addressID, userID)
 	ret0, _ := ret[0].(response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SetIsDefaultStatusOnAddress indicates an expected call of SetIsDefaultStatusOnAddress.
-func (mr *MockUserRepositoryMockRecorder) SetIsDefaultStatusOnAddress(status, addressId, userId interface{}) *gomock.Call {
+// SetDefaultAddressStatus indicates an expected call of SetDefaultAddressStatus.
+func (mr *MockUserRepositoryMockRecorder) SetDefaultAddressStatus(status, addressID, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIsDefaultStatusOnAddress", reflect.TypeOf((*MockUserRepository)(nil).SetIsDefaultStatusOnAddress), status, addressId, userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDefaultAddressStatus", reflect.TypeOf((*MockUserRepository)(nil).SetDefaultAddressStatus), status, addressID, userID)
 }
 
 // UpdateAddress mocks base method.

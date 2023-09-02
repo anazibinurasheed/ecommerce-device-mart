@@ -37,59 +37,59 @@ func (m *MockUserUseCase) EXPECT() *MockUserUseCaseMockRecorder {
 }
 
 // AddNewAddress mocks base method.
-func (m *MockUserUseCase) AddNewAddress(userId int, address request.Address) error {
+func (m *MockUserUseCase) AddNewAddress(userID int, address request.Address) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddNewAddress", userId, address)
+	ret := m.ctrl.Call(m, "AddNewAddress", userID, address)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddNewAddress indicates an expected call of AddNewAddress.
-func (mr *MockUserUseCaseMockRecorder) AddNewAddress(userId, address interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) AddNewAddress(userID, address interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewAddress", reflect.TypeOf((*MockUserUseCase)(nil).AddNewAddress), userId, address)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewAddress", reflect.TypeOf((*MockUserUseCase)(nil).AddNewAddress), userID, address)
 }
 
 // ChangeUserPassword mocks base method.
-func (m *MockUserUseCase) ChangeUserPassword(password request.ChangePassword, userId int, c *gin.Context) error {
+func (m *MockUserUseCase) ChangeUserPassword(password request.ChangePassword, userID int, c *gin.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ChangeUserPassword", password, userId, c)
+	ret := m.ctrl.Call(m, "ChangeUserPassword", password, userID, c)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ChangeUserPassword indicates an expected call of ChangeUserPassword.
-func (mr *MockUserUseCaseMockRecorder) ChangeUserPassword(password, userId, c interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) ChangeUserPassword(password, userID, c interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPassword", reflect.TypeOf((*MockUserUseCase)(nil).ChangeUserPassword), password, userId, c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPassword", reflect.TypeOf((*MockUserUseCase)(nil).ChangeUserPassword), password, userID, c)
 }
 
 // CheckUserOldPassword mocks base method.
-func (m *MockUserUseCase) CheckUserOldPassword(password request.OldPassword, userId int) error {
+func (m *MockUserUseCase) CheckUserOldPassword(password request.OldPassword, userID int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckUserOldPassword", password, userId)
+	ret := m.ctrl.Call(m, "CheckUserOldPassword", password, userID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CheckUserOldPassword indicates an expected call of CheckUserOldPassword.
-func (mr *MockUserUseCaseMockRecorder) CheckUserOldPassword(password, userId interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) CheckUserOldPassword(password, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserOldPassword", reflect.TypeOf((*MockUserUseCase)(nil).CheckUserOldPassword), password, userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserOldPassword", reflect.TypeOf((*MockUserUseCase)(nil).CheckUserOldPassword), password, userID)
 }
 
 // DeleteUserAddress mocks base method.
-func (m *MockUserUseCase) DeleteUserAddress(addressId int) error {
+func (m *MockUserUseCase) DeleteUserAddress(addressID int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUserAddress", addressId)
+	ret := m.ctrl.Call(m, "DeleteUserAddress", addressID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteUserAddress indicates an expected call of DeleteUserAddress.
-func (mr *MockUserUseCaseMockRecorder) DeleteUserAddress(addressId interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) DeleteUserAddress(addressID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserAddress", reflect.TypeOf((*MockUserUseCase)(nil).DeleteUserAddress), addressId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserAddress", reflect.TypeOf((*MockUserUseCase)(nil).DeleteUserAddress), addressID)
 }
 
 // DisplayListOfStates mocks base method.
@@ -108,62 +108,62 @@ func (mr *MockUserUseCaseMockRecorder) DisplayListOfStates() *gomock.Call {
 }
 
 // FindUserById mocks base method.
-func (m *MockUserUseCase) FindUserById(id int) (response.UserData, error) {
+func (m *MockUserUseCase) FindUserById(userID int) (response.UserData, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindUserById", id)
+	ret := m.ctrl.Call(m, "FindUserById", userID)
 	ret0, _ := ret[0].(response.UserData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindUserById indicates an expected call of FindUserById.
-func (mr *MockUserUseCaseMockRecorder) FindUserById(id interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) FindUserById(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserById", reflect.TypeOf((*MockUserUseCase)(nil).FindUserById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserById", reflect.TypeOf((*MockUserUseCase)(nil).FindUserById), userID)
 }
 
 // ForgotPassword mocks base method.
-func (m *MockUserUseCase) ForgotPassword(userId int, c *gin.Context) error {
+func (m *MockUserUseCase) ForgotPassword(userID int, c *gin.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ForgotPassword", userId, c)
+	ret := m.ctrl.Call(m, "ForgotPassword", userID, c)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ForgotPassword indicates an expected call of ForgotPassword.
-func (mr *MockUserUseCaseMockRecorder) ForgotPassword(userId, c interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) ForgotPassword(userID, c interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForgotPassword", reflect.TypeOf((*MockUserUseCase)(nil).ForgotPassword), userId, c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForgotPassword", reflect.TypeOf((*MockUserUseCase)(nil).ForgotPassword), userID, c)
 }
 
 // GetProfile mocks base method.
-func (m *MockUserUseCase) GetProfile(userId int) (response.Profile, error) {
+func (m *MockUserUseCase) GetProfile(userID int) (response.Profile, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProfile", userId)
+	ret := m.ctrl.Call(m, "GetProfile", userID)
 	ret0, _ := ret[0].(response.Profile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProfile indicates an expected call of GetProfile.
-func (mr *MockUserUseCaseMockRecorder) GetProfile(userId interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) GetProfile(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockUserUseCase)(nil).GetProfile), userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockUserUseCase)(nil).GetProfile), userID)
 }
 
 // GetUserAddresses mocks base method.
-func (m *MockUserUseCase) GetUserAddresses(userId int) ([]response.Address, error) {
+func (m *MockUserUseCase) GetUserAddresses(userID int) ([]response.Address, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserAddresses", userId)
+	ret := m.ctrl.Call(m, "GetUserAddresses", userID)
 	ret0, _ := ret[0].([]response.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetUserAddresses indicates an expected call of GetUserAddresses.
-func (mr *MockUserUseCaseMockRecorder) GetUserAddresses(userId interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) GetUserAddresses(userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAddresses", reflect.TypeOf((*MockUserUseCase)(nil).GetUserAddresses), userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAddresses", reflect.TypeOf((*MockUserUseCase)(nil).GetUserAddresses), userID)
 }
 
 // SetDefaultAddress mocks base method.

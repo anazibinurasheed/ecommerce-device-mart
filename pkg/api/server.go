@@ -31,7 +31,7 @@ type ServerHTTP struct {
 // @host		localhost:3000
 // @BasePath	/api/v1
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, refferalHandler *handler.RefferalHandler) *ServerHTTP {
+	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, refferalHandler *handler.ReferralHandler) *ServerHTTP {
 
 	Engine := gin.New()
 	Engine.LoadHTMLGlob("templates/*.html") //  loading html for razorpay payment
@@ -113,8 +113,8 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 			}
 			referral := user.Group("/referral")
 			{
-				referral.GET("/get-code", refferalHandler.GetRefferalCode)
-				referral.POST("/claim", refferalHandler.ApplyRefferalCode)
+				referral.GET("/get-code", refferalHandler.GetReferralCode)
+				referral.POST("/claim", refferalHandler.ApplyReferralCode)
 			}
 
 			wallet := user.Group("/wallet")

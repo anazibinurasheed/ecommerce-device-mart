@@ -22,7 +22,7 @@ func NewAdminUseCase(adminUseCase interfaces.AdminRepository, userUseCase interf
 	}
 }
 
-func (ac *adminUsecase) AdminSignup(admin request.SignUpData) error {
+func (ac *adminUsecase) AdminSignUp(admin request.SignUpData) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 10)
 	if err != nil {
 		return fmt.Errorf("Failed to generate hash from password :%s", err)
@@ -67,6 +67,7 @@ func (ac *adminUsecase) GetAllUserData() ([]response.UserData, error) {
 	return listOfAllUserData, nil
 
 }
+
 func (ac *adminUsecase) BlockUserByID(ID int) error {
 	err := ac.adminRepo.BlockUserByID(ID)
 	if err != nil {

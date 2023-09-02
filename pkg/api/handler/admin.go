@@ -61,7 +61,7 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 	}
 
 	body.Phone = Number
-	err = ah.adminUseCase.AdminSignup(body)
+	err = ah.adminUseCase.AdminSignUp(body)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)

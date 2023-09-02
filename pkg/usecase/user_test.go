@@ -35,7 +35,7 @@ func TestSignUp(t *testing.T) {
 			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
 				userRepo.EXPECT().FindUserByPhone(8590138151).Return(response.UserData{}, nil)
 				userRepo.EXPECT().FindUserByEmail("anazibinurasheed@gmail.com").Return(response.UserData{}, nil)
-				userRepo.EXPECT().SaveUserOnDatabase(request.SignUpData{
+				userRepo.EXPECT().CreateUser(request.SignUpData{
 					UserName: "Anaz",
 					Email:    "anazibinurasheed@gmail.com",
 					Phone:    8590138151,
