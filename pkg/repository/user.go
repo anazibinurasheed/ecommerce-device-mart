@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -64,6 +62,7 @@ func (ud *userDatabase) GetListOfStates() ([]response.States, error) {
 	err := ud.DB.Raw(query).Scan(&ListOfStates).Error
 	return ListOfStates, err
 }
+
 func (ud *userDatabase) AddAddress(userID int, address request.Address) (response.Address, error) {
 	var NewAddress response.Address
 
@@ -93,6 +92,7 @@ func (ud *userDatabase) SetDefaultAddressStatus(status bool, addressId int, user
 
 	return DefaultAddress, err
 }
+
 func (ud *userDatabase) GetAllUserAddresses(userID int) ([]response.Address, error) {
 
 	var ListOfUserAddress = make([]response.Address, 0)

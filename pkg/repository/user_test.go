@@ -178,7 +178,7 @@ func TestFindUserById(t *testing.T) {
 
 			tc.beforeTest(mockSQL)
 			ud := NewUserRepository(gormDB)
-			got, err := ud.FindUserById(tc.input.ID)
+			got, err := ud.FindUserByID(tc.input.ID)
 
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, got, tc.want)
