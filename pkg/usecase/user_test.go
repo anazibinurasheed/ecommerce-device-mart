@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	mockRepo "github.com/anazibinurasheed/project-device-mart/pkg/mock/repoMock"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/golang/mock/gomock"
 	"gopkg.in/go-playground/assert.v1"
