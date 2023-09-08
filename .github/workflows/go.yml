@@ -28,15 +28,18 @@ jobs:
     - name: Test # Runnable commands 
       run: go test -v ./...
 
-    - name: Deploy to AWS EC2 instance
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{secrets.PUBLIC_IP}}
-        username: ubuntu
-        key: ${{secrets.SSH_KEY}}
-        script: |
-          echo "Connected to AWS EC2 instance"
-          cd mainDevicemart/devicemart
-          git pull
-          go build ./cmd/api
-          sudo systemctl restart mainDevicemart.service
+
+# # Terminated EC2 instance 
+
+#     - name: Deploy to AWS EC2 instance
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{secrets.PUBLIC_IP}}
+#         username: ubuntu
+#         key: ${{secrets.SSH_KEY}}
+#         script: |
+#           echo "Connected to AWS EC2 instance"
+#           cd mainDevicemart/devicemart
+#           git pull
+#           go build ./cmd/api
+#           sudo systemctl restart mainDevicemart.service

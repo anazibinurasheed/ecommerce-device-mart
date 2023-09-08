@@ -13,4 +13,3 @@ app1.html
 codeTrash.txt
 postgres-secret.yml
 postgres-configmap.yml
-docker-compose.yml
