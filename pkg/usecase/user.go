@@ -41,12 +41,12 @@ func (u *userUseCase) SignUp(user request.SignUpData) error {
 		return fmt.Errorf("User already exist with this email address")
 	}
 
-	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to generate hash from password :%s", err)
-	// }
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	if err != nil {
+		return fmt.Errorf("failed to generate hash from password :%s", err)
+	}
 
-	// user.Password = string(hashedPassword)
+	user.Password = string(hashedPassword)
 
 	if _, err := u.userRepo.CreateUser(user); err != nil {
 		return fmt.Errorf("Failed to save user on db, user sign up failed :%s", err)

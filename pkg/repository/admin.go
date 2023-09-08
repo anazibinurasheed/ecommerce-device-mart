@@ -29,8 +29,8 @@ func (ud *adminDatabase) CreateAdmin(admin request.SignUpData) (response.UserDat
 	query := `INSERT INTO users (user_name,  email, phone, password,created_at,is_admin) VALUES ($1,$2,$3,$4,$5,$6) RETURNING * ;`
 	CreatedAt := time.Now()
 	var AdminData response.UserData
-	IsAdmin := true
-	err := ud.DB.Raw(query, admin.UserName, admin.Email, admin.Phone, admin.Password, CreatedAt, IsAdmin).Scan(&AdminData).Error
+	isAdmin := true
+	err := ud.DB.Raw(query, admin.UserName, admin.Email, admin.Phone, admin.Password, CreatedAt, isAdmin).Scan(&AdminData).Error
 
 	return AdminData, err
 }
