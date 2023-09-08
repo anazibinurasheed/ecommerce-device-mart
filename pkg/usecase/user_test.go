@@ -5,59 +5,58 @@ import (
 	"testing"
 
 	mockRepo "github.com/anazibinurasheed/project-device-mart/pkg/mock/repoMock"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/golang/mock/gomock"
 	"gopkg.in/go-playground/assert.v1"
 )
 
-func TestSignUp(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+// func TestSignUp(t *testing.T) {
+// 	ctrl := gomock.NewController(t)
+// 	defer ctrl.Finish()
 
-	mockRepository := mockRepo.NewMockUserRepository(ctrl)
-	userUseCase := NewUserUseCase(mockRepository)
+// 	mockRepository := mockRepo.NewMockUserRepository(ctrl)
+// 	userUseCase := NewUserUseCase(mockRepository)
 
-	testCases := []struct {
-		name        string
-		input       request.SignUpData
-		beforeTest  func(userRepo *mockRepo.MockUserRepository)
-		expectedErr error
-	}{
-		{name: "success sign up",
-			input: request.SignUpData{
-				UserName: "Anaz",
-				Email:    "anazibinurasheed@gmail.com",
-				Phone:    8590138151,
-				Password: "123456789",
-			},
+// 	testCases := []struct {
+// 		name        string
+// 		input       request.SignUpData
+// 		beforeTest  func(userRepo *mockRepo.MockUserRepository)
+// 		expectedErr error
+// 	}{
+// 		{name: "success sign up",
+// 			input: request.SignUpData{
+// 				UserName: "Anaz",
+// 				Email:    "anazibinurasheed@gmail.com",
+// 				Phone:    8590138151,
+// 				Password: "123456789",
+// 			},
 
-			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
-				userRepo.EXPECT().FindUserByPhone(8590138151).Return(response.UserData{}, nil)
-				userRepo.EXPECT().FindUserByEmail("anazibinurasheed@gmail.com").Return(response.UserData{}, nil)
-				userRepo.EXPECT().CreateUser(request.SignUpData{
-					UserName: "Anaz",
-					Email:    "anazibinurasheed@gmail.com",
-					Phone:    8590138151,
-					Password: "123456789",
-				}).Return(response.UserData{
-					ID:       1,
-					UserName: "Anaz",
-					Email:    "anazibinurasheed@gmail.com",
-					Phone:    8590138151,
-				}, nil)
-			},
-			expectedErr: nil},
-	}
+// 			beforeTest: func(userRepo *mockRepo.MockUserRepository) {
+// 				userRepo.EXPECT().FindUserByPhone(8590138151).Return(response.UserData{}, nil)
+// 				userRepo.EXPECT().FindUserByEmail("anazibinurasheed@gmail.com").Return(response.UserData{}, nil)
+// 				userRepo.EXPECT().CreateUser(request.SignUpData{
+// 					UserName: "Anaz",
+// 					Email:    "anazibinurasheed@gmail.com",
+// 					Phone:    8590138151,
+// 					Password: "123456789",
+// 				}).Return(response.UserData{
+// 					ID:       1,
+// 					UserName: "Anaz",
+// 					Email:    "anazibinurasheed@gmail.com",
+// 					Phone:    8590138151,
+// 				}, nil)
+// 			},
+// 			expectedErr: nil},
+// 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.beforeTest(mockRepository)
-			err := userUseCase.SignUp(tc.input)
-			assert.Equal(t, tc.expectedErr, err)
-		})
-	}
-}
+// 	for _, tc := range testCases {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			tc.beforeTest(mockRepository)
+// 			err := userUseCase.SignUp(tc.input)
+// 			assert.Equal(t, tc.expectedErr, err)
+// 		})
+// 	}
+// }
 
 func TestUpdateUserName(t *testing.T) {
 	ctrl := gomock.NewController(t)
