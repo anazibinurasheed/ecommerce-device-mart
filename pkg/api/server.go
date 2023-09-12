@@ -95,7 +95,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				profile.POST("/add-address", userHandler.AddAddress)
 				profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
 				profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
-				profile.GET("/addresses", userHandler.GetAllAdresses)
+				profile.GET("/addresses", userHandler.GetAllAddresses)
 				profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)
 				profile.POST("/edit-username", userHandler.EditUserName)
 				profile.POST("/verify-password", userHandler.ChangePasswordRequest)
