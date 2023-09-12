@@ -35,7 +35,7 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		handler.NewCouponHandler,
 
-		handler.NewRefferalHandler,
+		handler.NewReferralHandler,
 
 		usecase.NewAdminUseCase,
 
@@ -51,7 +51,7 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		usecase.NewCouponUseCase,
 
-		usecase.NewRefferalUseCase,
+		usecase.NewReferralUseCase,
 
 		repository.NewAdminRepository,
 
@@ -67,7 +67,7 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		repository.NewCouponRepository,
 
-		repository.NewRefferalRepository,
+		repository.NewReferralRepository,
 
 		http.NewServerHTTP)
 
