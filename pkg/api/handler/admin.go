@@ -22,10 +22,10 @@ func NewAdminHandler(useCase services.AdminUseCase) *AdminHandler {
 		adminUseCase: useCase}
 }
 
-// AdminSignup godoc
+// CreateAdmin godoc
 //
-//	@Summary		Admin signup
-//	@Description	Sudo admin can create new admin account.
+//	@Summary		Create admin
+//	@Description	Sudo admin to create new admin account.
 //	@Tags			sudo admin
 //	@Accept			json
 //	@Produce		json
@@ -34,7 +34,7 @@ func NewAdminHandler(useCase services.AdminUseCase) *AdminHandler {
 //	@Success		200	{object}	response.Response
 //	@Failure		400	{object}	response.Response
 //	@Router			/admin/create-admin [post]
-func (ah *AdminHandler) AdminSignup(c *gin.Context) {
+func (ah *AdminHandler) CreateAdmin(c *gin.Context) {
 	var body request.SignUpData
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -78,20 +78,20 @@ func (ah *AdminHandler) AdminSignup(c *gin.Context) {
 
 }
 
-// SudoAdminLogin godoc.
+// SULogin godoc.
 //
 //	@Summary		Sudo Admin Login
 //	@Description	For sudo admin login.
 //	@Tags			sudo admin
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		request.LoginSudoAdmin	true	"Sudo admin login credentials"
+//	@Param			body	body		request.SudoLoginData	true	"Sudo admin login credentials"
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/admin/sudo/login [post]
-func (ah *AdminHandler) SudoAdminLogin(c *gin.Context) {
+//	@Router			/admin/su-login [post]
+func (ah *AdminHandler) SULogin(c *gin.Context) {
 	var body request.SudoLoginData
 	if err := c.BindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -106,7 +106,7 @@ func (ah *AdminHandler) SudoAdminLogin(c *gin.Context) {
 		return
 	}
 
-	TokenString, _, err := helper.GenerateJwtToken(001) //for sudo admin login from .env
+	TokenString, _, err := helper.GenerateJwtToken(001) //for su admin
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -149,7 +149,7 @@ func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
 	// 	return
 	// }
 
-	ListOfAllUserData, err := ah.adminUseCase.GetAllUserData() ////////////////
+	ListOfAllUserData, err := ah.adminUseCase.GetAllUserData()
 	if err != nil {
 		response := response.ResponseMessage(501, "Failed", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)

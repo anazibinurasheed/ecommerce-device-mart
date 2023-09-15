@@ -31,35 +31,37 @@ type ServerHTTP struct {
 // @host		localhost:3000
 // @BasePath	/api/v1
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, refferalHandler *handler.ReferralHandler) *ServerHTTP {
+	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) *ServerHTTP {
 
 	Engine := gin.New()
-	Engine.LoadHTMLGlob("templates/*.html") //  loading html for razorpay payment
+	Engine.LoadHTMLGlob("templates/*.html")
 
-	// Add the Gin Logger middleware.
 	Engine.Use(gin.Logger())
 	Engine.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
 	user := Engine.Group("/api/v1")
 	{
-
-		user.POST("/send-otp", commonHandler.SendOtpToPhone) //sign up otp
-		user.POST("/verify-otp", commonHandler.VerifyOtp)    // otp for verify signup phone number
-		user.POST("/sign-up", middleware.IsVerified, userHandler.UserSignUp)
+		user.POST("/send-otp", commonHandler.SendOTP)
+		user.POST("/verify-otp", commonHandler.VerifyOTP)
+		user.POST("/sign-up", middleware.Verified, userHandler.UserSignUp)
 		user.POST("/login", userHandler.UserLogin)
-		// user.GET("/refresh_token", commonHandler.RefreshToken)
 		user.POST("/logout", commonHandler.Logout)
 		user.POST("/webhook", orderHandler.WebhookHandler)
 
 		user.Use(middleware.AuthenticateUserJwt)
 		{
 
-			user.GET("/products", productHandler.DisplayAllProductsToUser)
-			user.GET("/product-item/:productID", productHandler.ViewProductItem)
-			user.POST("/products/search", productHandler.SearchProducts)
-			user.GET("/product/rating/:productID", productHandler.ValidateRatingRequest)
-			user.POST("/product/rating/:productID", productHandler.AddProductRating)
-			user.GET("/products-by-category/:categoryID", productHandler.ListProductsByCategory)
+			product := user.Group("/product")
+			{
+				product.GET("/", productHandler.DisplayAllProductsToUser)
+				product.GET("/:productID", productHandler.ViewIndividualProduct)
+				product.POST("/search", productHandler.SearchProducts)
+				product.GET("/rating/:productID", productHandler.ValidateRatingRequest)
+				product.POST("/rating/:productID", productHandler.AddProductRating)
+				product.GET("/category/:categoryID", productHandler.ListProductsByCategory)
+
+			}
+
 			cart := user.Group("/cart")
 			{
 				cart.GET("/", cartHandler.ViewCart)
@@ -69,17 +71,20 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				cart.DELETE("/remove/:productID", cartHandler.RemoveFromCart)
 
 			}
+
 			coupon := user.Group("/coupon")
 			{
 				coupon.GET("/available", couponHandler.ListOutAvailableCouponsToUser)
 				coupon.POST("/apply", couponHandler.ApplyCoupon)
 				coupon.DELETE("/remove/:couponID", couponHandler.RemoveAppliedCoupon)
 			}
+
 			checkout := user.Group("/checkout")
 			{
 				checkout.GET("/", orderHandler.CheckOutPage)
 
 			}
+
 			payment := user.Group("/payment")
 			{
 				payment.POST("/order-cod-confirmed", orderHandler.ConfirmCodDelivery)
@@ -88,6 +93,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				payment.POST("/wallet", orderHandler.WalletPayment)
 
 			}
+
 			profile := user.Group("/profile")
 			{
 				profile.GET("/", userHandler.Profile)
@@ -109,12 +115,12 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
 				order.POST("/return/:orderID", orderHandler.ReturnOrder)
 				order.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
-
 			}
+
 			referral := user.Group("/referral")
 			{
-				referral.GET("/get-code", refferalHandler.GetReferralCode)
-				referral.POST("/claim", refferalHandler.ApplyReferralCode)
+				referral.GET("/get-code", referralHandler.GetReferralCode)
+				referral.POST("/claim", referralHandler.ApplyReferralCode)
 			}
 
 			wallet := user.Group("/wallet")
@@ -127,16 +133,15 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		}
 
 	}
-	//
+
 	admin := Engine.Group("api/v1/admin")
 	{
-		admin.POST("/sudo/login", adminHandler.SudoAdminLogin)
-		// admin.POST("/phone", commonHandler.SendOtpToPhone)
-		//got error
+		admin.POST("/su-login", adminHandler.SULogin)
+
 		admin.Use(middleware.AdminAuthJWT)
 		{
 
-			admin.POST("/create-admin", middleware.AuthenticateSudoAdminJwt, middleware.IsVerified, adminHandler.AdminSignup) //before using create-admin api should  ensure that provided phone number is valid by sending otp .
+			admin.POST("/create-admin", middleware.AuthenticateSudoAdminJwt, middleware.Verified, adminHandler.CreateAdmin)
 
 			category := admin.Group("/category")
 			{
@@ -157,6 +162,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				products.PATCH("/unblock-product/:productID", productHandler.UnBlockProduct)
 
 			}
+
 			coupon := admin.Group("/promotions")
 			{
 				coupon.POST("/create-coupon", couponHandler.CreateCoupon)
@@ -165,6 +171,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				coupon.PUT("/block-coupon/:couponID", couponHandler.BlockCoupon)
 				coupon.PUT("/unblock-coupon/:couponID", couponHandler.UnBlockCoupon)
 			}
+
 			user_management := admin.Group("/user-management")
 			{
 				user_management.GET("/view-all-users", adminHandler.DisplayAllUsers)
@@ -172,12 +179,14 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 				user_management.PATCH("/unblock-user/:userID", adminHandler.UnblockUser)
 
 			}
+
 			order_management := admin.Group("/orders")
 			{
 				order_management.GET("/", orderHandler.GetAllOrderOverViewPage)
 				order_management.GET("/management", orderHandler.GetOrderManagementPage)
 				order_management.PUT("/:orderID/update-status/:statusID", orderHandler.UpdateOrderStatus)
 			}
+
 		}
 	}
 	return &ServerHTTP{engine: Engine}

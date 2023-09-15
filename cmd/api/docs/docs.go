@@ -260,7 +260,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Sudo admin can create new admin account.",
+                "description": "Sudo admin to create new admin account.",
                 "consumes": [
                     "application/json"
                 ],
@@ -270,7 +270,7 @@ const docTemplate = `{
                 "tags": [
                     "sudo admin"
                 ],
-                "summary": "Admin signup",
+                "summary": "Create admin",
                 "parameters": [
                     {
                         "description": "Signup data",
@@ -914,7 +914,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.LoginSudoAdmin"
+                            "$ref": "#/definitions/request.SudoLoginData"
                         }
                     }
                 ],
@@ -1425,47 +1425,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/download-invoice/{orderID}": {
-            "get": {
-                "description": "Download the invoice as a PDF file.",
-                "produces": [
-                    "application/pdf"
-                ],
-                "tags": [
-                    "user orders"
-                ],
-                "summary": "Download invoice",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Order ID",
-                        "name": "orderID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "file"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/login": {
             "post": {
                 "description": "Logs in a user and sends an OTP for verification.",
@@ -1612,6 +1571,47 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/my-orders/download-invoice/{orderID}": {
+            "get": {
+                "description": "Download the invoice as a PDF file.",
+                "produces": [
+                    "application/pdf"
+                ],
+                "tags": [
+                    "user orders"
+                ],
+                "summary": "Download invoice",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
                         }
                     },
                     "400": {
@@ -2698,7 +2698,7 @@ const docTemplate = `{
                 "tags": [
                     "common"
                 ],
-                "summary": "Verify signup  OTP",
+                "summary": "Verify sign up  OTP",
                 "parameters": [
                     {
                         "description": "OTP",
@@ -2841,6 +2841,10 @@ const docTemplate = `{
         },
         "request.ChangePassword": {
             "type": "object",
+            "required": [
+                "new_password",
+                "re_new_password"
+            ],
             "properties": {
                 "new_password": {
                     "type": "string"
@@ -2857,7 +2861,8 @@ const docTemplate = `{
                 "coupon_name",
                 "discount_max_amount",
                 "discount_percentage",
-                "min_order_value"
+                "min_order_value",
+                "validity_days"
             ],
             "properties": {
                 "code": {
@@ -2876,7 +2881,8 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "validity_days": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -2895,24 +2901,11 @@ const docTemplate = `{
                 }
             }
         },
-        "request.LoginSudoAdmin": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "description": "Phone    string ` + "`" + `json:\"phone\"` + "`" + `",
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "request.OldPassword": {
             "type": "object",
+            "required": [
+                "old_password"
+            ],
             "properties": {
                 "old_password": {
                     "type": "string"
@@ -2923,13 +2916,13 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "otp",
-                "unique_id"
+                "uuid"
             ],
             "properties": {
                 "otp": {
                     "type": "string"
                 },
-                "unique_id": {
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -2941,7 +2934,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "phone": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 10,
+                    "minimum": 2
                 }
             }
         },
@@ -2972,6 +2967,10 @@ const docTemplate = `{
         },
         "request.Rating": {
             "type": "object",
+            "required": [
+                "description",
+                "rating"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -2999,13 +2998,33 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
-                    "description": "for retrieve user phone",
+                    "description": "for retrieve user phone from the map",
+                    "type": "string"
+                }
+            }
+        },
+        "request.SudoLoginData": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
         },
         "request.VerifyPayment": {
             "type": "object",
+            "required": [
+                "razorpay_order_id",
+                "razorpay_payment_id",
+                "razorpay_signature"
+            ],
             "properties": {
                 "razorpay_order_id": {
                     "type": "string"

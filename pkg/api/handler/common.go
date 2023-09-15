@@ -41,7 +41,7 @@ var (
 	phoneDataMutex = new(sync.Mutex)
 )
 
-// SendOtpToPhone godoc
+// SendOTP godoc
 //
 //	@Summary		Send sign up OTP to Phone
 //	@Description	Sends an OTP to the provided phone number.
@@ -52,7 +52,7 @@ var (
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Router			/send-otp [post]
-func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
+func (ch *CommonHandler) SendOTP(c *gin.Context) {
 	var body request.Phone
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -76,7 +76,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-// VerifyOtp godoc
+// VerifyOTP godoc
 //
 //	@Summary		Verify sign up  OTP
 //	@Description	Validates the provided OTP for a phone number.
@@ -88,7 +88,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Router			/verify-otp [post]
-func (ch *CommonHandler) VerifyOtp(c *gin.Context) {
+func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {

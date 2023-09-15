@@ -397,7 +397,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		404		{object}	response.Response
 //	@Failure		503		{object}	response.Response
-//	@Router			/products [get]
+//	@Router			/products/ [get]
 func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -430,7 +430,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// ViewProductItem godoc
+// ViewIndividualProduct godoc
 //
 //	@Summary		View a product
 //	@Description	Retrieves details of a product with the specified ID.
@@ -440,8 +440,8 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/product-item/{productID} [get]
-func (pd *ProductHandler) ViewProductItem(c *gin.Context) {
+//	@Router			/product/{productID} [get]
+func (pd *ProductHandler) ViewIndividualProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -554,7 +554,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
-//	@Router			/products/search [post]
+//	@Router			/product/search [post]
 func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -602,7 +602,7 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/products-by-category/{categoryID} [get]
+//	@Router			/category/{categoryID} [get]
 func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {

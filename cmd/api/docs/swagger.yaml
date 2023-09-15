@@ -40,6 +40,9 @@ definitions:
         type: string
       re_new_password:
         type: string
+    required:
+    - new_password
+    - re_new_password
     type: object
   request.Coupon:
     properties:
@@ -54,6 +57,7 @@ definitions:
       min_order_value:
         type: number
       validity_days:
+        minimum: 1
         type: integer
     required:
     - code
@@ -61,6 +65,7 @@ definitions:
     - discount_max_amount
     - discount_percentage
     - min_order_value
+    - validity_days
     type: object
   request.LoginData:
     properties:
@@ -72,35 +77,28 @@ definitions:
     - password
     - phone
     type: object
-  request.LoginSudoAdmin:
-    properties:
-      password:
-        description: Phone    string `json:"phone"`
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
   request.OldPassword:
     properties:
       old_password:
         type: string
+    required:
+    - old_password
     type: object
   request.Otp:
     properties:
       otp:
         type: string
-      unique_id:
+      uuid:
         type: string
     required:
     - otp
-    - unique_id
+    - uuid
     type: object
   request.Phone:
     properties:
       phone:
+        maximum: 10
+        minimum: 2
         type: integer
     required:
     - phone
@@ -128,6 +126,9 @@ definitions:
         type: string
       rating:
         type: integer
+    required:
+    - description
+    - rating
     type: object
   request.SignUpData:
     properties:
@@ -138,10 +139,20 @@ definitions:
       username:
         type: string
       uuid:
-        description: for retrieve user phone
+        description: for retrieve user phone from the map
         type: string
     required:
     - email
+    - password
+    - username
+    type: object
+  request.SudoLoginData:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
     - password
     - username
     type: object
@@ -153,6 +164,10 @@ definitions:
         type: string
       razorpay_signature:
         type: string
+    required:
+    - razorpay_order_id
+    - razorpay_payment_id
+    - razorpay_signature
     type: object
   response.Response:
     properties:
@@ -332,7 +347,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Sudo admin can create new admin account.
+      description: Sudo admin to create new admin account.
       parameters:
       - description: Signup data
         in: body
@@ -353,7 +368,7 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - BearerAuth: []
-      summary: Admin signup
+      summary: Create admin
       tags:
       - sudo admin
   /admin/orders:
@@ -763,7 +778,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/request.LoginSudoAdmin'
+          $ref: '#/definitions/request.SudoLoginData'
       produces:
       - application/json
       responses:
@@ -1105,33 +1120,6 @@ paths:
       summary: Remove applied coupon
       tags:
       - coupon
-  /download-invoice/{orderID}:
-    get:
-      description: Download the invoice as a PDF file.
-      parameters:
-      - description: Order ID
-        in: path
-        name: orderID
-        required: true
-        type: integer
-      produces:
-      - application/pdf
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: file
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Download invoice
-      tags:
-      - user orders
   /login:
     post:
       consumes:
@@ -1240,6 +1228,33 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Cancel an order
+      tags:
+      - user orders
+  /my-orders/download-invoice/{orderID}:
+    get:
+      description: Download the invoice as a PDF file.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: integer
+      produces:
+      - application/pdf
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Download invoice
       tags:
       - user orders
   /my-orders/return/{orderID}:
@@ -1967,7 +1982,7 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Verify signup  OTP
+      summary: Verify sign up  OTP
       tags:
       - common
   /wallet/:
