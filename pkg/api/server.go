@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/anazibinurasheed/project-device-mart/cmd/api/docs"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/routes"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"  // swagger embed files
@@ -28,8 +28,8 @@ type ServerHTTP struct {
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host		localhost:3000
-// @BasePath	/api/v1
+//	@host		localhost:3000
+//	@BasePath	/api/v1
 func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) *ServerHTTP {
 
@@ -37,157 +37,166 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 	Engine.LoadHTMLGlob("templates/*.html")
 
 	Engine.Use(gin.Logger())
+
 	Engine.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
-	user := Engine.Group("/api/v1")
-	{
-		user.POST("/send-otp", commonHandler.SendOTP)
-		user.POST("/verify-otp", commonHandler.VerifyOTP)
-		user.POST("/sign-up", middleware.Verified, userHandler.UserSignUp)
-		user.POST("/login", userHandler.UserLogin)
-		user.POST("/logout", commonHandler.Logout)
-		user.POST("/webhook", orderHandler.WebhookHandler)
+	// user := Engine.Group("/api/v1")
+	// {
+	// 	user.POST("/send-otp", commonHandler.SendOTP)
+	// 	user.POST("/verify-otp", commonHandler.VerifyOTP)
+	// 	user.POST("/sign-up", middleware.Verified, userHandler.UserSignUp)
+	// 	user.POST("/login", userHandler.UserLogin)
+	// 	user.POST("/logout", commonHandler.Logout)
+	// 	user.POST("/webhook", orderHandler.WebhookHandler)
 
-		user.Use(middleware.AuthenticateUserJwt)
-		{
+	// 	user.Use(middleware.AuthenticateUserJwt)
+	// 	{
 
-			profile := user.Group("/profile")
-			{
-				profile.GET("/", userHandler.Profile)
-				profile.GET("/add-address", userHandler.GetAddAddressPage)
-				profile.POST("/add-address", userHandler.AddAddress)
-				profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
-				profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
-				profile.GET("/addresses", userHandler.GetAllAddresses)
-				profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)
-				profile.POST("/edit-username", userHandler.EditUserName)
-				profile.POST("/verify-password", userHandler.ChangePasswordRequest)
-				profile.POST("/change-password", userHandler.ChangePassword)
-			}
+	// 		profile := user.Group("/profile")
+	// 		{
+	// 			profile.GET("/", userHandler.Profile)
+	// 			profile.GET("/add-address", userHandler.GetAddAddressPage)
+	// 			profile.POST("/add-address", userHandler.AddAddress)
+	// 			profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
+	// 			profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
+	// 			profile.GET("/addresses", userHandler.GetAllAddresses)
+	// 			profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)
+	// 			profile.POST("/edit-username", userHandler.EditUserName)
+	// 			profile.POST("/verify-password", userHandler.ChangePasswordRequest)
+	// 			profile.POST("/change-password", userHandler.ChangePassword)
+	// 		}
 
-			product := user.Group("/product")
-			{
-				product.GET("/", productHandler.DisplayAllProductsToUser)
-				product.GET("/:productID", productHandler.ViewIndividualProduct)
-				product.POST("/search", productHandler.SearchProducts)
-				product.GET("/rating/:productID", productHandler.ValidateRatingRequest)
-				product.POST("/rating/:productID", productHandler.AddProductRating)
-				product.GET("/category/:categoryID", productHandler.ListProductsByCategory)
+	// 		product := user.Group("/product")
+	// 		{
+	// 			product.GET("/", productHandler.DisplayAllProductsToUser)
+	// 			product.GET("/:productID", productHandler.ViewIndividualProduct)
+	// 			product.POST("/search", productHandler.SearchProducts)
+	// 			product.GET("/rating/:productID", productHandler.ValidateRatingRequest)
+	// 			product.POST("/rating/:productID", productHandler.AddProductRating)
+	// 			product.GET("/category/:categoryID", productHandler.ListProductsByCategory)
 
-			}
+	// 		}
 
-			cart := user.Group("/cart")
-			{
-				cart.GET("/", cartHandler.ViewCart)
-				cart.POST("/add/:productID", cartHandler.AddToCart)
-				cart.PATCH("/:productID/increment", cartHandler.IncrementQuantity)
-				cart.PATCH("/:productID/decrement", cartHandler.DecrementQuantity)
-				cart.DELETE("/remove/:productID", cartHandler.RemoveFromCart)
+	// 		cart := user.Group("/cart")
+	// 		{
+	// 			cart.GET("/", cartHandler.ViewCart)
+	// 			cart.POST("/add/:productID", cartHandler.AddToCart)
+	// 			cart.PUT("/:productID/increment", cartHandler.IncrementQuantity)
+	// 			cart.PUT("/:productID/decrement", cartHandler.DecrementQuantity)
+	// 			cart.DELETE("/remove/:productID", cartHandler.RemoveFromCart)
 
-			}
+	// 		}
 
-			coupon := user.Group("/coupon")
-			{
-				coupon.GET("/available", couponHandler.ListOutAvailableCouponsToUser)
-				coupon.POST("/apply", couponHandler.ApplyCoupon)
-				coupon.DELETE("/remove/:couponID", couponHandler.RemoveAppliedCoupon)
-			}
+	// 		coupon := user.Group("/coupon")
+	// 		{
+	// 			coupon.GET("/available", couponHandler.ListOutAvailableCouponsToUser)
+	// 			coupon.POST("/apply", couponHandler.ApplyCoupon)
+	// 			coupon.DELETE("/remove/:couponID", couponHandler.RemoveAppliedCoupon)
+	// 		}
 
-			checkout := user.Group("/checkout")
-			{
-				checkout.GET("/", orderHandler.CheckOutPage)
+	// 		checkout := user.Group("/checkout")
+	// 		{
+	// 			checkout.GET("/", orderHandler.CheckOutPage)
 
-			}
+	// 		}
 
-			payment := user.Group("/payment")
-			{
-				payment.POST("/order-cod-confirmed", orderHandler.ConfirmCodDelivery)
-				payment.GET("/razorpay", orderHandler.MakePaymentRazorpay)
-				payment.POST("/razorpay/process-order", orderHandler.ProccessRazorpayOrder)
-				payment.POST("/wallet", orderHandler.WalletPayment)
+	// 		payment := user.Group("/payment")
+	// 		{
+	// 			payment.POST("/order-cod-confirmed", orderHandler.ConfirmCodDelivery)
+	// 			payment.GET("/razorpay", orderHandler.MakePaymentRazorpay)
+	// 			payment.POST("/razorpay/process-order", orderHandler.ProccessRazorpayOrder)
+	// 			payment.POST("/wallet", orderHandler.WalletPayment)
 
-			}
+	// 		}
 
-			order := user.Group("/my-orders")
-			{
-				order.GET("/", orderHandler.UserOrderHistory)
-				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
-				order.POST("/return/:orderID", orderHandler.ReturnOrder)
-				order.GET("/invoice/:orderID", orderHandler.DownloadInvoice)
-			}
+	// 		order := user.Group("/my-orders")
+	// 		{
+	// 			order.GET("/", orderHandler.UserOrderHistory)
+	// 			order.POST("/cancel/:orderID", orderHandler.CancelOrder)
+	// 			order.POST("/return/:orderID", orderHandler.ReturnOrder)
+	// 			order.GET("/invoice/:orderID", orderHandler.GetInvoice)
+	// 		}
 
-			referral := user.Group("/referral")
-			{
-				referral.GET("/get-code", referralHandler.GetReferralCode)
-				referral.POST("/claim", referralHandler.ApplyReferralCode)
-			}
+	// 		referral := user.Group("/referral")
+	// 		{
+	// 			referral.GET("/get-code", referralHandler.GetReferralCode)
+	// 			referral.POST("/claim", referralHandler.ApplyReferralCode)
+	// 		}
 
-			wallet := user.Group("/wallet")
-			{
-				wallet.GET("/", orderHandler.ViewUserWallet)
-				wallet.POST("/create", orderHandler.CreateUserWallet)
+	// 		wallet := user.Group("/wallet")
+	// 		{
+	// 			wallet.GET("/", orderHandler.ViewUserWallet)
+	// 			wallet.POST("/create", orderHandler.CreateUserWallet)
 
-			}
+	// 		}
 
-		}
+	// 	}
 
-	}
+	// }
 
-	admin := Engine.Group("api/v1/admin")
-	{
-		admin.POST("/su-login", adminHandler.SULogin)
+	// admin := Engine.Group("api/v1/admin")
+	// {
+	// 	admin.POST("/su-login", adminHandler.SULogin)
 
-		admin.Use(middleware.AdminAuthJWT)
-		{
+	// 	admin.Use(middleware.AdminAuthJWT)
+	// 	{
 
-			admin.POST("/create-admin", middleware.AuthenticateSudoAdminJwt, middleware.Verified, adminHandler.CreateAdmin)
+	// 		admin.POST("/create-admin", middleware.AuthenticateSudoAdminJwt, middleware.Verified, adminHandler.CreateAdmin)
 
-			category := admin.Group("/category")
-			{
-				category.POST("/add-category", productHandler.CreateCategory)
-				category.GET("/all-category", productHandler.ReadAllCategories)
-				category.PATCH("/update-category/:categoryID", productHandler.UpdateCategory)
-				category.PATCH("/block-category/:categoryID", productHandler.BlockCategory)
-				category.PATCH("/unblock-category/:categoryID", productHandler.UnBlockCategory)
+	// 		category := admin.Group("/category")
+	// 		{
+	// 			category.POST("/add-category", productHandler.CreateCategory)
+	// 			category.GET("/all-category", productHandler.ReadAllCategories)
+	// 			category.PUT("/update-category/:categoryID", productHandler.UpdateCategory)
+	// 			category.PUT("/block-category/:categoryID", productHandler.BlockCategory)
+	// 			category.PUT("/unblock-category/:categoryID", productHandler.UnBlockCategory)
 
-			}
+	// 		}
 
-			products := admin.Group("/products")
-			{
-				products.GET("/all-products", productHandler.DisplayAllProductsToAdmin)
-				products.POST("/add-product/:categoryID", productHandler.CreateProduct)
-				products.PATCH("/update-product/:productID", productHandler.UpdateProduct)
-				products.PATCH("/block-product/:productID", productHandler.BlockProduct)
-				products.PATCH("/unblock-product/:productID", productHandler.UnBlockProduct)
+	// 		products := admin.Group("/products")
+	// 		{
+	// 			products.GET("/all-products", productHandler.DisplayAllProductsToAdmin)
+	// 			products.POST("/add-product/:categoryID", productHandler.CreateProduct)
+	// 			products.PUT("/update-product/:productID", productHandler.UpdateProduct)
+	// 			products.PUT("/block-product/:productID", productHandler.BlockProduct)
+	// 			products.PUT("/unblock-product/:productID", productHandler.UnBlockProduct)
 
-			}
+	// 		}
 
-			coupon := admin.Group("/promotions")
-			{
-				coupon.POST("/create-coupon", couponHandler.CreateCoupon)
-				coupon.PUT("/update-coupon/:couponID", couponHandler.UpdateCoupon)
-				coupon.GET("/all-coupons", couponHandler.ListOutAllCouponsToAdmin)
-				coupon.PUT("/block-coupon/:couponID", couponHandler.BlockCoupon)
-				coupon.PUT("/unblock-coupon/:couponID", couponHandler.UnBlockCoupon)
-			}
+	// 		coupon := admin.Group("/promotions")
+	// 		{
+	// 			coupon.POST("/create-coupon", couponHandler.CreateCoupon)
+	// 			coupon.PUT("/update-coupon/:couponID", couponHandler.UpdateCoupon)
+	// 			coupon.GET("/all-coupons", couponHandler.ListOutAllCouponsToAdmin)
+	// 			coupon.PUT("/block-coupon/:couponID", couponHandler.BlockCoupon)
+	// 			coupon.PUT("/unblock-coupon/:couponID", couponHandler.UnBlockCoupon)
+	// 		}
 
-			user_management := admin.Group("/user-management")
-			{
-				user_management.GET("/view-all-users", adminHandler.DisplayAllUsers)
-				user_management.PATCH("/block-user/:userID", adminHandler.BlockUser)
-				user_management.PATCH("/unblock-user/:userID", adminHandler.UnblockUser)
+	// 		user_management := admin.Group("/user-management")
+	// 		{
+	// 			user_management.GET("/view-all-users", adminHandler.DisplayAllUsers)
+	// 			user_management.PUT("/block-user/:userID", adminHandler.BlockUser)
+	// 			user_management.PUT("/unblock-user/:userID", adminHandler.UnblockUser)
 
-			}
+	// 		}
 
-			order_management := admin.Group("/orders")
-			{
-				order_management.GET("/", orderHandler.GetAllOrderOverViewPage)
-				order_management.GET("/management", orderHandler.GetOrderManagementPage)
-				order_management.PUT("/:orderID/update-status/:statusID", orderHandler.UpdateOrderStatus)
-			}
+	// 		order_management := admin.Group("/orders")
+	// 		{
+	// 			order_management.GET("/", orderHandler.GetAllOrderOverViewPage)
+	// 			order_management.GET("/management", orderHandler.GetOrderManagementPage)
+	// 			order_management.PUT("/:orderID/update-status/:statusID", orderHandler.UpdateOrderStatus)
 
-		}
-	}
+	// 		}
+
+	// 	}
+	// }
+
+	router := Engine.Group("/api/v1")
+	routes.UserRoutes(router, userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
+
+	router = Engine.Group("/api/v1/admin")
+	routes.AdminRoutes(router, userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
+
 	return &ServerHTTP{engine: Engine}
 }
 

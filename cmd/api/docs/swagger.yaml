@@ -175,7 +175,7 @@ definitions:
       error: {}
       message:
         type: string
-      statuscode:
+      status-code:
         type: integer
     type: object
 host: localhost:3000
@@ -253,7 +253,7 @@ paths:
       tags:
       - admin category management
   /admin/category/block-category/{categoryID}:
-    patch:
+    put:
       description: Blocks a category with the specified ID.
       parameters:
       - description: Category ID
@@ -280,7 +280,7 @@ paths:
       tags:
       - admin category management
   /admin/category/unblock-category/{categoryID}:
-    patch:
+    put:
       consumes:
       - application/json
       description: Unblocks a category with the specified ID.
@@ -309,7 +309,7 @@ paths:
       tags:
       - admin category management
   /admin/category/update-category/{categoryID}:
-    patch:
+    put:
       consumes:
       - application/json
       description: Updates a category with the specified ID.
@@ -541,7 +541,7 @@ paths:
       tags:
       - admin product management
   /admin/products/block-product/{productID}:
-    patch:
+    put:
       consumes:
       - application/json
       description: Blocks a product with the specified ID.
@@ -570,7 +570,7 @@ paths:
       tags:
       - admin product management
   /admin/products/unblock-product/{productID}:
-    patch:
+    put:
       description: Unblocks a product with the specified ID.
       parameters:
       - description: Product ID
@@ -597,7 +597,7 @@ paths:
       tags:
       - admin product management
   /admin/products/update-product/{productID}:
-    patch:
+    put:
       consumes:
       - application/json
       description: Updates an existing product with the specified ID.
@@ -767,7 +767,7 @@ paths:
       summary: Updates the existing
       tags:
       - promotions
-  /admin/sudo/login:
+  /admin/su-login:
     post:
       consumes:
       - application/json
@@ -802,7 +802,7 @@ paths:
       tags:
       - sudo admin
   /admin/user-management/block-user/{userID}:
-    post:
+    put:
       consumes:
       - application/json
       description: Blocks a user with the specified ID.
@@ -831,7 +831,7 @@ paths:
       tags:
       - admin user management
   /admin/user-management/unblock-user/{userID}:
-    post:
+    put:
       consumes:
       - application/json
       description: Unblocks a user with the specified ID.
@@ -920,7 +920,7 @@ paths:
       tags:
       - cart
   /cart/{productID}/decrement:
-    patch:
+    put:
       description: Decrements the quantity of a product in the cart for the authenticated
         user.
       parameters:
@@ -948,7 +948,7 @@ paths:
       tags:
       - cart
   /cart/{productID}/increment:
-    patch:
+    put:
       description: Increments the quantity of a product in the cart for the authenticated
         user.
       parameters:
@@ -1029,6 +1029,47 @@ paths:
       summary: Remove product from cart
       tags:
       - cart
+  /category/{categoryID}:
+    get:
+      consumes:
+      - application/json
+      description: Lists products based on the provided category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: List products by category
+      tags:
+      - products
   /checkout:
     get:
       description: Displays the checkout details for the current user.
@@ -1230,7 +1271,7 @@ paths:
       summary: Cancel an order
       tags:
       - user orders
-  /my-orders/download-invoice/{orderID}:
+  /my-orders/invoice/{orderID}:
     get:
       description: Download the invoice as a PDF file.
       parameters:
@@ -1245,7 +1286,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: file
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:
@@ -1373,7 +1414,7 @@ paths:
       summary: Wallet payment
       tags:
       - checkout
-  /product-item/{productID}:
+  /product/{productID}:
     get:
       description: Retrieves details of a product with the specified ID.
       parameters:
@@ -1467,88 +1508,7 @@ paths:
       summary: Add product rating
       tags:
       - user orders
-  /products:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves all available products for the user.
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Display all products to the user
-      tags:
-      - products
-  /products-by-category/{categoryID}:
-    get:
-      consumes:
-      - application/json
-      description: Lists products based on the provided category ID.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: List products by category
-      tags:
-      - products
-  /products/search:
+  /product/search:
     post:
       consumes:
       - application/json
@@ -1587,6 +1547,46 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Search Products
+      tags:
+      - products
+  /products/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all available products for the user.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Display all products to the user
       tags:
       - products
   /profile:

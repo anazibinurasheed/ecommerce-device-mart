@@ -39,7 +39,7 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = ch.cartUseCase.AddToCart(userID, productID)
 	if err != nil {
@@ -77,7 +77,7 @@ func (ch *CartHandler) ViewCart(c *gin.Context) {
 	// 	c.JSON(http.StatusBadRequest, response)
 	// 	return
 	// }
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	CartItems, err := ch.cartUseCase.ViewCart(userID) ///////////////
 	if err != nil {
@@ -101,7 +101,7 @@ func (ch *CartHandler) ViewCart(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/cart/{productID}/increment [patch]
+//	@Router			/cart/{productID}/increment [put]
 func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -110,7 +110,7 @@ func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = ch.cartUseCase.IncrementQuantity(userID, productID)
 	if err != nil {
@@ -133,7 +133,7 @@ func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/cart/{productID}/decrement [patch]
+//	@Router			/cart/{productID}/decrement [put]
 func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -142,7 +142,7 @@ func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = ch.cartUseCase.DecrementQuantity(userID, productID)
 	if err != nil {
@@ -174,7 +174,7 @@ func (ch *CartHandler) RemoveFromCart(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = ch.cartUseCase.RemoveFromCart(userID, productID)
 	if err != nil {

@@ -207,7 +207,7 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err := ch.coupenUseCase.ProcessApplyCoupon(body, userID)
 	if err != nil {
@@ -230,7 +230,7 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/coupon/available [get]
 func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	AvailabeCoupons, err := ch.coupenUseCase.ListOutAvailableCouponsToUser(userID)
 	if err != nil {
@@ -268,7 +268,7 @@ func (ch *CouponHandler) RemoveAppliedCoupon(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 	err = ch.coupenUseCase.RemoveFromCouponTracking(couponID, userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())

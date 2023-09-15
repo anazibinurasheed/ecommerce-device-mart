@@ -172,7 +172,7 @@ func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/admin/user-management/block-user/{userID} [post]
+//	@Router			/admin/user-management/block-user/{userID} [put]
 func (ah *AdminHandler) BlockUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("userID"))
 	if err != nil {
@@ -202,7 +202,7 @@ func (ah *AdminHandler) BlockUser(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/admin/user-management/unblock-user/{userID} [post]
+//	@Router			/admin/user-management/unblock-user/{userID} [put]
 func (ah *AdminHandler) UnblockUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("userID"))
 	if err != nil {

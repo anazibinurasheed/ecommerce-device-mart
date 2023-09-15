@@ -1,6 +1,8 @@
 package interfaces
 
 import (
+	"time"
+
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 )
@@ -25,6 +27,11 @@ type OrderRepository interface {
 	//
 	UpdateWalletTransactionHistory(update response.WalletTransactionHistory) (response.WalletTransactionHistory, error)
 	GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error)
+
+	TopSellingProduct(startDate, endDate time.Time) (response.TopSelling, error)
+	GetTotalSaleCount(startDate, endDate time.Time) (int, error)
+	GetAverageOrderValue(startDate, endDate time.Time) (float32, error)
+	GetTotalRevenue(returnID int, startDate, endDate time.Time) ([]response.OrderLine, error)
 }
 
 // GetUserOrderHistory

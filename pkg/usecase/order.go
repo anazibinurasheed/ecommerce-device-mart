@@ -192,15 +192,7 @@ func (ou *orderUseCase) GetUserOrderHistory(userID, page, count int) ([]response
 }
 
 func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManagement, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	orderHistory, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -218,14 +210,7 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 }
 
 func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	allOrders, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -444,48 +429,93 @@ func (ou *orderUseCase) ValidateWalletPayment(userID int) error {
 	return nil
 }
 
-func (ou *orderUseCase) CreateInvoice(orderID int) ([]byte, error) {
-	orderLineData, err := ou.orderRepo.FindOrderByID(orderID)
+func (ou *orderUseCase) CreateInvoice(orderID int) (response.Invoice, error) {
+	order, err := ou.orderRepo.FindOrderByID(orderID)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get invoice data :%s", err)
+		return response.Invoice{}, fmt.Errorf("Failed to get order details:%s", err)
 	}
-	if orderLineData.ID == 0 {
-		return nil, fmt.Errorf("Failed to fetch order by id")
+	if order.ID == 0 {
+		return response.Invoice{}, fmt.Errorf("Failed to fetch order by id")
 	}
 
-	order, err := ou.orderRepo.GetInvoiceDataByID(orderID)
+	invoiceData, err := ou.orderRepo.GetInvoiceDataByID(orderID)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get invoice data :%s", err)
+		return response.Invoice{}, fmt.Errorf("Failed to get invoice data :%s", err)
 	}
-	if order.OrderID == 0 {
-		return nil, fmt.Errorf("Failed to fetch order by id")
+	if invoiceData.OrderID == 0 {
+		return response.Invoice{}, fmt.Errorf("Failed to fetch order by id")
 	}
 
-	product, err := ou.productRepo.FindProductById(order.ProductID)
+	product, err := ou.productRepo.FindProductById(invoiceData.ProductID)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get product data :%s", err)
+		return response.Invoice{}, fmt.Errorf("Failed to get product data :%s", err)
 	}
 	if product.ID == 0 {
-		return nil, fmt.Errorf("Failed to fetch product by id")
+		return response.Invoice{}, fmt.Errorf("Failed to fetch product by id")
 	}
 
-	invoiceData := map[string]interface{}{
+	return response.Invoice{
+		OrderDate:       order.CreatedAt.String(),
+		OrderID:         orderID,
+		DeliveryAddress: invoiceData.DeliveryAddress,
+		ProductName:     product.ProductName,
+		PaymentMethod:   invoiceData.PaymentMethod,
+		ProductPrice:    product.Price,
+		Discount:        (float32(product.Price) - order.Price),
+		TotalAmount:     order.Price,
+	}, nil
+}
 
-		"   ": "",
+func (ou *orderUseCase) MonthlySalesReport() (response.MonthlySalesReport, error) {
 
-		"Order Date": orderLineData.CreatedAt.String(),
-		"Order ID":   fmt.Sprint(orderID),
+	startDate := time.Now().AddDate(0, 0, -30)
+	endDate := time.Now()
 
-		" ": "",
-
-		"Delivery Address": order.DeliveryAddress,
-
-		"  ": "",
-
-		"Product name":   product.ProductName,
-		"Payment method": order.PaymentMethod,
-
-		"Total Amount": fmt.Sprint(product.Price),
+	topSelling, err := ou.orderRepo.TopSellingProduct(startDate, endDate)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
 	}
-	return helper.GenerateInvoicePDF(invoiceData), nil
+
+	product, err := ou.productRepo.FindProductById(topSelling.ProductID)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	category, err := ou.productRepo.FindCategoryByID(product.CategoryID)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	totalSalesCount, err := ou.orderRepo.GetTotalSaleCount(startDate, endDate)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	avgOrderValue, err := ou.orderRepo.GetAverageOrderValue(startDate, endDate)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	status, err := ou.orderRepo.GetStatusReturned()
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	revenueData, err := ou.orderRepo.GetTotalRevenue(int(status.ID), startDate, endDate)
+	if err != nil {
+		return response.MonthlySalesReport{}, err
+	}
+
+	return response.MonthlySalesReport{
+
+		Date:              time.Now().Format("January 2, 2006"),
+		ReportFromDate:    startDate.Format("January 2, 2006"),
+		TopSellingBrand:   category.CategoryName,
+		TopSellingProduct: product.ProductName,
+		TopSoldQuantity:   topSelling.Quantity,
+		TotalSalesCount:   totalSalesCount,
+		AverageOrderValue: avgOrderValue,
+		TotalRevenue:      float32(helper.CalculateTotalRevenue(revenueData...)),
+	}, nil
+
 }

@@ -30,7 +30,7 @@ func NewReferralHandler(useCase services.ReferralUseCase) *ReferralHandler {
 //	@Failure		500	{object}	response.Response	"Failed."
 //	@Router			/referral/get-code [get]
 func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 	referralCode, err := rh.referralUseCase.GetUserReferralCode(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
@@ -65,7 +65,7 @@ func (rh *ReferralHandler) ApplyReferralCode(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body, userID)
 
 	if err != nil {

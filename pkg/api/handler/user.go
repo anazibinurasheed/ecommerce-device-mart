@@ -172,7 +172,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.AddNewAddress(userId, body)
 	if err != nil {
@@ -213,7 +213,7 @@ func (uh *UserHandler) UpdateAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err = uh.userUseCase.UpdateUserAddress(body, addressID, userId)
 	if err != nil {
@@ -265,7 +265,7 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/addresses [get]
 func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	ListOfAddresses, err := uh.userUseCase.GetUserAddresses(userId)
 	if err != nil {
@@ -288,7 +288,7 @@ func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile [get]
 func (uh *UserHandler) Profile(c *gin.Context) {
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	UserProfile, err := uh.userUseCase.GetProfile(userId)
 	if err != nil {
@@ -322,7 +322,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.CheckUserOldPassword(body, userId)
 	if err != nil {
@@ -366,7 +366,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.ChangeUserPassword(body, userId, c)
 	if err != nil {
@@ -400,7 +400,7 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = uh.userUseCase.SetDefaultAddress(userID, addressID)
 	if err != nil {
@@ -434,7 +434,7 @@ func (uh *UserHandler) EditUserName(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.UpdateUserName(body.Name, userID)
 	if err != nil {

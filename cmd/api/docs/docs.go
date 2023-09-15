@@ -116,7 +116,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/block-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Blocks a category with the specified ID.",
                 "produces": [
                     "application/json"
@@ -157,7 +157,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/unblock-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Unblocks a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -201,7 +201,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/update-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Updates a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -550,7 +550,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/block-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Blocks a product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -594,7 +594,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/unblock-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Unblocks a product with the specified ID.",
                 "produces": [
                     "application/json"
@@ -635,7 +635,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/update-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Updates an existing product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -894,7 +894,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/sudo/login": {
+        "/admin/su-login": {
             "post": {
                 "description": "For sudo admin login.",
                 "consumes": [
@@ -947,7 +947,7 @@ const docTemplate = `{
             }
         },
         "/admin/user-management/block-user/{userID}": {
-            "post": {
+            "put": {
                 "description": "Blocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -991,7 +991,7 @@ const docTemplate = `{
             }
         },
         "/admin/user-management/unblock-user/{userID}": {
-            "post": {
+            "put": {
                 "description": "Unblocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -1205,7 +1205,7 @@ const docTemplate = `{
             }
         },
         "/cart/{productID}/decrement": {
-            "patch": {
+            "put": {
                 "description": "Decrements the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1246,7 +1246,7 @@ const docTemplate = `{
             }
         },
         "/cart/{productID}/increment": {
-            "patch": {
+            "put": {
                 "description": "Increments the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1261,6 +1261,66 @@ const docTemplate = `{
                         "description": "Product ID",
                         "name": "productID",
                         "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/{categoryID}": {
+            "get": {
+                "description": "Lists products based on the provided category ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "List products by category",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -1588,7 +1648,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/my-orders/download-invoice/{orderID}": {
+        "/my-orders/invoice/{orderID}": {
             "get": {
                 "description": "Download the invoice as a PDF file.",
                 "produces": [
@@ -1611,7 +1671,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "file"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
@@ -1803,47 +1863,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/product-item/{productID}": {
-            "get": {
-                "description": "Retrieves details of a product with the specified ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "View a product",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Product ID",
-                        "name": "productID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/product/rating/{productID}": {
             "get": {
                 "description": "Validates if the user is authorized to rate a product.",
@@ -1945,126 +1964,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products": {
-            "get": {
-                "description": "Retrieves all available products for the user.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "Display all products to the user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/products-by-category/{categoryID}": {
-            "get": {
-                "description": "Lists products based on the provided category ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "List products by category",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/products/search": {
+        "/product/search": {
             "post": {
                 "description": "Searches for products based on the provided search input",
                 "consumes": [
@@ -2117,6 +2017,106 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/{productID}": {
+            "get": {
+                "description": "Retrieves details of a product with the specified ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "View a product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/": {
+            "get": {
+                "description": "Retrieves all available products for the user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Display all products to the user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -3045,7 +3045,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "statuscode": {
+                "status-code": {
                     "type": "integer"
                 }
             }
