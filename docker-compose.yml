@@ -2,7 +2,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:15.4-alpine3.18
-    restart: always ##docker-compose file restarts the postgres container automatically, regardless of the exit code
+    # restart: always ##docker-compose file restarts the postgres container automatically, regardless of the exit code
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -15,7 +15,7 @@ services:
 
   devicemart:
     image: anazibinurasheed/devicemart
-    restart: on-failure ##docker-compose file restarts the postgres container automatically if it exits with a non-zero exit code
+    # restart: on-failure ##docker-compose file restarts the postgres container automatically if it exits with a non-zero exit code
     environment:
       DB_HOST: postgres
       DB_USER: admin

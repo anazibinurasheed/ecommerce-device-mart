@@ -114,17 +114,17 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	var CoockieName string
+	var coockieName string
 
 	if UserData.IsAdmin {
-		CoockieName = "AdminAuthorization"
+		coockieName = "AdminAuthorization"
 	} else {
-		CoockieName = "UserAuthorization"
+		coockieName = "UserAuthorization"
 	}
 
 	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(CoockieName, TokenString, MaxAge, "", "", false, true)
+	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
 	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
 
 	response := response.ResponseMessage(200, "Login success", nil, nil)
@@ -264,7 +264,7 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/addresses [get]
-func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
+func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
 	userId, _ := helper.GetUserIDFromContext(c)
 
 	ListOfAddresses, err := uh.userUseCase.GetUserAddresses(userId)
