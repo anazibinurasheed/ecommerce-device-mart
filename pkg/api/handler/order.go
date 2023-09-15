@@ -125,6 +125,7 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 		return
 
 	}
+
 	err = oh.orderUseCase.ConfirmedOrder(userId, 2) //2 is reffering payment method razorpay(online)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())

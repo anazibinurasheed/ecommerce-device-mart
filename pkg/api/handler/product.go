@@ -413,7 +413,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 		return
 	}
 
-	products, err := ph.productUseCase.DisplayAllAvailabeProductsToUser(page, count)
+	products, err := ph.productUseCase.DisplayAllAvailableProductsToUser(page, count)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed to retrieve products", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)

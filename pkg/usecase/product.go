@@ -148,7 +148,7 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]response.Product, error) {
+func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
 	if page <= 0 {
 		page = 1
 	}

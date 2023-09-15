@@ -36,32 +36,32 @@ func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services
 //safe for concurrent use by multiple goroutines without additional locking or coordination. Loads, stores, and deletes run in amortized constant time.
 
 func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
-	var checkOutDetails response.CheckOut
 
 	addresses, err := ou.userRepo.GetAllUserAddresses(userID)
 	if err != nil {
 		return response.CheckOut{}, fmt.Errorf("Failed to retrieve checkout details %s", err)
 	}
 	if len(addresses) == 0 {
-		return response.CheckOut{}, fmt.Errorf("User dont have an address")
+		return response.CheckOut{}, fmt.Errorf("User don't have an address")
 	}
 
 	cartItems, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
-		return response.CheckOut{}, fmt.Errorf("Failed to retrieve cartitems %s", err)
+		return response.CheckOut{}, fmt.Errorf("Failed to retrieve cart items %s", err)
 	}
 
 	paymentMethods, err := ou.paymentRepo.GetPaymentMethods()
 	if err != nil || paymentMethods == nil {
 		return response.CheckOut{}, fmt.Errorf("Failed to get payment methods %s", err)
 	}
-	checkOutDetails.Address = addresses
-	checkOutDetails.Cart = cartItems.Cart
-	checkOutDetails.Total = cartItems.Total
-	checkOutDetails.Discount = cartItems.Discount
-	checkOutDetails.PaymentOptions = paymentMethods
 
-	return checkOutDetails, nil
+	return response.CheckOut{
+		Address:        addresses,
+		Cart:           cartItems.Cart,
+		Total:          cartItems.Total,
+		Discount:       cartItems.Discount,
+		PaymentOptions: paymentMethods,
+	}, nil
 }
 
 func (ou *orderUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails, error) {
@@ -101,12 +101,14 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 	if err != nil || address.ID == 0 {
 		return fmt.Errorf("Failed to find default address : %s", err)
 	}
+
 	addressID := address.ID
 
 	cartData, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to get Cart data :  %s", err)
 	}
+
 	couponDetails, err := ou.couponRepo.CheckAppliedCoupon(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to retrieve the coupon tracking details  ;%s", err)
@@ -121,6 +123,7 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 			return fmt.Errorf("Failed to verify inserted coupon record")
 		}
 	}
+
 	if couponDetails.ID != 0 {
 		Coupon, err := ou.couponRepo.FindCouponByID(couponDetails.CouponID)
 		if err != nil {
@@ -130,16 +133,21 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 			return fmt.Errorf("Failed applied Coupon is expired")
 		}
 	}
+
 	status, err := ou.orderRepo.GetStatusPending()
 	if err != nil {
 		return fmt.Errorf("Failed to get order status :%s", err)
 	}
+
 	statusID := status.ID
 
 	for _, productData := range cartData.Cart {
+
 		createdAt := time.Now()
 		updatedAt := time.Now()
+
 		newOrderLine, err := ou.orderRepo.InsertOrder(request.NewOrder{
+
 			UserID:          userID,
 			ProductID:       int(productData.ProductID),
 			AddressID:       int(addressID),
@@ -155,7 +163,6 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		if err != nil || newOrderLine.ID == 0 {
 			return fmt.Errorf("Failed to insert order line : %s", err)
 		}
-
 	}
 
 	err = ou.cartUseCase.DeleteUserCart(userID)
@@ -191,10 +198,9 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 	if count < 10 {
 		count = 10
 	}
+
 	startIndex := (page - 1) * count
 	endIndex := startIndex + count
-
-	var orderManagementDetails response.OrderManagement
 
 	orderHistory, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -204,9 +210,11 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 	if err != nil {
 		return response.OrderManagement{}, fmt.Errorf("Failed to retrieve order statuses : %s", err)
 	}
-	orderManagementDetails.Orders = orderHistory
-	orderManagementDetails.OrderStatuses = orderStatuses
-	return orderManagementDetails, nil
+
+	return response.OrderManagement{
+		OrderStatuses: orderStatuses,
+		Orders:        orderHistory,
+	}, nil
 }
 
 func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, error) {

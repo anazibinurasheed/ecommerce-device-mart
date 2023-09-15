@@ -135,6 +135,7 @@ func (ah *AdminHandler) SULogin(c *gin.Context) {
 //	@Failure		501										{object}	response.Response	"Failed"
 //	@Router			/admin/user-management/view-all-users	[get]
 func (ah *AdminHandler) DisplayAllUsers(c *gin.Context) {
+
 	// page, err := strconv.Atoi(c.Query("page"))
 	// if err != nil {
 	// 	response := response.ResponseMessage(400, "Invalid entry.", nil, nil)

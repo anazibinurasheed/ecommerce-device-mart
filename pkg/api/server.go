@@ -51,6 +51,20 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 		user.Use(middleware.AuthenticateUserJwt)
 		{
 
+			profile := user.Group("/profile")
+			{
+				profile.GET("/", userHandler.Profile)
+				profile.GET("/add-address", userHandler.GetAddAddressPage)
+				profile.POST("/add-address", userHandler.AddAddress)
+				profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
+				profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
+				profile.GET("/addresses", userHandler.GetAllAdresses)
+				profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)
+				profile.POST("/edit-username", userHandler.EditUserName)
+				profile.POST("/verify-password", userHandler.ChangePasswordRequest)
+				profile.POST("/change-password", userHandler.ChangePassword)
+			}
+
 			product := user.Group("/product")
 			{
 				product.GET("/", productHandler.DisplayAllProductsToUser)
@@ -94,27 +108,12 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 			}
 
-			profile := user.Group("/profile")
-			{
-				profile.GET("/", userHandler.Profile)
-				profile.GET("/add-address", userHandler.GetAddAddressPage)
-				profile.POST("/add-address", userHandler.AddAddress)
-				profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
-				profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
-				profile.GET("/addresses", userHandler.GetAllAdresses)
-				profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)
-				profile.POST("/edit-username", userHandler.EditUserName)
-				profile.POST("/verify-password", userHandler.ChangePasswordRequest)
-				profile.POST("/change-password", userHandler.ChangePassword) //m.authchangepass
-
-			}
-
 			order := user.Group("/my-orders")
 			{
 				order.GET("/", orderHandler.UserOrderHistory)
 				order.POST("/cancel/:orderID", orderHandler.CancelOrder)
 				order.POST("/return/:orderID", orderHandler.ReturnOrder)
-				order.GET("/download-invoice/:orderID", orderHandler.DownloadInvoice)
+				order.GET("/invoice/:orderID", orderHandler.DownloadInvoice)
 			}
 
 			referral := user.Group("/referral")
