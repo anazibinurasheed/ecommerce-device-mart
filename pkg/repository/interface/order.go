@@ -25,7 +25,7 @@ type OrderRepository interface {
 	GetStatusReturned() (response.OrderStatus, error)
 	GetInvoiceDataByID(orderID int) (response.Orders, error)
 	//
-	UpdateWalletTransactionHistory(update response.WalletTransactionHistory) (response.WalletTransactionHistory, error)
+	UpdateWalletTransactionHistory(update request.WalletTransactionHistory) (response.WalletTransactionHistory, error)
 	GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error)
 
 	TopSellingProduct(startDate, endDate time.Time) (response.TopSelling, error)

@@ -1429,9 +1429,49 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Wallet payment
+      summary: Pay using wallet
       tags:
       - checkout
+  /product/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all available products for the user.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Display all products to the user
+      tags:
+      - products
   /product/{productID}:
     get:
       description: Retrieves details of a product with the specified ID.
@@ -1565,46 +1605,6 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Search Products
-      tags:
-      - products
-  /products/:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves all available products for the user.
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Display all products to the user
       tags:
       - products
   /profile:
@@ -2037,6 +2037,24 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Create user wallet
+      tags:
+      - wallet
+  /wallet/history:
+    get:
+      description: This endpoint will show all the wallet transaction history of the
+        user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User wallet transaction history
       tags:
       - wallet
 swagger: "2.0"

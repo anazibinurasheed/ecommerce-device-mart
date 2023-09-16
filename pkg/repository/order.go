@@ -198,15 +198,16 @@ func (od *orderDatabase) UpdateUserWalletBalance(userID int, amount float32) (re
 	err := od.DB.Raw(query, amount, userID).Scan(&UpdatedWallet).Error
 	return UpdatedWallet, err
 }
+func (od *orderDatabase) UpdateWalletTransactionHistory(update request.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
 
-func (od *orderDatabase) UpdateWalletTransactionHistory(update response.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
 	var updatedHistory response.WalletTransactionHistory
-	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type,amount_display) 
-			VALUES($1,$2,$3,$4,$5) RETURNING *;`
-	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType, update.AmountDisplay).Scan(&updatedHistory).Error
+
+	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type) 
+	VALUES($1,$2,$3,$4) RETURNING *;`
+
+	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType).Scan(&updatedHistory).Error
 
 	return updatedHistory, err
-
 }
 
 func (od *orderDatabase) GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error) {

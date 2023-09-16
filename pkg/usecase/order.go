@@ -96,7 +96,6 @@ func (ou *orderUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID 
 }
 
 func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
-
 	address, err := ou.userRepo.FindDefaultAddress(userID)
 	if err != nil || address.ID == 0 {
 		return fmt.Errorf("Failed to find default address : %s", err)
@@ -276,6 +275,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	if err != nil {
 		return fmt.Errorf("Failed to fetch payment method :%s", err)
 	}
+
 	orderStatus, err := ou.orderRepo.FindOrderStatusByID(cancellingOrder.OrderStatusID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order statuses :%s", err)
@@ -347,14 +347,19 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 		newWalletBalance := (wallet.Amount + refundingAmount)
 		updatedWalletDetails, err := ou.orderRepo.UpdateUserWalletBalance(int(cancellingOrder.UserID), newWalletBalance)
 		if err != nil {
-			if cancellingOrder.ID == 0 {
-				return fmt.Errorf("Failed to verify cancelling product")
-			}
+
 			return fmt.Errorf("order-cancelled failed to add amount to wallet : %s", err)
+		}
+		if cancellingOrder.ID == 0 {
+			return fmt.Errorf("Failed to verify cancelling product")
 		}
 
 		if updatedWalletDetails.ID == 0 {
 			return fmt.Errorf("Failed to verify the wallet info by id")
+		}
+		err = ou.UpdateWalletHistory(int(cancellingOrder.UserID), refundingAmount, "credit")
+		if err != nil {
+			return err
 		}
 	}
 
@@ -376,6 +381,38 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 		}
 	}
 	return nil
+}
+
+func (ou *orderUseCase) UpdateWalletHistory(userID int, amount float32, transactionType string) error {
+
+	walletHistory, err := ou.orderRepo.UpdateWalletTransactionHistory(
+		request.WalletTransactionHistory{
+			TransactionTime: time.Now(),
+			UserID:          userID,
+			Amount:          amount,
+			TransactionType: transactionType,
+		},
+	)
+
+	if err != nil || walletHistory.ID == 0 {
+		return func() error {
+			if err != nil {
+				return err
+			}
+			return fmt.Errorf("Failed to verify the updated history")
+		}()
+
+	}
+	return err
+}
+
+func (ou *orderUseCase) GetWalletHistory(userID int) ([]response.WalletTransactionHistory, error) {
+	walletHistory, err := ou.orderRepo.GetWalletHistoryByUserID(userID)
+	if err != nil {
+		return walletHistory, err
+	}
+
+	return walletHistory, nil
 }
 
 func (ou *orderUseCase) GetUserWallet(userID int) (response.Wallet, error) {

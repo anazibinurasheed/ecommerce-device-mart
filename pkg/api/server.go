@@ -37,7 +37,7 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 	router.Use(gin.Logger())
 	router.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
-	router.LoadHTMLGlob("web/templates/*.html")
+	router.LoadHTMLGlob("web/template/*.html")
 
 	routes.UserRoutes(router.Group("/api/v1"), userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
 

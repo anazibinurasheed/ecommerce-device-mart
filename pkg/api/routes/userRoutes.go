@@ -9,7 +9,6 @@ import (
 func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
 
-	// Define routes for various endpoints
 	router.POST("/send-otp", commonHandler.SendOTP)
 	router.POST("/verify-otp", commonHandler.VerifyOTP)
 	router.POST("/sign-up", middleware.Verified, userHandler.UserSignUp)
@@ -20,7 +19,6 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 	// Authentication middleware
 	router.Use(middleware.AuthenticateUserJwt)
 	{
-		// Group routes for the "profile" section
 		profile := router.Group("/profile")
 		{
 			profile.GET("/", userHandler.Profile)
@@ -35,21 +33,19 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			profile.POST("/change-password", userHandler.ChangePassword)
 		}
 
-		// Group routes for the "referral" section
 		referral := router.Group("/referral")
 		{
 			referral.GET("/get-code", referralHandler.GetReferralCode)
 			referral.POST("/claim", referralHandler.ApplyReferralCode)
 		}
 
-		// Group routes for the "wallet" section
 		wallet := router.Group("/wallet")
 		{
 			wallet.GET("/", orderHandler.ViewUserWallet)
 			wallet.POST("/create", orderHandler.CreateUserWallet)
+			wallet.GET("/history", orderHandler.WalletTransactionHistory)
 		}
 
-		// Group routes for the "product" section
 		product := router.Group("/product")
 		{
 			product.GET("/", productHandler.DisplayAllProductsToUser)
@@ -60,7 +56,6 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			product.GET("/category/:categoryID", productHandler.ListProductsByCategory)
 		}
 
-		// Group routes for the "cart" section
 		cart := router.Group("/cart")
 		{
 			cart.GET("/", cartHandler.ViewCart)
@@ -70,7 +65,6 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			cart.DELETE("/remove/:productID", cartHandler.RemoveFromCart)
 		}
 
-		// Group routes for the "coupon" section
 		coupon := router.Group("/coupon")
 		{
 			coupon.GET("/available", couponHandler.ListOutAvailableCouponsToUser)
@@ -78,13 +72,11 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			coupon.DELETE("/remove/:couponID", couponHandler.RemoveAppliedCoupon)
 		}
 
-		// Group routes for the "checkout" section
 		checkout := router.Group("/checkout")
 		{
 			checkout.GET("/", orderHandler.CheckOutPage)
 		}
 
-		// Group routes for the "payment" section
 		payment := router.Group("/payment")
 		{
 			payment.GET("/online", orderHandler.GetOnlinePayment)
@@ -94,7 +86,6 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 
 		}
 
-		// Group routes for the "my-orders" section
 		orders := router.Group("/orders")
 		{
 			orders.GET("/", orderHandler.UserOrderHistory)

@@ -48,7 +48,8 @@ func (ah *AdminHandler) CreateAdmin(c *gin.Context) {
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
+		err := fmt.Errorf("Failed to fetch phone number from phoneDataMap")
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}

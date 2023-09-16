@@ -488,7 +488,7 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 
 // PayUsingWallet godoc
 //
-//	@Summary		Wallet payment
+//	@Summary		Pay using wallet
 //	@Description	User can purchase using wallet
 //	@Tags			checkout
 //	@Produce		json
@@ -516,8 +516,26 @@ func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (od *OrderHandler) WalletPaymentHistory(c *gin.Context) {
+// WalletTransactionHistory godoc
+// @Summary User wallet transaction history
+// @Description This endpoint will show all the wallet transaction history of the user.
+// @Tags wallet
+// @Produce		json
+// @Success		200	{object}	response.Response
+// @Failure		500	{object}	response.Response
+// @Router			/wallet/history [get]
+func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
+	userID, _ := helper.GetIDFromContext(c)
 
+	walletHistory, err := od.orderUseCase.GetWalletHistory(userID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed to get wallet history", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "success", walletHistory, nil)
+	c.JSON(http.StatusOK, response)
 }
 
 // MonthlySalesReport godoc

@@ -397,7 +397,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		404		{object}	response.Response
 //	@Failure		503		{object}	response.Response
-//	@Router			/products/ [get]
+//	@Router			/product/ [get]
 func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
