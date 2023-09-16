@@ -101,7 +101,7 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	number, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
+		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}

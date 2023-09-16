@@ -767,6 +767,23 @@ paths:
       summary: Updates the existing
       tags:
       - promotions
+  /admin/sales-report:
+    get:
+      description: Sales report of last 30 days from the requested time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Monthly sales report
+      tags:
+      - sales-report
   /admin/su-login:
     post:
       consumes:
@@ -1210,7 +1227,7 @@ paths:
       summary: User Logout
       tags:
       - common
-  /my-orders:
+  /orders:
     get:
       description: Retrieves the order history of the current user.
       parameters:
@@ -1240,7 +1257,7 @@ paths:
       summary: Get order history
       tags:
       - user orders
-  /my-orders/cancel/{orderID}:
+  /orders/cancel/{orderID}:
     post:
       consumes:
       - application/json
@@ -1271,7 +1288,7 @@ paths:
       summary: Cancel an order
       tags:
       - user orders
-  /my-orders/invoice/{orderID}:
+  /orders/invoice/{orderID}:
     get:
       description: Download the invoice as a PDF file.
       parameters:
@@ -1298,13 +1315,14 @@ paths:
       summary: Download invoice
       tags:
       - user orders
-  /my-orders/return/{orderID}:
+  /orders/return/{orderID}:
     post:
       consumes:
       - application/json
       description: |-
         Return the order if the order is valid for return.Amount will be added to the user's wallet.
-        If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
+        If the user has used a coupon for the order, the discount amount will be recalculated based
+        on the percentage used and deducted from the refunding amount.
       parameters:
       - description: Order ID
         in: path
@@ -1329,7 +1347,7 @@ paths:
       summary: Return order
       tags:
       - user orders
-  /payment/order-cod-confirmed:
+  /payment/cod-confirm:
     post:
       description: Confirms the cash on delivery (COD) delivery for the current user.
       produces:
@@ -1346,7 +1364,7 @@ paths:
       summary: Confirm COD delivery
       tags:
       - checkout
-  /payment/razorpay:
+  /payment/online:
     get:
       description: Make payment using razorpay page .
       produces:
@@ -1361,7 +1379,7 @@ paths:
       summary: Make payment razorpay
       tags:
       - checkout
-  /payment/razorpay/process-order:
+  /payment/online/process:
     post:
       description: Verify razorpay payment using razorpay credentials .
       parameters:
@@ -1793,7 +1811,7 @@ paths:
         name: addressID
         required: true
         type: integer
-      - description: Address updation details
+      - description: Address update details
         in: body
         name: body
         required: true

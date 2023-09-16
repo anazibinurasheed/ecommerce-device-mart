@@ -49,7 +49,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
+		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -193,7 +193,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			addressID	path		int				true	"Address ID"
-//	@Param			body		body		request.Address	true	"Address updation details"
+//	@Param			body		body		request.Address	true	"Address update details"
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response

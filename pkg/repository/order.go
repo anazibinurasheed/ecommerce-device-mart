@@ -221,8 +221,7 @@ func (o *orderDatabase) TopSellingProduct(startDate, endDate time.Time) (respons
 
 	var data response.TopSelling
 	query := ` SELECT product_id, SUM(qty) AS quantity
-	FROM orders
-	WHERE created_at >= ? AND created_at <= ?
+	FROM order_lines	WHERE created_at >= ? AND created_at <= ?
 	GROUP BY product_id
 	ORDER BY quantity DESC
 	LIMIT 1;`
@@ -236,8 +235,8 @@ func (o *orderDatabase) GetTotalSaleCount(startDate, endDate time.Time) (int, er
 
 	var count int
 	query := `SELECT COUNT(*) AS count
-	FROM OrderLine
-	WHERE createdAt >= $1 AND createdAt <= $2;`
+	FROM order_lines
+	WHERE created_at >= $1 AND created_at <= $2;`
 
 	err := o.DB.Raw(query, startDate, endDate).Scan(&count).Error
 	return count, err
@@ -254,10 +253,10 @@ func (o *orderDatabase) GetAverageOrderValue(startDate, endDate time.Time) (floa
 	return avg, err
 }
 
-func (o *orderDatabase) GetTotalRevenue(returnID int, startDate, endDate time.Time) ([]response.OrderLine, error) {
+func (o *orderDatabase) GetTotalRevenue(status int, startDate, endDate time.Time) ([]response.OrderLine, error) {
 	var data = make([]response.OrderLine, 0)
-	query := `SELECT * order_lines WHERE created_at >= $1 AND created_at <= $2 AND order_status_id != $3 ;`
+	query := `SELECT * from order_lines WHERE created_at >= $1 AND created_at <= $2 AND order_status_id != $3 ;`
 
-	err := o.DB.Raw(query, startDate, endDate).Scan(&data).Error
+	err := o.DB.Raw(query, startDate, endDate, status).Scan(&data).Error
 	return data, err
 }

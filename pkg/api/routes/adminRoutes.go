@@ -61,7 +61,7 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 
 		}
 
-		router.GET("/sales-report", orderHandler.SalesReport)
+		router.GET("/sales-report", orderHandler.MonthlySalesReport)
 
 	}
 }

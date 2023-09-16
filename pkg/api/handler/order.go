@@ -520,6 +520,24 @@ func (od *OrderHandler) WalletPaymentHistory(c *gin.Context) {
 
 }
 
-func (od *OrderHandler) SalesReport(c *gin.Context) {
+// MonthlySalesReport godoc
+//
+// @Summary		Monthly sales report
+// @Description	Sales report of last 30 days from the requested time
+// @Tags			sales-report
+// @Produce		json
+// @Success		200	{object}	response.Response
+// @Failure		500	{object}	response.Response
+// @Router			/admin/sales-report [get]
+func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
+	salesReport, err := od.orderUseCase.MonthlySalesReport()
 
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed to generate the sales report", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "Success", salesReport, nil)
+	c.JSON(http.StatusInternalServerError, response)
 }
