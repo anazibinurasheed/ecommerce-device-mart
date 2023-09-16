@@ -11,6 +11,11 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 )
 
+const (
+	debit  = "debit"
+	credit = "credit"
+)
+
 type orderUseCase struct {
 	userRepo    interfaces.UserRepository
 	cartUseCase services.CartUseCase
@@ -164,11 +169,45 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		}
 	}
 
+	err = ou.UpdateWallet(userID, cartData.Total, debit)
+	if err != nil {
+		return err
+	}
+
 	err = ou.cartUseCase.DeleteUserCart(userID)
 	if err != nil {
 		return fmt.Errorf("Failed to delete user cart :%s", err)
 	}
 
+	return nil
+}
+
+func (ou *orderUseCase) UpdateWallet(userID int, amount float32, transactionType string) error {
+	wallet, err := ou.orderRepo.FindUserWalletByID(userID)
+	if err != nil {
+		return err
+	}
+
+	var updtAmount float32
+
+	if transactionType == credit {
+		updtAmount = (wallet.Amount + amount)
+
+	}
+
+	if transactionType == debit {
+		updtAmount = (wallet.Amount - amount)
+
+	}
+
+	wallet, err = ou.orderRepo.UpdateUserWalletBalance(userID, updtAmount)
+	if err != nil {
+		return err
+	}
+	err = ou.UpdateWalletHistory(userID, amount, transactionType)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -344,22 +383,9 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 			}
 		}
 
-		newWalletBalance := (wallet.Amount + refundingAmount)
-		updatedWalletDetails, err := ou.orderRepo.UpdateUserWalletBalance(int(cancellingOrder.UserID), newWalletBalance)
+		err = ou.UpdateWallet(wallet.UserID, refundingAmount, credit)
 		if err != nil {
-
-			return fmt.Errorf("order-cancelled failed to add amount to wallet : %s", err)
-		}
-		if cancellingOrder.ID == 0 {
-			return fmt.Errorf("Failed to verify cancelling product")
-		}
-
-		if updatedWalletDetails.ID == 0 {
-			return fmt.Errorf("Failed to verify the wallet info by id")
-		}
-		err = ou.UpdateWalletHistory(int(cancellingOrder.UserID), refundingAmount, "credit")
-		if err != nil {
-			return err
+			return fmt.Errorf("Failed to update wallet %s:", err)
 		}
 	}
 
