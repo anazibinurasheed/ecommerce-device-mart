@@ -45,7 +45,7 @@ var (
 //
 //	@Summary		Send sign up OTP to Phone
 //	@Description	Sends an OTP to the provided phone number.
-//	@Tags			common
+//	@Tags			auth
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Phone	true	"Phone number"
@@ -80,7 +80,7 @@ func (ch *CommonHandler) SendOTP(c *gin.Context) {
 //
 //	@Summary		Verify sign up  OTP
 //	@Description	Validates the provided OTP for a phone number.
-//	@Tags			common
+//	@Tags			auth
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Otp	true	"OTP"
@@ -128,14 +128,15 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-//	@Summary		User Logout
-//	@Description	Logs out user and remove cookie from browser.
-//	@Tags			common
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	response.Response{}
-//	@Router			/logout [post]
+// @Summary		User Logout
+// @Description	Logs out user and remove cookie from browser.
+// @Tags			aommon
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	response.Response{}
+// @Router			/logout [post]
 func (uh *CommonHandler) Logout(c *gin.Context) {
+
 	helper.DeleteCookie("AdminAuthorization", c)
 	helper.DeleteCookie("SudoAdminAuthorization", c)
 	helper.DeleteCookie("UserAuthorization", c)
@@ -143,51 +144,3 @@ func (uh *CommonHandler) Logout(c *gin.Context) {
 	response := response.ResponseMessage(200, "Logged out, success", nil, nil)
 	c.JSON(http.StatusAccepted, response)
 }
-
-// func (uh *CommonHandler) RefreshToken(c *gin.Context) {
-// 	refreshToken, err := c.Cookie("RefreshToken")
-
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 			"StatusCode": 401,
-// 			"msg":        "Unauthorized User",
-// 		})
-// 		return
-// 	}
-
-// 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-// 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-// 		if !ok {
-// 			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
-// 		}
-// 		return []byte(config.GetConfig().JwtSecret), nil
-// 	})
-
-// 	claims, ok := token.Claims.(jwt.MapClaims)
-
-// 	if !ok && !token.Valid {
-// 		c.JSON(http.StatusUnauthorized, gin.H{
-// 			"Statuscode": 401,
-// 			"Msg":        "Invalid claims",
-// 		})
-// 	}
-
-// 	if claims["exp"].(float64) > float64(time.Now().Add(time.Minute*60).Unix()) {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"msg": "Allocated refresh time expired",
-// 		})
-// 		return
-// 	}
-
-// 	userID, _ := helper.GetUserIDFromContext(c)
-// 	tokenString, _, err := helper.GenerateJwtToken(userID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"msg": "Failed to generate access token",
-// 		})
-// 		return
-// 	}
-// 	MaxAge := time.Now().Add((time.Hour * 24 * 30)).Unix()
-// 	c.SetSameSite(http.SameSiteLaxMode)
-// 	c.SetCookie("UserAuthorization", tokenString, int(MaxAge), "", "", false, true)
-// }
