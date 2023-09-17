@@ -67,6 +67,7 @@ func (ph *ProductHandler) ReadAllCategories(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, nil)

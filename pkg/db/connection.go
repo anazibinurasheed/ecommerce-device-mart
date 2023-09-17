@@ -11,15 +11,14 @@ import (
 	domain "github.com/anazibinurasheed/project-device-mart/pkg/domain"
 )
 
-// this function is only for initialize the database and do migrate tables
-// it is also used in the di / wire.go
+// for feature isolation
 var dbInstance *gorm.DB
 
 func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s ", cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
 	db, dbErr := gorm.Open(postgres.Open(dsn), &gorm.Config{SkipDefaultTransaction: true})
 
-	db.Debug() //to log the query
+	db.Debug()
 
 	if err := db.AutoMigrate(
 

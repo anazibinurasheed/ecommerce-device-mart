@@ -50,6 +50,8 @@ func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Cat
 		return nil, fmt.Errorf("Failed to find categories :%s", err)
 	}
 
+	fmt.Println(listOfAllCategories)
+
 	return listOfAllCategories, nil
 }
 
@@ -100,7 +102,7 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 		return fmt.Errorf("category not found")
 	}
 
-	product.Brand = category.CategoryName
+	product.Brand = category.Category_Name
 	product.SKU = helper.MakeSKU(product.ProductName)
 
 	existingProduct, err := pu.productRepo.FindProductByName(product.ProductName)

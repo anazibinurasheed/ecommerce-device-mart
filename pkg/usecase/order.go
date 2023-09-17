@@ -573,7 +573,7 @@ func (ou *orderUseCase) MonthlySalesReport() (response.MonthlySalesReport, error
 
 		Date:              time.Now().Format("January 2, 2006"),
 		ReportFromDate:    startDate.Format("January 2, 2006"),
-		TopSellingBrand:   category.CategoryName,
+		TopSellingBrand:   category.Category_Name,
 		TopSellingProduct: product.ProductName,
 		TopSoldQuantity:   topSelling.Quantity,
 		TotalSalesCount:   totalSalesCount,

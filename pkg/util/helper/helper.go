@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func PageCount(count, page int) (startIndex, endIndex int) {
+func PageCount(page, count int) (startIndex, endIndex int) {
 	if page <= 0 {
 		page = 1
 	}
