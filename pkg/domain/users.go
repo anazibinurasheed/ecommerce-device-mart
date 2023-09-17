@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// it is the tables in the database
 type User struct {
 	ID        uint   `gorm:"primaryKey;unique;autoIncrement;not null"`
 	UserName  string `gorm:"not null" binding:"required,min=3,max=15"`
@@ -15,6 +14,7 @@ type User struct {
 	IsBlocked bool   `gorm:"default:false"`
 	CreatedAt time.Time
 }
+
 type Addresses struct {
 	ID               uint   `json:"id" gorm:"primaryKey;unique;autoIncrement;not null"`
 	Name             string `json:"name"`
@@ -31,11 +31,6 @@ type Addresses struct {
 	User             User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	IsDefault        bool   `gorm:"default:false"`
 }
-
-// type UserAdresses struct {
-// AddressID uint      `gorm:"not null"`
-// 	Address   Addresses `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-// }
 
 type State struct {
 	ID   uint   `gorm:"primaryKey;unique;autoIncrement;not null"`

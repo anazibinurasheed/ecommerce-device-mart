@@ -1,12 +1,6 @@
-package response
+package request
 
 import "time"
-
-type Wallet struct {
-	ID     int     `json:"id"`
-	UserID int     `json:"user_id"`
-	Amount float32 `json:"amount"`
-}
 
 type WalletTransactionHistory struct {
 	ID              uint      `json:"id"`

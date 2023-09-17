@@ -41,7 +41,7 @@ var (
 	phoneDataMutex = new(sync.Mutex)
 )
 
-// SendOtpToPhone godoc
+// SendOTP godoc
 //
 //	@Summary		Send sign up OTP to Phone
 //	@Description	Sends an OTP to the provided phone number.
@@ -52,7 +52,7 @@ var (
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Router			/send-otp [post]
-func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
+func (ch *CommonHandler) SendOTP(c *gin.Context) {
 	var body request.Phone
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -76,7 +76,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-// VerifyOtp godoc
+// VerifyOTP godoc
 //
 //	@Summary		Verify sign up  OTP
 //	@Description	Validates the provided OTP for a phone number.
@@ -88,7 +88,7 @@ func (ch *CommonHandler) SendOtpToPhone(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Router			/verify-otp [post]
-func (ch *CommonHandler) VerifyOtp(c *gin.Context) {
+func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -101,7 +101,7 @@ func (ch *CommonHandler) VerifyOtp(c *gin.Context) {
 	number, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
+		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -128,13 +128,13 @@ func (ch *CommonHandler) VerifyOtp(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
-// @Summary		User Logout
-// @Description	Logs out user and remove cookie from browser.
-// @Tags			common
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	response.Response{}
-// @Router			/logout [post]
+//	@Summary		User Logout
+//	@Description	Logs out user and remove cookie from browser.
+//	@Tags			common
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	response.Response{}
+//	@Router			/logout [post]
 func (uh *CommonHandler) Logout(c *gin.Context) {
 	helper.DeleteCookie("AdminAuthorization", c)
 	helper.DeleteCookie("SudoAdminAuthorization", c)

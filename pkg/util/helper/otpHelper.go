@@ -15,7 +15,7 @@ var VERIFY_SERVICE_SID string
 var client *twilio.RestClient
 
 func SendOtp(phone string) error {
-	return nil // Because of development mode
+	return nil // set predefined in development mode
 	TWILIO_ACCOUNT_SID = config.GetConfig().TwiliAccountSid
 	TWILIO_AUTH_TOKEN = config.GetConfig().TwilioAuthToken
 	VERIFY_SERVICE_SID = config.GetConfig().TwilioServiceSid

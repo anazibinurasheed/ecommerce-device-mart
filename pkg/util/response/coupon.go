@@ -10,13 +10,14 @@ type Coupon struct {
 	DiscountPercent   float64   `json:"discount_percentage"`
 	DiscountMaxAmount float64   `json:"discount_max_amount"`
 	ValidFrom         time.Time `json:"valid_from"`
-	ValidTill         time.Time `json:"valid_till"` //date and hours left
+	ValidTill         time.Time `json:"valid_till"` 
 	ValidDays         int       `json:"-"`
 	IsBlocked         bool      `json:"is_blocked"`
 }
+
 type CouponTracking struct {
 	ID       int
 	CouponID int
-	userID   int
+	UserID   int
 	IsUsed   bool
 }

@@ -30,11 +30,6 @@ type AdminCredentials struct {
 	AdminPassword string
 }
 
-// type TwilioCredentials struct {
-// 	TwilioSid       string
-// 	TwilioAuthToken string
-// }
-
 var (
 	envs = []string{
 		"DB_HOST", "DB_NAME", "DB_USER", "DB_PORT", "DB_PASSWORD", "ADMIN",
@@ -74,18 +69,8 @@ func LoadConfig() (Config, error) {
 }
 
 func GetAdminCredentials() AdminCredentials {
-
 	return AdminCredentials{config.AdminUsername, config.AdminPassword}
 }
-
-// func GetTwilioCredentials() (TwilioCredentials, error) {
-// 	if config.TwilioSid == "" || config.TwilioAuthToken == "" {
-// 		return TwilioCredentials{}, errors.New("Empty twillio credentials")
-// 	}
-// 	return TwilioCredentials{
-// 		TwilioSid:       config.TwilioSid,
-// 		TwilioAuthToken: config.TwilioAuthToken}, nil
-// }
 
 func GetConfig() Config {
 	return config

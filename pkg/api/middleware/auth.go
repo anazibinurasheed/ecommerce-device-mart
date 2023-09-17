@@ -24,7 +24,7 @@ func AuthenticateSudoAdminJwt(c *gin.Context) {
 	JwtAuth(c, "SudoAdmin")
 	c.Next()
 }
-func IsVerified(c *gin.Context) {
+func Verified(c *gin.Context) {
 	JwtAuth(c, "Phone")
 	c.Next()
 }
@@ -32,18 +32,6 @@ func AuthChangePass(c *gin.Context) {
 	JwtAuth(c, "PassChange")
 	c.Next()
 }
-
-// //Admin has the permission to access every route except sudo admin authority.
-// func MainAuthJWT(c *gin.Context) {
-// 	if _, err := c.Cookie("UserAuthorization"); err == nil {
-// 		AuthenticateUserJwt(c)
-// 	} else if _, err := c.Cookie("AdminAuthorization"); err == nil {
-// 		AuthenticateAdminJwt(c)
-// 	} else {
-// 		JwtAuth(c, "") //for requests without any required token
-// 	}
-
-// }
 
 // for admin routes
 func AdminAuthJWT(c *gin.Context) {

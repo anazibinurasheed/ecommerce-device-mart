@@ -28,9 +28,10 @@ func (pd *productDatabase) CreateCategory(category request.Category) (response.C
 func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]response.Category, error) {
 	var ListOfAllCategories = make([]response.Category, 0)
 
-	query := "SELECT * FROM Categories ORDER BY Category_Name OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
+	query := "SELECT id,category_name FROM Categories ORDER BY category_name OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
 
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllCategories).Error
+	fmt.Println(ListOfAllCategories)
 	return ListOfAllCategories, err
 }
 

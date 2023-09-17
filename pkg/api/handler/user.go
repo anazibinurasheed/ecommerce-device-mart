@@ -49,7 +49,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("Failed to fetch phone number from phoneDataMap").Error())
+		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -114,17 +114,17 @@ func (uh *UserHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	var CoockieName string
+	var coockieName string
 
 	if UserData.IsAdmin {
-		CoockieName = "AdminAuthorization"
+		coockieName = "AdminAuthorization"
 	} else {
-		CoockieName = "UserAuthorization"
+		coockieName = "UserAuthorization"
 	}
 
 	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(CoockieName, TokenString, MaxAge, "", "", false, true)
+	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
 	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
 
 	response := response.ResponseMessage(200, "Login success", nil, nil)
@@ -172,7 +172,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.AddNewAddress(userId, body)
 	if err != nil {
@@ -193,7 +193,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			addressID	path		int				true	"Address ID"
-//	@Param			body		body		request.Address	true	"Address updation details"
+//	@Param			body		body		request.Address	true	"Address update details"
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
@@ -213,7 +213,7 @@ func (uh *UserHandler) UpdateAddress(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err = uh.userUseCase.UpdateUserAddress(body, addressID, userId)
 	if err != nil {
@@ -264,8 +264,8 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile/addresses [get]
-func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
-	userId, _ := helper.GetUserIDFromContext(c)
+func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
+	userId, _ := helper.GetIDFromContext(c)
 
 	ListOfAddresses, err := uh.userUseCase.GetUserAddresses(userId)
 	if err != nil {
@@ -288,7 +288,7 @@ func (uh *UserHandler) GetAllAdresses(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile [get]
 func (uh *UserHandler) Profile(c *gin.Context) {
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	UserProfile, err := uh.userUseCase.GetProfile(userId)
 	if err != nil {
@@ -322,7 +322,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.CheckUserOldPassword(body, userId)
 	if err != nil {
@@ -366,7 +366,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.ChangeUserPassword(body, userId, c)
 	if err != nil {
@@ -400,7 +400,7 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = uh.userUseCase.SetDefaultAddress(userID, addressID)
 	if err != nil {
@@ -434,7 +434,7 @@ func (uh *UserHandler) EditUserName(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err := uh.userUseCase.UpdateUserName(body.Name, userID)
 	if err != nil {
