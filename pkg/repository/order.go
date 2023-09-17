@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -165,6 +167,7 @@ func (od *orderDatabase) FindOrderByID(orderID int) (response.OrderLine, error) 
 	err := od.DB.Raw(query, orderID).Scan(&Order).Error
 	return Order, err
 }
+
 func (od *orderDatabase) FindOrdersBoughtUsingCoupon(couponID int) ([]response.OrderLine, error) {
 	var Orders = make([]response.OrderLine, 0)
 	query := `SELECT * FROM order_lines WHERE coupon_id = $1 ; `
@@ -195,20 +198,66 @@ func (od *orderDatabase) UpdateUserWalletBalance(userID int, amount float32) (re
 	err := od.DB.Raw(query, amount, userID).Scan(&UpdatedWallet).Error
 	return UpdatedWallet, err
 }
+func (od *orderDatabase) UpdateWalletTransactionHistory(update request.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
 
-func (od *orderDatabase) UpdateWalletTransactionHistory(update response.WalletTransactionHistory) (response.WalletTransactionHistory, error) {
 	var updatedHistory response.WalletTransactionHistory
-	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type,amount_display) 
-			VALUES($1,$2,$3,$4,$5) RETURNING *;`
-	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType, update.AmountDisplay).Scan(&updatedHistory).Error
+
+	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type) 
+	VALUES($1,$2,$3,$4) RETURNING *;`
+
+	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType).Scan(&updatedHistory).Error
 
 	return updatedHistory, err
-
 }
 
 func (od *orderDatabase) GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error) {
+
 	var walletHistory = make([]response.WalletTransactionHistory, 0)
 	query := `SELECT * FROM wallet_transaction_histories WHERE user_id = $1 ;`
 	err := od.DB.Raw(query, userID).Scan(&walletHistory).Error
 	return walletHistory, err
+}
+
+func (o *orderDatabase) TopSellingProduct(startDate, endDate time.Time) (response.TopSelling, error) {
+
+	var data response.TopSelling
+	query := ` SELECT product_id, SUM(qty) AS quantity
+	FROM order_lines	WHERE created_at >= ? AND created_at <= ?
+	GROUP BY product_id
+	ORDER BY quantity DESC
+	LIMIT 1;`
+
+	err := o.DB.Raw(query, startDate, endDate).Scan(&data).Error
+	return data, err
+
+}
+
+func (o *orderDatabase) GetTotalSaleCount(startDate, endDate time.Time) (int, error) {
+
+	var count int
+	query := `SELECT COUNT(*) AS count
+	FROM order_lines
+	WHERE created_at >= $1 AND created_at <= $2;`
+
+	err := o.DB.Raw(query, startDate, endDate).Scan(&count).Error
+	return count, err
+
+}
+
+func (o *orderDatabase) GetAverageOrderValue(startDate, endDate time.Time) (float32, error) {
+
+	var avg float32
+	query := `SELECT AVG(qty * price) AS average_order_value
+	FROM order_lines WHERE created_at >= $1 AND created_at <= $2 ;`
+
+	err := o.DB.Raw(query, startDate, endDate).Scan(&avg).Error
+	return avg, err
+}
+
+func (o *orderDatabase) GetTotalRevenue(status int, startDate, endDate time.Time) ([]response.OrderLine, error) {
+	var data = make([]response.OrderLine, 0)
+	query := `SELECT * from order_lines WHERE created_at >= $1 AND created_at <= $2 AND order_status_id != $3 ;`
+
+	err := o.DB.Raw(query, startDate, endDate, status).Scan(&data).Error
+	return data, err
 }

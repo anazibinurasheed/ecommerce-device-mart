@@ -42,20 +42,15 @@ func (pu *productUseCase) CreateNewCategory(category request.Category) error {
 }
 
 func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Category, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
 
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllCategories, err := pu.productRepo.ReadCategory(startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to find categories :%s", err)
 	}
+
+	fmt.Println(listOfAllCategories)
 
 	return listOfAllCategories, nil
 }
@@ -107,7 +102,7 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 		return fmt.Errorf("category not found")
 	}
 
-	product.Brand = category.CategoryName
+	product.Brand = category.Category_Name
 	product.SKU = helper.MakeSKU(product.ProductName)
 
 	existingProduct, err := pu.productRepo.FindProductByName(product.ProductName)
@@ -130,15 +125,7 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 }
 
 func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response.Product, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
 	if err != nil {
@@ -148,16 +135,8 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) DisplayAllAvailabeProductsToUser(page, count int) ([]response.Product, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
 	if err != nil {
@@ -276,14 +255,7 @@ func (pu *productUseCase) InsertNewProductRating(userID int, productID int, rati
 }
 
 func (pu *productUseCase) SearchProducts(search string, page, count int) ([]response.Product, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	products, err := pu.productRepo.SearchProducts(search, startIndex, endIndex)
 	if err != nil {
@@ -297,14 +269,8 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 }
 
 func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int) ([]response.Product, error) {
-	if page <= 0 {
-		page = 1
-	}
-	if count < 10 {
-		count = 10
-	}
-	startIndex := (page - 1) * count
-	endIndex := startIndex + count
+	startIndex, endIndex := helper.PageCount(page, count)
+
 	products, err := pu.productRepo.GetProductsByCategory(categoryID, startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get products by category : %s", err)

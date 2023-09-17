@@ -7,11 +7,25 @@ import (
 	"strings"
 	"time"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-func GetUserIDFromContext(c *gin.Context) (int, error) {
+func PageCount(page, count int) (startIndex, endIndex int) {
+	if page <= 0 {
+		page = 1
+	}
+	if count < 10 {
+		count = 10
+	}
+
+	startIndex = (page - 1) * count
+	endIndex = startIndex + count
+	return
+}
+
+func GetIDFromContext(c *gin.Context) (int, error) {
 	userIDStr := c.GetString("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	return userID, err
@@ -23,18 +37,6 @@ func SetToCookie(Data int, cookieName string, c *gin.Context) {
 	c.SetCookie(cookieName, fmt.Sprint(Data), maxAge, "", "", false, true)
 	c.SetSameSite(http.SameSiteLaxMode)
 }
-
-// func GetFromCookie(cookieName string, c *gin.Context) (int, error) {
-// 	cookieData, err := c.Cookie(cookieName)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	data, err := strconv.Atoi(cookieData)
-
-// 	return data, err
-
-// }
 
 func DeleteCookie(cookieName string, c *gin.Context) {
 
@@ -48,6 +50,17 @@ func GenerateUniqueID() string {
 }
 
 func MakeSKU(name string) string {
-	name = strings.ReplaceAll(name, " ", "-")
-	return name
+	return strings.ReplaceAll(name, " ", "-")
+}
+
+func CalculateTotalRevenue(args ...response.OrderLine) float64 {
+
+	return func() (totalRevenue float64) {
+
+		for _, orders := range args {
+			totalRevenue += float64(orders.Qty) * float64(orders.Price)
+		}
+
+		return
+	}()
 }

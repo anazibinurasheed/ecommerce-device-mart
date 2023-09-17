@@ -29,8 +29,8 @@ type Address struct {
 	IsDefault        bool
 }
 type States struct {
-	ID   uint   `gorm:"primaryKey;unique;autoIncrement;not null"`
-	Name string `gorm:"not null;unique"`
+	ID   uint   `json:"id"`
+	Name string `json:"state_name"`
 }
 
 type Profile struct {

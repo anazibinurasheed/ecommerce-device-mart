@@ -59,9 +59,11 @@ func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (resp
 	userData, err := u.userRepo.FindUserByPhone(user.Phone)
 	if err != nil {
 		return response.UserData{}, err
-	} else if userData.ID == 0 {
-		return response.UserData{}, fmt.Errorf("User dont have an account")
-	} else if userData.IsBlocked {
+	}
+	if userData.ID == 0 {
+		return response.UserData{}, fmt.Errorf("User don't have an account")
+	}
+	if userData.IsBlocked {
 		return response.UserData{}, fmt.Errorf("User have been blocked")
 	}
 
@@ -123,7 +125,7 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 
 		setDefaultAddress, err := u.userRepo.SetDefaultAddressStatus(true, int(createdAddress.ID), userID)
 		if err != nil {
-			return fmt.Errorf("failed to set default address :%s", err)
+			return fmt.Errorf("Failed to set default address :%s", err)
 		}
 
 		if setDefaultAddress.ID == 0 {

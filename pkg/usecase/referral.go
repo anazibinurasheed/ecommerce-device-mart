@@ -15,7 +15,7 @@ type referralUseCase struct {
 	orderUseCase interfaces.OrderRepository
 }
 
-func NewRefferalUseCase(referraluseCase interfaces.ReferralRepository, orderUseCase interfaces.OrderRepository) services.ReferralUseCase {
+func NewReferralUseCase(referraluseCase interfaces.ReferralRepository, orderUseCase interfaces.OrderRepository) services.ReferralUseCase {
 	return &referralUseCase{
 		referralRepo: referraluseCase,
 		orderUseCase: orderUseCase,

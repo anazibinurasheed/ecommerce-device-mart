@@ -116,7 +116,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/block-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Blocks a category with the specified ID.",
                 "produces": [
                     "application/json"
@@ -157,7 +157,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/unblock-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Unblocks a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -201,7 +201,7 @@ const docTemplate = `{
             }
         },
         "/admin/category/update-category/{categoryID}": {
-            "patch": {
+            "put": {
                 "description": "Updates a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -260,7 +260,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Sudo admin can create new admin account.",
+                "description": "Sudo admin to create new admin account.",
                 "consumes": [
                     "application/json"
                 ],
@@ -270,7 +270,7 @@ const docTemplate = `{
                 "tags": [
                     "sudo admin"
                 ],
-                "summary": "Admin signup",
+                "summary": "Create admin",
                 "parameters": [
                     {
                         "description": "Signup data",
@@ -550,7 +550,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/block-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Blocks a product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -594,7 +594,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/unblock-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Unblocks a product with the specified ID.",
                 "produces": [
                     "application/json"
@@ -635,7 +635,7 @@ const docTemplate = `{
             }
         },
         "/admin/products/update-product/{productID}": {
-            "patch": {
+            "put": {
                 "description": "Updates an existing product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -894,7 +894,33 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/sudo/login": {
+        "/admin/sales-report": {
+            "get": {
+                "description": "Sales report of last 30 days from the requested time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales-report"
+                ],
+                "summary": "Monthly sales report",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/su-login": {
             "post": {
                 "description": "For sudo admin login.",
                 "consumes": [
@@ -914,7 +940,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.LoginSudoAdmin"
+                            "$ref": "#/definitions/request.SudoLoginData"
                         }
                     }
                 ],
@@ -947,7 +973,7 @@ const docTemplate = `{
             }
         },
         "/admin/user-management/block-user/{userID}": {
-            "post": {
+            "put": {
                 "description": "Blocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -991,7 +1017,7 @@ const docTemplate = `{
             }
         },
         "/admin/user-management/unblock-user/{userID}": {
-            "post": {
+            "put": {
                 "description": "Unblocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -1205,7 +1231,7 @@ const docTemplate = `{
             }
         },
         "/cart/{productID}/decrement": {
-            "patch": {
+            "put": {
                 "description": "Decrements the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1246,7 +1272,7 @@ const docTemplate = `{
             }
         },
         "/cart/{productID}/increment": {
-            "patch": {
+            "put": {
                 "description": "Increments the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1261,6 +1287,66 @@ const docTemplate = `{
                         "description": "Product ID",
                         "name": "productID",
                         "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/{categoryID}": {
+            "get": {
+                "description": "Lists products based on the provided category ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "List products by category",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -1425,47 +1511,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/download-invoice/{orderID}": {
-            "get": {
-                "description": "Download the invoice as a PDF file.",
-                "produces": [
-                    "application/pdf"
-                ],
-                "tags": [
-                    "user orders"
-                ],
-                "summary": "Download invoice",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Order ID",
-                        "name": "orderID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "file"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/login": {
             "post": {
                 "description": "Logs in a user and sends an OTP for verification.",
@@ -1541,7 +1586,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/my-orders": {
+        "/orders": {
             "get": {
                 "description": "Retrieves the order history of the current user.",
                 "produces": [
@@ -1585,7 +1630,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/my-orders/cancel/{orderID}": {
+        "/orders/cancel/{orderID}": {
             "post": {
                 "description": "Cancel the order. For online payments, the amount will be added to the user's wallet. For cash on delivery orders,will be marked as cancelled.\nIf the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.",
                 "consumes": [
@@ -1629,9 +1674,50 @@ const docTemplate = `{
                 }
             }
         },
-        "/my-orders/return/{orderID}": {
+        "/orders/invoice/{orderID}": {
+            "get": {
+                "description": "Download the invoice as a PDF file.",
+                "produces": [
+                    "application/pdf"
+                ],
+                "tags": [
+                    "user orders"
+                ],
+                "summary": "Download invoice",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/return/{orderID}": {
             "post": {
-                "description": "Return the order if the order is valid for return.Amount will be added to the user's wallet.\nIf the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.",
+                "description": "Return the order if the order is valid for return.Amount will be added to the user's wallet.\nIf the user has used a coupon for the order, the discount amount will be recalculated based\non the percentage used and deducted from the refunding amount.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1673,7 +1759,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment/order-cod-confirmed": {
+        "/payment/cod-confirm": {
             "post": {
                 "description": "Confirms the cash on delivery (COD) delivery for the current user.",
                 "produces": [
@@ -1699,7 +1785,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment/razorpay": {
+        "/payment/online": {
             "get": {
                 "description": "Make payment using razorpay page .",
                 "produces": [
@@ -1722,7 +1808,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment/razorpay/process-order": {
+        "/payment/online/process": {
             "post": {
                 "description": "Verify razorpay payment using razorpay credentials .",
                 "produces": [
@@ -1780,7 +1866,7 @@ const docTemplate = `{
                 "tags": [
                     "checkout"
                 ],
-                "summary": "Wallet payment",
+                "summary": "Pay using wallet",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1803,22 +1889,34 @@ const docTemplate = `{
                 }
             }
         },
-        "/product-item/{productID}": {
+        "/product/": {
             "get": {
-                "description": "Retrieves details of a product with the specified ID.",
+                "description": "Retrieves all available products for the user.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "products"
                 ],
-                "summary": "View a product",
+                "summary": "Display all products to the user",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Product ID",
-                        "name": "productID",
-                        "in": "path",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -1831,6 +1929,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1945,126 +2049,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products": {
-            "get": {
-                "description": "Retrieves all available products for the user.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "Display all products to the user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/products-by-category/{categoryID}": {
-            "get": {
-                "description": "Lists products based on the provided category ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "List products by category",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/products/search": {
+        "/product/search": {
             "post": {
                 "description": "Searches for products based on the provided search input",
                 "consumes": [
@@ -2117,6 +2102,47 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/{productID}": {
+            "get": {
+                "description": "Retrieves details of a product with the specified ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "View a product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2441,7 +2467,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Address updation details",
+                        "description": "Address update details",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -2698,7 +2724,7 @@ const docTemplate = `{
                 "tags": [
                     "common"
                 ],
-                "summary": "Verify signup  OTP",
+                "summary": "Verify sign up  OTP",
                 "parameters": [
                     {
                         "description": "OTP",
@@ -2786,6 +2812,32 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/wallet/history": {
+            "get": {
+                "description": "This endpoint will show all the wallet transaction history of the user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallet"
+                ],
+                "summary": "User wallet transaction history",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2841,6 +2893,10 @@ const docTemplate = `{
         },
         "request.ChangePassword": {
             "type": "object",
+            "required": [
+                "new_password",
+                "re_new_password"
+            ],
             "properties": {
                 "new_password": {
                     "type": "string"
@@ -2857,7 +2913,8 @@ const docTemplate = `{
                 "coupon_name",
                 "discount_max_amount",
                 "discount_percentage",
-                "min_order_value"
+                "min_order_value",
+                "validity_days"
             ],
             "properties": {
                 "code": {
@@ -2876,7 +2933,8 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "validity_days": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -2895,24 +2953,11 @@ const docTemplate = `{
                 }
             }
         },
-        "request.LoginSudoAdmin": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "description": "Phone    string ` + "`" + `json:\"phone\"` + "`" + `",
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "request.OldPassword": {
             "type": "object",
+            "required": [
+                "old_password"
+            ],
             "properties": {
                 "old_password": {
                     "type": "string"
@@ -2923,13 +2968,13 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "otp",
-                "unique_id"
+                "uuid"
             ],
             "properties": {
                 "otp": {
                     "type": "string"
                 },
-                "unique_id": {
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -2941,7 +2986,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "phone": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 10,
+                    "minimum": 2
                 }
             }
         },
@@ -2972,6 +3019,10 @@ const docTemplate = `{
         },
         "request.Rating": {
             "type": "object",
+            "required": [
+                "description",
+                "rating"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -2999,13 +3050,33 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
-                    "description": "for retrieve user phone",
+                    "description": "for retrieve user phone from the map",
+                    "type": "string"
+                }
+            }
+        },
+        "request.SudoLoginData": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
         },
         "request.VerifyPayment": {
             "type": "object",
+            "required": [
+                "razorpay_order_id",
+                "razorpay_payment_id",
+                "razorpay_signature"
+            ],
             "properties": {
                 "razorpay_order_id": {
                     "type": "string"
@@ -3026,7 +3097,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "statuscode": {
+                "status-code": {
                     "type": "integer"
                 }
             }
