@@ -43,7 +43,7 @@ func (pu *productUseCase) CreateNewCategory(category request.Category) error {
 
 func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Category, error) {
 
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllCategories, err := pu.productRepo.ReadCategory(startIndex, endIndex)
 	if err != nil {
@@ -125,7 +125,7 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 }
 
 func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response.Product, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
 	if err != nil {
@@ -136,7 +136,7 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 }
 
 func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
 	if err != nil {
@@ -255,7 +255,7 @@ func (pu *productUseCase) InsertNewProductRating(userID int, productID int, rati
 }
 
 func (pu *productUseCase) SearchProducts(search string, page, count int) ([]response.Product, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	products, err := pu.productRepo.SearchProducts(search, startIndex, endIndex)
 	if err != nil {
@@ -269,7 +269,7 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 }
 
 func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int) ([]response.Product, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	products, err := pu.productRepo.GetProductsByCategory(categoryID, startIndex, endIndex)
 	if err != nil {

@@ -230,7 +230,7 @@ func (ou *orderUseCase) GetUserOrderHistory(userID, page, count int) ([]response
 }
 
 func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManagement, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	orderHistory, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -248,7 +248,7 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 }
 
 func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.PageCount(page, count)
 
 	allOrders, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {

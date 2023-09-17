@@ -1,12 +1,8 @@
-#from image
 FROM golang:1.20.6-alpine3.18 AS build-stage
-#consider this is the workingdir we copy and store all in this, and the rest of the work is in this workdir
-WORKDIR /devicemart 
-#copy the entire entire things from the current dir
-COPY  . . 
+WORKDIR /devicemart ##consider this is the workingdir we copy and store all in this, and the rest of the work is in this workdir
+COPY  . . ##copy the entire entire things from the current dir
 RUN go mod download
-# first path is the out put path and the second path is the main path
-RUN go build -v -o ./build/api ./cmd/main
+RUN go build -v -o ./build/api ./cmd/api/ 
 
 # Run the tests in the container
 FROM build-stage AS run-test-stage
@@ -20,4 +16,4 @@ COPY  --from=build-stage /devicemart/build/api /
 COPY  --from=build-stage /devicemart/.env /
 COPY  --from=build-stage /devicemart/templates /templates
 EXPOSE 3000
-CMD [ "./main" ]
+CMD [ "./api" ]
