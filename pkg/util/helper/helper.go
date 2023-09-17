@@ -12,7 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func PageCount(page, count int) (startIndex, endIndex int) {
+// it's a util function for pagination
+func PageNCount(page, count int) (startIndex, endIndex int) {
 	if page <= 0 {
 		page = 1
 	}

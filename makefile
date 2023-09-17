@@ -15,10 +15,10 @@ ${BINARY_DIR}:
 	mkdir -p $(BINARY_DIR)
 
 build: ${BINARY_DIR} ## Compile the code, build Executable File
-	$(GOCMD) build -o $(BINARY_DIR) -v ./cmd/devicemart
+	$(GOCMD) build -o $(BINARY_DIR) -v ./cmd/main
 
 run: ## Start application
-	$(GOCMD) run ./cmd/devicemart
+	$(GOCMD) run ./cmd/main
 
 
 
