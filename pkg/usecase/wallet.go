@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 )

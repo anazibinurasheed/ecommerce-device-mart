@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
