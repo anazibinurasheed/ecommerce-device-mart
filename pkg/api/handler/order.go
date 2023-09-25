@@ -445,18 +445,6 @@ func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 }
 
 func (od *OrderHandler) WebhookHandler(c *gin.Context) {
-	// // Get the raw webhook request body
-	// webhookBody, _ := c.GetRawData()
-
-	// // Get the signature from the X-Razorpay-Signature header
-	// webhookSignature := c.GetHeader("X-Razorpay-Signature")
-
-	// Validate the webhook signature
-	// if !helper.ValidateWebhookSignature(string(webhookBody), webhookSignature) {
-	// 	fmt.Println("errr")
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid webhook signature"})
-	// 	return
-	// }
 
 	// Parse the webhook event data
 	var eventData map[string]interface{}

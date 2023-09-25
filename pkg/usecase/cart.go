@@ -136,9 +136,7 @@ func (cu *CartUseCase) DeleteUserCart(userID int) error {
 	if err != nil {
 		return fmt.Errorf("failed to delete user cart  : %s", err)
 	}
-	// if DeletedCart.ID == 0 {
-	// 	return fmt.Errorf("failed to delete user cart  :showing deleted cart id = %d", DeletedCart.ID)
-	// }
+
 	return nil
 
 }

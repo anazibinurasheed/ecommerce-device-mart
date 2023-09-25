@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
-	//	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -76,7 +75,6 @@ func JwtAuth(c *gin.Context, name string) {
 		}
 
 		c.Set("userId", fmt.Sprint(claims["sub"]))
-		fmt.Println("MIDDLEWARE ::::", claims["sub"])
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"Statuscode": 401,
@@ -85,43 +83,3 @@ func JwtAuth(c *gin.Context, name string) {
 		return
 	}
 }
-
-// func JwtAuth(c *gin.Context, name string) {
-// 	tokenString, err := c.Cookie(name + "Authorization")
-
-// 	if err != nil {
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 			"StatusCode": 401,
-// 			"msg":        "Unauthorized User",
-// 		})
-// 		return
-// 	}
-
-// 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-// 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-// 		if !ok {
-// 			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
-// 		}
-// 		return []byte(config.GetConfig().JwtSecret), nil
-// 	})
-
-// 	claims, ok := token.Claims.(*helper.SignedDetails)
-// 	if ok && token.Valid {
-// 		if time.Now().Local().Unix() > claims.ExpiresAt {
-// 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 				"StatusCode": 401,
-// 				"msg":        "Jwt session expired",
-// 			})
-
-// 			return
-// 		}
-
-// 		c.Set("userId", claims.UserId)
-// 		c.Set("IsAdmin", claims.IsAdmin)
-// 	} else {
-// 		c.JSON(http.StatusUnauthorized, gin.H{
-// 			"Statuscode": 401,
-// 			"Msg":        "Invalid claims",
-// 		})
-// 	}
-// }

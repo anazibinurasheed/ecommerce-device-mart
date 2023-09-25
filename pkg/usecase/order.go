@@ -429,7 +429,7 @@ func (ou *orderUseCase) UpdateWalletHistory(userID int, amount float32, transact
 		}()
 
 	}
-	return err
+	return nil
 }
 
 func (ou *orderUseCase) GetWalletHistory(userID int) ([]response.WalletTransactionHistory, error) {
