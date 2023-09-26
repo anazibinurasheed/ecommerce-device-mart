@@ -38,7 +38,7 @@ func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.Referral{},
 		&domain.WalletTransactionHistory{},
 	); err != nil {
-		log.Fatal("FAILED TO CONNECT WITH DATABASE ", err)
+		log.Fatal("Failed to connect with DB", err)
 		return nil, err
 	}
 	dbInstance = db

@@ -3,7 +3,7 @@ package usecase
 import (
 	"fmt"
 
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -136,9 +136,7 @@ func (cu *CartUseCase) DeleteUserCart(userID int) error {
 	if err != nil {
 		return fmt.Errorf("failed to delete user cart  : %s", err)
 	}
-	// if DeletedCart.ID == 0 {
-	// 	return fmt.Errorf("failed to delete user cart  :showing deleted cart id = %d", DeletedCart.ID)
-	// }
+
 	return nil
 
 }

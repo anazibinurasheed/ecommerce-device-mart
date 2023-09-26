@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	// razorpay "github.com/razorpay/razorpay-go"
 )
@@ -15,3 +15,5 @@ func NewPaymentUseCase(PaymentUseCase interfaces.PaymentRepository) services.Pay
 		paymentRepo: PaymentUseCase,
 	}
 }
+
+

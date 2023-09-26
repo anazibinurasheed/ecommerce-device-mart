@@ -253,51 +253,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/create-admin": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Sudo admin to create new admin account.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "sudo admin"
-                ],
-                "summary": "Create admin",
-                "parameters": [
-                    {
-                        "description": "Signup data",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.SignUpData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/admin/orders": {
             "get": {
                 "description": "Retrieves all order overview data.",
@@ -922,7 +877,7 @@ const docTemplate = `{
         },
         "/admin/su-login": {
             "post": {
-                "description": "For sudo admin login.",
+                "description": "For admin login.",
                 "consumes": [
                     "application/json"
                 ],
@@ -930,9 +885,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sudo admin"
+                    "auth"
                 ],
-                "summary": "Sudo Admin Login",
+                "summary": "Admin Login",
                 "parameters": [
                     {
                         "description": "Sudo admin login credentials",
@@ -1521,7 +1476,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User login data, verify it and send otp",
                 "parameters": [
@@ -1573,7 +1528,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User Logout",
                 "responses": {
@@ -2634,7 +2589,7 @@ const docTemplate = `{
         },
         "/send-otp": {
             "post": {
-                "description": "Sends an OTP to the provided phone number.",
+                "description": "Sends an OTP to the provided phone number. Should take the uuid and verify the otp using verify otp api then take the uuid and include it also in the sign up credentials. Else will not work",
                 "consumes": [
                     "application/json"
                 ],
@@ -2642,7 +2597,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "Send sign up OTP to Phone",
                 "parameters": [
@@ -2682,7 +2637,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User Sign-Up after otp validation",
                 "parameters": [
@@ -2714,7 +2669,7 @@ const docTemplate = `{
         },
         "/verify-otp": {
             "post": {
-                "description": "Validates the provided OTP for a phone number.",
+                "description": "Validates the provided OTP for a phone number. Provide the accurate uuid and otp = 0000(predefined).",
                 "consumes": [
                     "application/json"
                 ],
@@ -2722,7 +2677,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "Verify sign up  OTP",
                 "parameters": [
@@ -2987,8 +2942,7 @@ const docTemplate = `{
             "properties": {
                 "phone": {
                     "type": "integer",
-                    "maximum": 10,
-                    "minimum": 2
+                    "minimum": 10
                 }
             }
         },
@@ -3037,7 +2991,8 @@ const docTemplate = `{
             "required": [
                 "email",
                 "password",
-                "username"
+                "username",
+                "uuid"
             ],
             "properties": {
                 "email": {

@@ -6,12 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// user service is collection of method signature in the usecase package .
-// usecase have a struct that struct have repository/interfaces.UserRespository type variable ,with including that methods we
-// created a new method , that method signature will hold in this  UserService interface .
 type UserUseCase interface {
-	SignUp(user request.SignUpData) error
-	ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error)
 	FindUserById(userID int) (response.UserData, error)
 	AddNewAddress(userID int, address request.Address) error
 	DisplayListOfStates() ([]response.States, error)

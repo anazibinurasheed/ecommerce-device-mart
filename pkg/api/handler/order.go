@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -445,18 +446,6 @@ func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 }
 
 func (od *OrderHandler) WebhookHandler(c *gin.Context) {
-	// // Get the raw webhook request body
-	// webhookBody, _ := c.GetRawData()
-
-	// // Get the signature from the X-Razorpay-Signature header
-	// webhookSignature := c.GetHeader("X-Razorpay-Signature")
-
-	// Validate the webhook signature
-	// if !helper.ValidateWebhookSignature(string(webhookBody), webhookSignature) {
-	// 	fmt.Println("errr")
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid webhook signature"})
-	// 	return
-	// }
 
 	// Parse the webhook event data
 	var eventData map[string]interface{}
@@ -517,13 +506,13 @@ func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
 }
 
 // WalletTransactionHistory godoc
-// @Summary User wallet transaction history
-// @Description This endpoint will show all the wallet transaction history of the user.
-// @Tags wallet
-// @Produce		json
-// @Success		200	{object}	response.Response
-// @Failure		500	{object}	response.Response
-// @Router			/wallet/history [get]
+//	@Summary		User wallet transaction history
+//	@Description	This endpoint will show all the wallet transaction history of the user.
+//	@Tags			wallet
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/wallet/history [get]
 func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
@@ -540,15 +529,21 @@ func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 
 // MonthlySalesReport godoc
 //
-// @Summary		Monthly sales report
-// @Description	Sales report of last 30 days from the requested time
-// @Tags			sales-report
-// @Produce		json
-// @Success		200	{object}	response.Response
-// @Failure		500	{object}	response.Response
-// @Router			/admin/sales-report [get]
+//	@Summary		Monthly sales report
+//	@Description	Sales report of last 30 days from the requested time
+//	@Tags			sales-report
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/admin/sales-report [get]
 func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
 	salesReport, err := od.orderUseCase.MonthlySalesReport()
+
+	if err == usecase.ErrNoOrders {
+		response := response.ResponseMessage(http.StatusOK, "No orders created yet", salesReport, nil)
+		c.JSON(http.StatusOK, response)
+		return
+	}
 
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate the sales report", nil, err.Error())

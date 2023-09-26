@@ -64,19 +64,7 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/cart [get]
 func (ch *CartHandler) ViewCart(c *gin.Context) {
-	// page, err := strconv.Atoi(c.Query("page"))
-	// if err != nil {
-	// 	response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
-	// 	c.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
 
-	// count, err := strconv.Atoi(c.Query("count"))
-	// if err != nil {
-	// 	response := response.ResponseMessage(400, "Invalid entry.", nil, nil)
-	// 	c.JSON(http.StatusBadRequest, response)
-	// 	return
-	// }
 	userID, _ := helper.GetIDFromContext(c)
 
 	CartItems, err := ch.cartUseCase.ViewCart(userID) ///////////////

@@ -3,7 +3,7 @@ package usecase
 import (
 	"fmt"
 
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 
@@ -25,7 +25,7 @@ func NewReferralUseCase(referraluseCase interfaces.ReferralRepository, orderUseC
 func (ru *referralUseCase) GetUserReferralCode(userID int) (response.Referral, error) {
 	referralCode, err := ru.referralRepo.FindReferralCodeByUserID(userID)
 	if err != nil {
-		return response.Referral{}, fmt.Errorf("Failed to find refferal code by user id : %s", err)
+		return response.Referral{}, fmt.Errorf("Failed to find referral code by user id : %s", err)
 	}
 	if referralCode.ID != 0 {
 		return referralCode, nil

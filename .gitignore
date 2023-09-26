@@ -16,3 +16,4 @@ postgres-configmap.yml
 out.pdf
 demoPrograms
 notes
+.gitignore
