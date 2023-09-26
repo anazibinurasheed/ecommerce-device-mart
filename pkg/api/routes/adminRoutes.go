@@ -7,7 +7,7 @@ import (
 )
 
 func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
+	productHandler *handler.ProductHandler, commonHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
 
 	router.POST("/su-login", adminHandler.SULogin)
 
@@ -58,10 +58,9 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 			orderManagement.GET("/", orderHandler.GetAllOrderOverViewPage)
 			orderManagement.GET("/management", orderHandler.GetOrderManagementPage)
 			orderManagement.PUT("/:orderID/update-status/:statusID", orderHandler.UpdateOrderStatus)
+			router.GET("/sales-report", orderHandler.MonthlySalesReport)
 
 		}
-
-		router.GET("/sales-report", orderHandler.MonthlySalesReport)
 
 	}
 }

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -22,113 +21,6 @@ func NewUserHandler(useCase services.UserUseCase) *UserHandler {
 	return &UserHandler{
 		userUseCase: useCase,
 	}
-}
-
-// UserSignUp is the handler function for user sign-up.
-//
-//	@Summary		User Sign-Up after otp validation
-//	@Description	Creates a new user account.
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body		request.SignUpData	true	"User Sign-Up Data"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
-//	@Router			/sign-up [post]
-func (u *UserHandler) UserSignUp(c *gin.Context) {
-	var body request.SignUpData
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
-	//use of these variable also mentioned near to the declaration.
-	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.UUID]
-	phoneDataMutex.Unlock()
-	if !ok {
-		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
-		c.JSON(http.StatusInternalServerError, response)
-		return
-	}
-
-	Number, err := strconv.Atoi(Phone)
-	if err != nil {
-		response := response.ResponseMessage(200, "Failed.", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-
-	}
-
-	body.Phone = Number
-
-	err = u.userUseCase.SignUp(body)
-	if err != nil {
-		response := response.ResponseMessage(400, "Failed", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.UUID)
-	phoneDataMutex.Unlock()
-
-	response := response.ResponseMessage(200, "Success, account created", nil, nil)
-	c.JSON(http.StatusOK, response)
-}
-
-// UserLogin godoc
-//
-//	@Summary		User login data, verify it and send otp
-//	@Description	Logs in a user and sends an OTP for verification.
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body		request.LoginData	true	"User login data"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
-//	@Failure		401		{object}	response.Response
-//	@Failure		500		{object}	response.Response
-//	@Router			/login [post]
-func (uh *UserHandler) UserLogin(c *gin.Context) {
-	var body request.LoginData
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	UserData, err := uh.userUseCase.ValidateUserLoginCredentials(body)
-	if err != nil {
-		response := response.ResponseMessage(401, "Failed", nil, err.Error())
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
-
-	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.ID)
-	if err != nil {
-		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
-		c.JSON(http.StatusInternalServerError, response)
-		return
-	}
-
-	var coockieName string
-
-	if UserData.IsAdmin {
-		coockieName = "AdminAuthorization"
-	} else {
-		coockieName = "UserAuthorization"
-	}
-
-	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
-	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
-
-	response := response.ResponseMessage(200, "Login success", nil, nil)
-	c.JSON(http.StatusOK, response)
 }
 
 // GetAddAddressPage godoc

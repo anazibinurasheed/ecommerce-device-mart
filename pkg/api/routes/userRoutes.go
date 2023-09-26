@@ -7,13 +7,13 @@ import (
 )
 
 func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, commonHandler *handler.CommonHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
 
-	router.POST("/send-otp", commonHandler.SendOTP)
-	router.POST("/verify-otp", commonHandler.VerifyOTP)
-	router.POST("/sign-up", middleware.Verified, userHandler.UserSignUp)
-	router.POST("/login", userHandler.UserLogin)
-	router.POST("/logout", commonHandler.Logout)
+	router.POST("/send-otp", authHandler.SendOTP)
+	router.POST("/verify-otp", authHandler.VerifyOTP)
+	router.POST("/sign-up", middleware.Verified, authHandler.UserSignUp)
+	router.POST("/login", authHandler.UserLogin)
+	router.POST("/logout", authHandler.Logout)
 	router.POST("/webhook", orderHandler.WebhookHandler)
 
 	// Authentication middleware

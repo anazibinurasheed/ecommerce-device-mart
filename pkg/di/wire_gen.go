@@ -33,7 +33,7 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	productUseCase := usecase.NewProductUseCase(productRepository, orderRepository)
 	productHandler := handler.NewProductHandler(productUseCase)
 	commonUseCase := usecase.NewCommonUseCase(userRepository, adminRepository)
-	commonHandler := handler.NewCommonHandler(commonUseCase)
+	commonHandler := handler.NewAuthHandler(commonUseCase)
 	cartRepository := repo.NewCartRepository(gormDB)
 	couponRepository := repo.NewCouponRepository(gormDB)
 	cartUseCase := usecase.NewCartUseCase(cartRepository, couponRepository)

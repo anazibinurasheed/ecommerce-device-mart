@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -13,14 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CommonHandler struct {
-	commonUseCase services.CommonUseCase
+type AuthHandler struct {
+	authUseCase services.AuthUseCase
 }
 
-// for wire
-func NewCommonHandler(useCase services.CommonUseCase) *CommonHandler {
-	return &CommonHandler{
-		commonUseCase: useCase,
+func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
+	return &AuthHandler{
+		authUseCase: useCase,
 	}
 }
 
@@ -52,7 +52,7 @@ var (
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Router			/send-otp [post]
-func (ch *CommonHandler) SendOTP(c *gin.Context) {
+func (ch *AuthHandler) SendOTP(c *gin.Context) {
 	var body request.Phone
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -60,7 +60,7 @@ func (ch *CommonHandler) SendOTP(c *gin.Context) {
 		return
 	}
 
-	Phone, err := ch.commonUseCase.ValidateSignUpRequest(body)
+	Phone, err := ch.authUseCase.ValidateSignUpRequest(body)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -74,9 +74,13 @@ func (ch *CommonHandler) SendOTP(c *gin.Context) {
 
 	go helper.GoClean(phoneDataMap, uid, phoneDataMutex)
 
-	phoneDataMutex.Lock()
-	fmt.Println(phoneDataMap)
-	phoneDataMutex.Unlock()
+	go func() {
+		time.Sleep(65 * time.Second)
+		phoneDataMutex.Lock()
+		fmt.Println(phoneDataMap)
+		phoneDataMutex.Unlock()
+	}()
+
 	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uid, nil)
 	c.JSON(http.StatusAccepted, response)
 }
@@ -93,7 +97,7 @@ func (ch *CommonHandler) SendOTP(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Router			/verify-otp [post]
-func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
+func (ch *AuthHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -133,6 +137,113 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	c.JSON(http.StatusAccepted, response)
 }
 
+// UserSignUp is the handler function for user sign-up.
+//
+//	@Summary		User Sign-Up after otp validation
+//	@Description	Creates a new user account.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		request.SignUpData	true	"User Sign-Up Data"
+//	@Success		200		{object}	response.Response
+//	@Failure		400		{object}	response.Response
+//	@Router			/sign-up [post]
+func (u *AuthHandler) UserSignUp(c *gin.Context) {
+	var body request.SignUpData
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
+	//use of these variable also mentioned near to the declaration.
+	phoneDataMutex.Lock()
+	Phone, ok := phoneDataMap[body.UUID]
+	phoneDataMutex.Unlock()
+	if !ok {
+		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	Number, err := strconv.Atoi(Phone)
+	if err != nil {
+		response := response.ResponseMessage(200, "Failed.", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+
+	}
+
+	body.Phone = Number
+
+	err = u.authUseCase.SignUp(body)
+	if err != nil {
+		response := response.ResponseMessage(400, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	phoneDataMutex.Lock()
+	delete(phoneDataMap, body.UUID)
+	phoneDataMutex.Unlock()
+
+	response := response.ResponseMessage(200, "Success, account created", nil, nil)
+	c.JSON(http.StatusOK, response)
+}
+
+// UserLogin godoc
+//
+//	@Summary		User login data, verify it and send otp
+//	@Description	Logs in a user and sends an OTP for verification.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		request.LoginData	true	"User login data"
+//	@Success		200		{object}	response.Response
+//	@Failure		400		{object}	response.Response
+//	@Failure		401		{object}	response.Response
+//	@Failure		500		{object}	response.Response
+//	@Router			/login [post]
+func (uh *AuthHandler) UserLogin(c *gin.Context) {
+	var body request.LoginData
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	UserData, err := uh.authUseCase.ValidateUserLoginCredentials(body)
+	if err != nil {
+		response := response.ResponseMessage(401, "Failed", nil, err.Error())
+		c.JSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.ID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	var coockieName string
+
+	if UserData.IsAdmin {
+		coockieName = "AdminAuthorization"
+	} else {
+		coockieName = "UserAuthorization"
+	}
+
+	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
+	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
+
+	response := response.ResponseMessage(200, "Login success", nil, nil)
+	c.JSON(http.StatusOK, response)
+}
+
 // @Summary		User Logout
 // @Description	Logs out user and remove cookie from browser.
 // @Tags			auth
@@ -140,7 +251,7 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 // @Produce		json
 // @Success		200	{object}	response.Response{}
 // @Router			/logout [post]
-func (uh *CommonHandler) Logout(c *gin.Context) {
+func (uh *AuthHandler) Logout(c *gin.Context) {
 
 	helper.DeleteCookie("AdminAuthorization", c)
 	helper.DeleteCookie("SudoAdminAuthorization", c)

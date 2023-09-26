@@ -21,15 +21,14 @@ func AuthenticateAdminJwt(c *gin.Context) {
 
 func AuthenticateSudoAdminJwt(c *gin.Context) {
 	JwtAuth(c, "SudoAdmin")
-	c.Next()
 }
+
 func Verified(c *gin.Context) {
 	JwtAuth(c, "Phone")
-	c.Next()
 }
+
 func AuthChangePass(c *gin.Context) {
 	JwtAuth(c, "PassChange")
-	c.Next()
 }
 
 // for admin routes
@@ -70,14 +69,13 @@ func JwtAuth(c *gin.Context, name string) {
 				"StatusCode": 401,
 				"msg":        "Jwt session expired",
 			})
-
 			return
 		}
 
 		c.Set("userId", fmt.Sprint(claims["sub"]))
 	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"Statuscode": 401,
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"StatusCode": 401,
 			"Msg":        "Invalid claims",
 		})
 		return

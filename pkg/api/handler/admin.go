@@ -43,7 +43,7 @@ func (ah *AdminHandler) CreateAdmin(c *gin.Context) {
 	}
 
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
-	//usecase of these variable also mentioned near to the declaration.
+	//use case of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
