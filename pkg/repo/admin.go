@@ -2,11 +2,9 @@ package repo
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"gorm.io/gorm"
 )
@@ -20,16 +18,6 @@ func NewAdminRepository(DB *gorm.DB) interfaces.AdminRepository {
 		DB: DB,
 	}
 
-}
-
-func (ud *adminDatabase) CreateAdmin(admin request.SignUpData) (response.UserData, error) {
-	query := `INSERT INTO users (user_name,  email, phone, password,created_at,is_admin) VALUES ($1,$2,$3,$4,$5,$6) RETURNING * ;`
-	CreatedAt := time.Now()
-	var AdminData response.UserData
-	isAdmin := true
-	err := ud.DB.Raw(query, admin.UserName, admin.Email, admin.Phone, admin.Password, CreatedAt, isAdmin).Scan(&AdminData).Error
-
-	return AdminData, err
 }
 
 func (ad *adminDatabase) FindAdminCredentials() (config.AdminCredentials, error) {

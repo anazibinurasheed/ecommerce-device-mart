@@ -253,51 +253,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/create-admin": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Sudo admin to create new admin account.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "sudo admin"
-                ],
-                "summary": "Create admin",
-                "parameters": [
-                    {
-                        "description": "Signup data",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.SignUpData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/admin/orders": {
             "get": {
                 "description": "Retrieves all order overview data.",
@@ -922,7 +877,7 @@ const docTemplate = `{
         },
         "/admin/su-login": {
             "post": {
-                "description": "For sudo admin login.",
+                "description": "For admin login.",
                 "consumes": [
                     "application/json"
                 ],
@@ -930,9 +885,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sudo admin"
+                    "auth"
                 ],
-                "summary": "Sudo Admin Login",
+                "summary": "Admin Login",
                 "parameters": [
                     {
                         "description": "Sudo admin login credentials",
@@ -2986,7 +2941,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "phone": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 10
                 }
             }
         },
@@ -3035,7 +2991,8 @@ const docTemplate = `{
             "required": [
                 "email",
                 "password",
-                "username"
+                "username",
+                "uuid"
             ],
             "properties": {
                 "email": {

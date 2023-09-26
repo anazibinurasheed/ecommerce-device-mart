@@ -223,7 +223,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 		return
 	}
 
-	TokenString, _, err := helper.GenerateJwtToken(userId)
+	TokenString, err := helper.GenerateJwtToken(userId)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)

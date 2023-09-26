@@ -17,7 +17,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 	router.POST("/webhook", orderHandler.WebhookHandler)
 
 	// Authentication middleware
-	router.Use(middleware.AuthenticateUserJwt)
+	router.Use(middleware.UserAuthRequired)
 	{
 		profile := router.Group("/profile")
 		{

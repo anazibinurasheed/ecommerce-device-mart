@@ -41,6 +41,51 @@ var (
 	phoneDataMutex = new(sync.Mutex)
 )
 
+// SULogin godoc.
+//
+//	@Summary		Admin Login
+//	@Description	For admin login.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		request.SudoLoginData	true	"Sudo admin login credentials"
+//	@Success		200		{object}	response.Response
+//	@Failure		400		{object}	response.Response
+//	@Failure		401		{object}	response.Response
+//	@Failure		500		{object}	response.Response
+//	@Router			/admin/su-login [post]
+func (ah *AuthHandler) SULogin(c *gin.Context) {
+	var body request.SudoLoginData
+	if err := c.BindJSON(&body); err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := ah.authUseCase.SudoAdminLogin(body)
+	if err != nil {
+		response := response.ResponseMessage(401, "Failed", nil, err.Error())
+		c.JSON(http.StatusUnauthorized, response)
+		return
+	}
+
+	TokenString, err := helper.GenerateJwtToken(001) //for su admin
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
+	c.SetCookie("SudoAdminAuthorization", TokenString, MaxAge, "", "", false, true)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("AdminAuthorization", TokenString, MaxAge, "", "", false, true) /////////////////
+	c.SetSameSite(http.SameSiteLaxMode)
+
+	response := response.ResponseMessage(200, "Success", nil, nil)
+	c.JSON(http.StatusOK, response)
+}
+
 // SendOTP godoc
 //
 //	@Summary		Send sign up OTP to Phone
@@ -57,6 +102,10 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	if !helper.ValidateData(c, &body) {
 		return
 	}
 
@@ -128,7 +177,7 @@ func (ch *AuthHandler) VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	tokenString, _, _ := helper.GenerateJwtToken(0)
+	tokenString, _ := helper.GenerateJwtToken(0)
 	maxAge := int(time.Now().Add(time.Minute * 30).Unix())
 	c.SetCookie("PhoneAuthorization", tokenString, maxAge, "", "", false, true)
 	c.SetSameSite(http.SameSiteLaxMode)
@@ -156,14 +205,18 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 		return
 	}
 
+	if !helper.ValidateData(c, &body) {
+		return
+	}
+
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//use of these variable also mentioned near to the declaration.
 	phoneDataMutex.Lock()
 	Phone, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed.", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
-		c.JSON(http.StatusInternalServerError, response)
+		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("otp expired").Error())
+		c.JSON(http.StatusUnauthorized, response)
 		return
 	}
 
@@ -213,6 +266,10 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
+	if !helper.ValidateData(c, &body) {
+		return
+	}
+
 	UserData, err := uh.authUseCase.ValidateUserLoginCredentials(body)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed", nil, err.Error())
@@ -220,25 +277,18 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	TokenString, RefreshTokenString, err := helper.GenerateJwtToken(UserData.ID)
+	TokenString, err := helper.GenerateJwtToken(UserData.ID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	var coockieName string
-
-	if UserData.IsAdmin {
-		coockieName = "AdminAuthorization"
-	} else {
-		coockieName = "UserAuthorization"
-	}
+	var coockieName = "UserAuthorization"
 
 	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
-	c.SetCookie("RefreshToken", RefreshTokenString, MaxAge, "", "", false, true)
 
 	response := response.ResponseMessage(200, "Login success", nil, nil)
 	c.JSON(http.StatusOK, response)

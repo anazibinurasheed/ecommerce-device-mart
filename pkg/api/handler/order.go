@@ -506,13 +506,13 @@ func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
 }
 
 // WalletTransactionHistory godoc
-// @Summary User wallet transaction history
-// @Description This endpoint will show all the wallet transaction history of the user.
-// @Tags wallet
-// @Produce		json
-// @Success		200	{object}	response.Response
-// @Failure		500	{object}	response.Response
-// @Router			/wallet/history [get]
+//	@Summary		User wallet transaction history
+//	@Description	This endpoint will show all the wallet transaction history of the user.
+//	@Tags			wallet
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/wallet/history [get]
 func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
@@ -529,13 +529,13 @@ func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 
 // MonthlySalesReport godoc
 //
-// @Summary		Monthly sales report
-// @Description	Sales report of last 30 days from the requested time
-// @Tags			sales-report
-// @Produce		json
-// @Success		200	{object}	response.Response
-// @Failure		500	{object}	response.Response
-// @Router			/admin/sales-report [get]
+//	@Summary		Monthly sales report
+//	@Description	Sales report of last 30 days from the requested time
+//	@Tags			sales-report
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/admin/sales-report [get]
 func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
 	salesReport, err := od.orderUseCase.MonthlySalesReport()
 

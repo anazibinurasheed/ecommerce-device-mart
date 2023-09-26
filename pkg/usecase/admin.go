@@ -5,9 +5,7 @@ import (
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type adminUsecase struct {
@@ -19,41 +17,6 @@ func NewAdminUseCase(adminUseCase interfaces.AdminRepository, userUseCase interf
 	return &adminUsecase{
 		adminRepo: adminUseCase,
 		userRepo:  userUseCase,
-	}
-}
-
-func (ac *adminUsecase) AdminSignUp(admin request.SignUpData) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.Password), 10)
-	if err != nil {
-		return fmt.Errorf("Failed to generate hash from password :%s", err)
-	}
-
-	admin.Password = string(hashedPassword)
-	adminData, err := ac.adminRepo.CreateAdmin(admin)
-
-	if err != nil {
-		return fmt.Errorf("Failed to create user :%s", err)
-	}
-	if adminData.ID == 0 {
-		return fmt.Errorf("Failed to verify created user")
-	}
-
-	return nil
-}
-
-func (ac *adminUsecase) SudoAdminLogin(sudoData request.SudoLoginData) error {
-	adminCredentials, err := ac.adminRepo.FindAdminCredentials()
-	if err != nil {
-		return err
-	}
-	if sudoData.Username == "" || sudoData.Password == "" {
-		return fmt.Errorf("Credentials is empty")
-
-	} else if adminCredentials.AdminUsername == sudoData.Username && adminCredentials.AdminPassword == sudoData.Password {
-		return nil
-
-	} else {
-		return fmt.Errorf("Invalid credentials")
 	}
 }
 

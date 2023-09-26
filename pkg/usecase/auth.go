@@ -23,6 +23,22 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 
 }
 
+func (ac *authUseCase) SudoAdminLogin(sudoData request.SudoLoginData) error {
+	adminCredentials, err := ac.adminRepo.FindAdminCredentials()
+	if err != nil {
+		return err
+	}
+	if sudoData.Username == "" || sudoData.Password == "" {
+		return fmt.Errorf("Credentials is empty")
+
+	} else if adminCredentials.AdminUsername == sudoData.Username && adminCredentials.AdminPassword == sudoData.Password {
+		return nil
+
+	} else {
+		return fmt.Errorf("Invalid credentials")
+	}
+}
+
 func (cu *authUseCase) ValidateSignUpRequest(phone request.Phone) (int, error) {
 	userData, err := cu.userRepo.FindUserByPhone(phone.Phone)
 	if err != nil {
@@ -31,7 +47,6 @@ func (cu *authUseCase) ValidateSignUpRequest(phone request.Phone) (int, error) {
 	if userData.ID != 0 {
 		return 0, fmt.Errorf("User already exist with this phone number")
 	}
-
 	//below code is necessary commented out because defined a predefined otp
 
 	// number := strconv.Itoa(phone.Phone)

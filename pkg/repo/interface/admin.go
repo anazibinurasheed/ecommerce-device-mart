@@ -2,7 +2,6 @@ package interfaces
 
 import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
-	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 )
 
@@ -21,5 +20,4 @@ type AdminRepository interface {
 	BlockUserByID(userID int) error
 	UnblockUserByID(userID int) error
 	FindUsersByName(name string) ([]response.UserData, error)
-	CreateAdmin(adminData request.SignUpData) (response.UserData, error)
 }
