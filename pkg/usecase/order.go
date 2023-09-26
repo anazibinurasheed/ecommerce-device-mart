@@ -1,10 +1,11 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -14,6 +15,10 @@ import (
 const (
 	debit  = "debit"
 	credit = "credit"
+)
+
+var (
+	ErrNoOrders = errors.New("no orders created yet")
 )
 
 type orderUseCase struct {
@@ -230,7 +235,7 @@ func (ou *orderUseCase) GetUserOrderHistory(userID, page, count int) ([]response
 }
 
 func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManagement, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.Paginate(page, count)
 
 	orderHistory, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -248,7 +253,7 @@ func (ou *orderUseCase) GetOrderManagement(page, count int) (response.OrderManag
 }
 
 func (ou *orderUseCase) AllOrderOverView(page, count int) ([]response.Orders, error) {
-	startIndex, endIndex := helper.PageNCount(page, count)
+	startIndex, endIndex := helper.Paginate(page, count)
 
 	allOrders, err := ou.orderRepo.GetAllOrderData(startIndex, endIndex)
 	if err != nil {
@@ -429,7 +434,7 @@ func (ou *orderUseCase) UpdateWalletHistory(userID int, amount float32, transact
 		}()
 
 	}
-	return err
+	return nil
 }
 
 func (ou *orderUseCase) GetWalletHistory(userID int) ([]response.WalletTransactionHistory, error) {
@@ -534,39 +539,51 @@ func (ou *orderUseCase) MonthlySalesReport() (response.MonthlySalesReport, error
 	startDate := time.Now().AddDate(0, 0, -30)
 	endDate := time.Now()
 
+	orders, err := ou.orderRepo.GetAllOrderData(0, 20)
+	if err != nil {
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to get order details :%s", err)
+	}
+
+	if len(orders) == 0 {
+		return response.MonthlySalesReport{
+			Date:           startDate.Format("January 2, 2006"),
+			ReportFromDate: time.Now().Format("January 2, 2006"),
+		}, ErrNoOrders
+	}
+
 	topSelling, err := ou.orderRepo.TopSellingProduct(startDate, endDate)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find product :%s", err)
 	}
 
 	product, err := ou.productRepo.FindProductById(topSelling.ProductID)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find product :%s", err)
 	}
 
 	category, err := ou.productRepo.FindCategoryByID(product.CategoryID)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find category :%s", err)
 	}
 
 	totalSalesCount, err := ou.orderRepo.GetTotalSaleCount(startDate, endDate)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find total sales :%s", err)
 	}
 
 	avgOrderValue, err := ou.orderRepo.GetAverageOrderValue(startDate, endDate)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find average order value :%s", err)
 	}
 
 	status, err := ou.orderRepo.GetStatusReturned()
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find returned products :%s", err)
 	}
 
 	revenueData, err := ou.orderRepo.GetTotalRevenue(int(status.ID), startDate, endDate)
 	if err != nil {
-		return response.MonthlySalesReport{}, err
+		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find total revenue :%s", err)
 	}
 
 	return response.MonthlySalesReport{

@@ -97,8 +97,7 @@ definitions:
   request.Phone:
     properties:
       phone:
-        maximum: 10
-        minimum: 2
+        minimum: 10
         type: integer
     required:
     - phone
@@ -145,6 +144,7 @@ definitions:
     - email
     - password
     - username
+    - uuid
     type: object
   request.SudoLoginData:
     properties:
@@ -343,34 +343,6 @@ paths:
       summary: Update a category
       tags:
       - admin category management
-  /admin/create-admin:
-    post:
-      consumes:
-      - application/json
-      description: Sudo admin to create new admin account.
-      parameters:
-      - description: Signup data
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/request.SignUpData'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - BearerAuth: []
-      summary: Create admin
-      tags:
-      - sudo admin
   /admin/orders:
     get:
       description: Retrieves all order overview data.
@@ -788,7 +760,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: For sudo admin login.
+      description: For admin login.
       parameters:
       - description: Sudo admin login credentials
         in: body
@@ -815,9 +787,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Sudo Admin Login
+      summary: Admin Login
       tags:
-      - sudo admin
+      - auth
   /admin/user-management/block-user/{userID}:
     put:
       consumes:
@@ -1211,7 +1183,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User login data, verify it and send otp
       tags:
-      - common
+      - auth
   /logout:
     post:
       consumes:
@@ -1226,7 +1198,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User Logout
       tags:
-      - common
+      - auth
   /orders:
     get:
       description: Retrieves the order history of the current user.
@@ -1925,7 +1897,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Sends an OTP to the provided phone number.
+      description: Sends an OTP to the provided phone number. Should take the uuid
+        and verify the otp using verify otp api then take the uuid and include it
+        also in the sign up credentials. Else will not work
       parameters:
       - description: Phone number
         in: body
@@ -1946,7 +1920,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: Send sign up OTP to Phone
       tags:
-      - common
+      - auth
   /sign-up:
     post:
       consumes:
@@ -1972,12 +1946,13 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User Sign-Up after otp validation
       tags:
-      - common
+      - auth
   /verify-otp:
     post:
       consumes:
       - application/json
-      description: Validates the provided OTP for a phone number.
+      description: Validates the provided OTP for a phone number. Provide the accurate
+        uuid and otp = 0000(predefined).
       parameters:
       - description: OTP
         in: body
@@ -2002,7 +1977,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: Verify sign up  OTP
       tags:
-      - common
+      - auth
   /wallet/:
     get:
       description: Get the wallet details for the authenticated user.
