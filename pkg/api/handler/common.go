@@ -44,7 +44,7 @@ var (
 // SendOTP godoc
 //
 //	@Summary		Send sign up OTP to Phone
-//	@Description	Sends an OTP to the provided phone number.
+//	@Description	Sends an OTP to the provided phone number. Should take the uuid and verify the otp using verify otp api then take the uuid and include it also in the sign up credentials. Else will not work
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
@@ -72,14 +72,19 @@ func (ch *CommonHandler) SendOTP(c *gin.Context) {
 	phoneDataMap[uid] = fmt.Sprint(Phone)
 	phoneDataMutex.Unlock()
 
-	response := response.ResponseMessage(202, "Success, otp sended", uid, nil)
+	go helper.GoClean(phoneDataMap, uid, phoneDataMutex)
+
+	phoneDataMutex.Lock()
+	fmt.Println(phoneDataMap)
+	phoneDataMutex.Unlock()
+	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uid, nil)
 	c.JSON(http.StatusAccepted, response)
 }
 
 // VerifyOTP godoc
 //
 //	@Summary		Verify sign up  OTP
-//	@Description	Validates the provided OTP for a phone number.
+//	@Description	Validates the provided OTP for a phone number. Provide the accurate uuid and otp = 0000(predefined).
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
@@ -101,7 +106,7 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 	number, ok := phoneDataMap[body.UUID]
 	phoneDataMutex.Unlock()
 	if !ok {
-		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("failed to fetch phone number from phoneDataMap").Error())
+		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("otp expired").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
@@ -130,7 +135,7 @@ func (ch *CommonHandler) VerifyOTP(c *gin.Context) {
 
 // @Summary		User Logout
 // @Description	Logs out user and remove cookie from browser.
-// @Tags			aommon
+// @Tags			auth
 // @Accept			json
 // @Produce		json
 // @Success		200	{object}	response.Response{}

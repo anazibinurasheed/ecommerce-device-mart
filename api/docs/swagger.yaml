@@ -97,8 +97,6 @@ definitions:
   request.Phone:
     properties:
       phone:
-        maximum: 10
-        minimum: 2
         type: integer
     required:
     - phone
@@ -1211,7 +1209,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User login data, verify it and send otp
       tags:
-      - common
+      - auth
   /logout:
     post:
       consumes:
@@ -1226,7 +1224,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User Logout
       tags:
-      - common
+      - auth
   /orders:
     get:
       description: Retrieves the order history of the current user.
@@ -1925,7 +1923,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Sends an OTP to the provided phone number.
+      description: Sends an OTP to the provided phone number. Should take the uuid
+        and verify the otp using verify otp api then take the uuid and include it
+        also in the sign up credentials. Else will not work
       parameters:
       - description: Phone number
         in: body
@@ -1946,7 +1946,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: Send sign up OTP to Phone
       tags:
-      - common
+      - auth
   /sign-up:
     post:
       consumes:
@@ -1972,12 +1972,13 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: User Sign-Up after otp validation
       tags:
-      - common
+      - auth
   /verify-otp:
     post:
       consumes:
       - application/json
-      description: Validates the provided OTP for a phone number.
+      description: Validates the provided OTP for a phone number. Provide the accurate
+        uuid and otp = 0000(predefined).
       parameters:
       - description: OTP
         in: body
@@ -2002,7 +2003,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: Verify sign up  OTP
       tags:
-      - common
+      - auth
   /wallet/:
     get:
       description: Get the wallet details for the authenticated user.

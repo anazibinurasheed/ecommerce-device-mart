@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"time"
+
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -42,9 +44,9 @@ func (ud *userDatabase) FindUserByID(id int) (response.UserData, error) {
 }
 
 func (ud *userDatabase) CreateUser(user request.SignUpData) (response.UserData, error) {
-	query := `INSERT INTO users (user_name,  email, phone, password,created_at) VALUES ($1,$2,$3,$4) RETURNING id,user_name,email,phone;`
+	query := `INSERT INTO users (user_name,  email, phone, password,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id,user_name,email,phone;`
 	var userData response.UserData
-	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password).Scan(&userData).Error
+	err := ud.DB.Raw(query, user.UserName, user.Email, user.Phone, user.Password, time.Now(), time.Now()).Scan(&userData).Error
 
 	return userData, err
 }

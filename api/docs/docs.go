@@ -1521,7 +1521,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User login data, verify it and send otp",
                 "parameters": [
@@ -1573,7 +1573,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User Logout",
                 "responses": {
@@ -2634,7 +2634,7 @@ const docTemplate = `{
         },
         "/send-otp": {
             "post": {
-                "description": "Sends an OTP to the provided phone number.",
+                "description": "Sends an OTP to the provided phone number. Should take the uuid and verify the otp using verify otp api then take the uuid and include it also in the sign up credentials. Else will not work",
                 "consumes": [
                     "application/json"
                 ],
@@ -2642,7 +2642,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "Send sign up OTP to Phone",
                 "parameters": [
@@ -2682,7 +2682,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "User Sign-Up after otp validation",
                 "parameters": [
@@ -2714,7 +2714,7 @@ const docTemplate = `{
         },
         "/verify-otp": {
             "post": {
-                "description": "Validates the provided OTP for a phone number.",
+                "description": "Validates the provided OTP for a phone number. Provide the accurate uuid and otp = 0000(predefined).",
                 "consumes": [
                     "application/json"
                 ],
@@ -2722,7 +2722,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "common"
+                    "auth"
                 ],
                 "summary": "Verify sign up  OTP",
                 "parameters": [
@@ -2986,9 +2986,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "phone": {
-                    "type": "integer",
-                    "maximum": 10,
-                    "minimum": 2
+                    "type": "integer"
                 }
             }
         },

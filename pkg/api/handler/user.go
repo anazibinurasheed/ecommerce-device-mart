@@ -28,7 +28,7 @@ func NewUserHandler(useCase services.UserUseCase) *UserHandler {
 //
 //	@Summary		User Sign-Up after otp validation
 //	@Description	Creates a new user account.
-//	@Tags			common
+//	@Tags			auth
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.SignUpData	true	"User Sign-Up Data"
@@ -83,7 +83,7 @@ func (u *UserHandler) UserSignUp(c *gin.Context) {
 //
 //	@Summary		User login data, verify it and send otp
 //	@Description	Logs in a user and sends an OTP for verification.
-//	@Tags			common
+//	@Tags			auth
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.LoginData	true	"User login data"

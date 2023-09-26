@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -537,6 +538,12 @@ func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 // @Router			/admin/sales-report [get]
 func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
 	salesReport, err := od.orderUseCase.MonthlySalesReport()
+
+	if err == usecase.ErrNoOrders {
+		response := response.ResponseMessage(http.StatusOK, "No orders created yet", salesReport, nil)
+		c.JSON(http.StatusOK, response)
+		return
+	}
 
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate the sales report", nil, err.Error())

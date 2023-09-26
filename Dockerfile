@@ -6,7 +6,7 @@ WORKDIR /devicemart
 COPY  . . 
 RUN go mod download
 # first path is the out put path and the second path is the main path
-RUN go build -v -o ./build/api ./cmd/main
+RUN go build -v -o ./build/bin ./cmd/main
 
 # Run the tests in the container
 FROM build-stage AS run-test-stage
