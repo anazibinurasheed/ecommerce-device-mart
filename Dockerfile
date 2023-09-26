@@ -16,8 +16,8 @@ RUN go test -v ./...
 # Deploy the application binary into a lean image
 FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /
-COPY  --from=build-stage /devicemart/build/api /
+COPY  --from=build-stage /devicemart/build/bin/ /
 COPY  --from=build-stage /devicemart/.env /
-COPY  --from=build-stage /devicemart/templates /templates
+COPY  --from=build-stage /devicemart/web /web
 EXPOSE 3000
 CMD [ "./main" ]

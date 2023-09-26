@@ -10,3 +10,9 @@ docker-compose.yml
 
 notes/
 notes
+
+postgres-configmap.yml
+postgres-k8s.yml
+postgres-secret.yml
+devicemart-k8s.yml
+deployments
