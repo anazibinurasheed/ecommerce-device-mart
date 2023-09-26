@@ -7,7 +7,7 @@ import (
 	http "github.com/anazibinurasheed/project-device-mart/pkg/api"
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
-	"github.com/anazibinurasheed/project-device-mart/pkg/repository"
+	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
 	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
@@ -35,7 +35,7 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		handler.NewCouponHandler,
 
-		handler.NewRefferalHandler,
+		handler.NewReferralHandler,
 
 		usecase.NewAdminUseCase,
 
@@ -51,23 +51,23 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		usecase.NewCouponUseCase,
 
-		usecase.NewRefferalUseCase,
+		usecase.NewReferralUseCase,
 
-		repository.NewAdminRepository,
+		repo.NewAdminRepository,
 
-		repository.NewUserRepository,
+		repo.NewUserRepository,
 
-		repository.NewProductRepository,
+		repo.NewProductRepository,
 
-		repository.NewCartRepository,
+		repo.NewCartRepository,
 
-		repository.NewPaymentRepository,
+		repo.NewPaymentRepository,
 
-		repository.NewOrderRepository,
+		repo.NewOrderRepository,
 
-		repository.NewCouponRepository,
+		repo.NewCouponRepository,
 
-		repository.NewRefferalRepository,
+		repo.NewReferralRepository,
 
 		http.NewServerHTTP)
 

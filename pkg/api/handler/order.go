@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -32,7 +33,7 @@ func NewOrderHandler(useCase services.OrderUseCase) *OrderHandler {
 //	@Failure		500	{object}	response.Response
 //	@Router			/checkout [get]
 func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	CheckOutDetails, err := oh.orderUseCase.CheckOutDetails(userID)
 	if err != nil {
@@ -41,7 +42,7 @@ func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Succussful.", CheckOutDetails, nil)
+	response := response.ResponseMessage(200, "Success.", CheckOutDetails, nil)
 	c.JSON(http.StatusOK, response)
 
 }
@@ -54,10 +55,10 @@ func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/payment/order-cod-confirmed [post]
+//	@Router			/payment/cod-confirm [post]
 func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 
-	UserID, _ := helper.GetUserIDFromContext(c)
+	UserID, _ := helper.GetIDFromContext(c)
 	err := oh.orderUseCase.ConfirmedOrder(UserID, 1) //1 is for  payment cash on delivery
 
 	if err != nil {
@@ -71,7 +72,7 @@ func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 
 }
 
-// MakePaymentRazorpay godoc
+// GetOnlinePayment godoc
 //
 //	@Summary		Make payment razorpay
 //	@Description	Make payment using razorpay page .
@@ -79,9 +80,9 @@ func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 //	@Produce		json
 //	@Success		200
 //	@Failure		500	{object}	response.Response
-//	@Router			/payment/razorpay [get]
-func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+//	@Router			/payment/online [get]
+func (oh *OrderHandler) GetOnlinePayment(c *gin.Context) {
+	userID, _ := helper.GetIDFromContext(c)
 	PaymentDetails, err := oh.orderUseCase.GetRazorPayDetails(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
@@ -96,7 +97,7 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 	})
 }
 
-// ProccessRazorpayOrder is the handler function for verify  razorpay payment.
+// ProcessOnlinePayment is the handler function for verify  razorpay payment.
 //
 //	@Summary		Verify razorpay payment
 //	@Description	Verify razorpay payment using razorpay credentials .
@@ -107,8 +108,8 @@ func (oh *OrderHandler) MakePaymentRazorpay(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/payment/razorpay/process-order [post]
-func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
+//	@Router			/payment/online/process [post]
+func (oh *OrderHandler) ProcessOnlinePayment(c *gin.Context) {
 	var body request.VerifyPayment
 	if err := c.BindJSON(&body); err != nil {
 		response := response.ResponseMessage(403, "Invalid input", nil, err.Error())
@@ -116,16 +117,17 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
-	err := oh.orderUseCase.VerifyRazorPayPayment(body.Signature, body.RazorpayOrderId, body.RazorPayPaymentId)
+	err := oh.orderUseCase.VerifyRazorPayPayment(body.Signature, body.RazorpayOrderID, body.RazorPayPaymentID)
 	if err != nil {
 		response := response.ResponseMessage(403, "Failed", nil, err.Error())
 		c.JSON(http.StatusForbidden, response)
 		return
 
 	}
-	err = oh.orderUseCase.ConfirmedOrder(userId, 2) //2 is reffering payment method razorpay(online)
+
+	err = oh.orderUseCase.ConfirmedOrder(userId, 2) //2 is referring payment method razorpay(online)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -146,7 +148,7 @@ func (oh *OrderHandler) ProccessRazorpayOrder(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/my-orders [get]
+//	@Router			/orders [get]
 func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -162,7 +164,7 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetUserIDFromContext(c)
+	userId, _ := helper.GetIDFromContext(c)
 
 	orderHistory, err := oh.orderUseCase.GetUserOrderHistory(userId, page, count)
 	if err != nil {
@@ -314,7 +316,7 @@ func (oh *OrderHandler) UpdateOrderStatus(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/my-orders/cancel/{orderID} [post]
+//	@Router			/orders/cancel/{orderID} [post]
 func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("orderID"))
 	if err != nil {
@@ -338,7 +340,8 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 //
 //	@Summary		Return order
 //	@Description	Return the order if the order is valid for return.Amount will be added to the user's wallet.
-//	@Description	If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
+//	@Description	If the user has used a coupon for the order, the discount amount will be recalculated based
+//	@Description	on the percentage used and deducted from the refunding amount.
 //	@Tags			user orders
 //	@Accept			json
 //	@Produce		json
@@ -346,7 +349,7 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/my-orders/return/{orderID} [post]
+//	@Router			/orders/return/{orderID} [post]
 func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("orderID"))
 	if err != nil {
@@ -364,19 +367,18 @@ func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// DownloadInvoice godoc
+// CreateInvoice godoc
 //
 //	@Summary		Download invoice
 //	@Description	Download the invoice as a PDF file.
 //	@Tags			user orders
 //	@Produce		application/pdf
 //	@Param			orderID	path		int	true	"Order ID"
-//	@Success		200		{file}		application/pdf
+//	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/my-orders/download-invoice/{orderID} [get]
-func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
-	// Sample invoice data (you can replace this with your actual invoice data)
+//	@Router			/orders/invoice/{orderID} [get]
+func (oh *OrderHandler) CreateInvoice(c *gin.Context) {
 	orderID, err := strconv.Atoi(c.Param("orderID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
@@ -384,19 +386,15 @@ func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
 		return
 	}
 
-	pdfData, err := oh.orderUseCase.CreateInvoice(orderID)
+	invoiceDetails, err := oh.orderUseCase.CreateInvoice(orderID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	// Set the response headers for downloading the file
-	c.Header("Content-Type", "application/pdf")
-	c.Header("Content-Disposition", "attachment; filename=invoice.pdf")
+	c.JSON(http.StatusOK, invoiceDetails)
 
-	// Send the PDF data as the response
-	c.Data(http.StatusOK, "application/pdf", pdfData)
 }
 
 // CreateUserWallet godoc
@@ -410,7 +408,7 @@ func (oh *OrderHandler) DownloadInvoice(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/wallet/create [post]
 func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err := oh.orderUseCase.CreateUserWallet(userID)
 	if err != nil {
@@ -434,7 +432,7 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //	@Failure		500	{object}	response.Response
 //	@Router			/wallet/ [get]
 func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	Wallet, err := oh.orderUseCase.GetUserWallet(userID)
 	if err != nil {
@@ -448,18 +446,6 @@ func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 }
 
 func (od *OrderHandler) WebhookHandler(c *gin.Context) {
-	// // Get the raw webhook request body
-	// webhookBody, _ := c.GetRawData()
-
-	// // Get the signature from the X-Razorpay-Signature header
-	// webhookSignature := c.GetHeader("X-Razorpay-Signature")
-
-	// Validate the webhook signature
-	// if !helper.ValidateWebhookSignature(string(webhookBody), webhookSignature) {
-	// 	fmt.Println("errr")
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid webhook signature"})
-	// 	return
-	// }
 
 	// Parse the webhook event data
 	var eventData map[string]interface{}
@@ -489,9 +475,9 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 	}
 }
 
-// WalletPayment godoc
+// PayUsingWallet godoc
 //
-//	@Summary		Wallet payment
+//	@Summary		Pay using wallet
 //	@Description	User can purchase using wallet
 //	@Tags			checkout
 //	@Produce		json
@@ -499,8 +485,8 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 //	@Failure		400	{object}	response.Response
 //	@Failure		500	{object}	response.Response
 //	@Router			/payment/wallet [post]
-func (od *OrderHandler) WalletPayment(c *gin.Context) {
-	userID, _ := helper.GetUserIDFromContext(c)
+func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
+	userID, _ := helper.GetIDFromContext(c)
 	err := od.orderUseCase.ValidateWalletPayment(userID)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
@@ -519,6 +505,52 @@ func (od *OrderHandler) WalletPayment(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (od *OrderHandler) WalletPaymentHistory(c *gin.Context) {
+// WalletTransactionHistory godoc
+//	@Summary		User wallet transaction history
+//	@Description	This endpoint will show all the wallet transaction history of the user.
+//	@Tags			wallet
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/wallet/history [get]
+func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
+	userID, _ := helper.GetIDFromContext(c)
 
+	walletHistory, err := od.orderUseCase.GetWalletHistory(userID)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed to get wallet history", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "success", walletHistory, nil)
+	c.JSON(http.StatusOK, response)
+}
+
+// MonthlySalesReport godoc
+//
+//	@Summary		Monthly sales report
+//	@Description	Sales report of last 30 days from the requested time
+//	@Tags			sales-report
+//	@Produce		json
+//	@Success		200	{object}	response.Response
+//	@Failure		500	{object}	response.Response
+//	@Router			/admin/sales-report [get]
+func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
+	salesReport, err := od.orderUseCase.MonthlySalesReport()
+
+	if err == usecase.ErrNoOrders {
+		response := response.ResponseMessage(http.StatusOK, "No orders created yet", salesReport, nil)
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed to generate the sales report", nil, err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "Success", salesReport, nil)
+	c.JSON(http.StatusInternalServerError, response)
 }

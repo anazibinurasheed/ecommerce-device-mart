@@ -67,6 +67,7 @@ func (ph *ProductHandler) ReadAllCategories(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
@@ -103,7 +104,7 @@ func (ph *ProductHandler) ReadAllCategories(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		400	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/admin/category/update-category/{categoryID} [patch]
+//	@Router			/admin/category/update-category/{categoryID} [put]
 func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 	var body request.Category
 	if err := c.BindJSON(&body); err != nil {
@@ -140,7 +141,7 @@ func (ph *ProductHandler) UpdateCategory(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		400	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/admin/category/block-category/{categoryID} [patch]
+//	@Router			/admin/category/block-category/{categoryID} [put]
 func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
@@ -171,7 +172,7 @@ func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 //	@Success		200	{object}	response.Response
 //	@Failure		400	{object}	response.Response
 //	@Failure		500	{object}	response.Response
-//	@Router			/admin/category/unblock-category/{categoryID} [patch]
+//	@Router			/admin/category/unblock-category/{categoryID} [put]
 func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
@@ -296,7 +297,7 @@ func (ph *ProductHandler) DisplayAllProductsToAdmin(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/admin/products/update-product/{productID} [patch]
+//	@Router			/admin/products/update-product/{productID} [put]
 func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 	var body request.Product
 	if err := c.BindJSON(&body); err != nil {
@@ -334,7 +335,7 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/admin/products/block-product/{productID} [patch]
+//	@Router			/admin/products/block-product/{productID} [put]
 func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -364,7 +365,7 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/admin/products/unblock-product/{productID} [patch]
+//	@Router			/admin/products/unblock-product/{productID} [put]
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -397,7 +398,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		404		{object}	response.Response
 //	@Failure		503		{object}	response.Response
-//	@Router			/products [get]
+//	@Router			/product/ [get]
 func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -413,7 +414,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 		return
 	}
 
-	products, err := ph.productUseCase.DisplayAllAvailabeProductsToUser(page, count)
+	products, err := ph.productUseCase.DisplayAllAvailableProductsToUser(page, count)
 	if err != nil {
 		response := response.ResponseMessage(503, "Failed to retrieve products", nil, err.Error())
 		c.JSON(http.StatusServiceUnavailable, response)
@@ -430,7 +431,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// ViewProductItem godoc
+// ViewIndividualProduct godoc
 //
 //	@Summary		View a product
 //	@Description	Retrieves details of a product with the specified ID.
@@ -440,8 +441,8 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		503			{object}	response.Response
-//	@Router			/product-item/{productID} [get]
-func (pd *ProductHandler) ViewProductItem(c *gin.Context) {
+//	@Router			/product/{productID} [get]
+func (pd *ProductHandler) ViewIndividualProduct(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -480,7 +481,7 @@ func (pd *ProductHandler) ValidateRatingRequest(c *gin.Context) {
 		return
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 	err = pd.productUseCase.ValidateProductRatingRequest(userID, productID)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed, user is unauthorized to perform a rating", nil, err.Error())
@@ -528,7 +529,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 
 	}
 
-	userID, _ := helper.GetUserIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
 
 	err = pd.productUseCase.InsertNewProductRating(userID, productID, body)
 	if err != nil {
@@ -554,7 +555,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
-//	@Router			/products/search [post]
+//	@Router			/product/search [post]
 func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
@@ -602,7 +603,7 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Success		200			{object}	response.Response
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/products-by-category/{categoryID} [get]
+//	@Router			/category/{categoryID} [get]
 func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {

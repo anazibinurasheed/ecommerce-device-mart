@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repository/interface"
+	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -22,56 +22,6 @@ func NewUserUseCase(repo interfaces.UserRepository) services.UserUseCase {
 	return &userUseCase{
 		userRepo: repo,
 	}
-}
-
-func (u *userUseCase) SignUp(user request.SignUpData) error {
-	userData, err := u.userRepo.FindUserByPhone(user.Phone)
-	if err != nil {
-		return fmt.Errorf("Failed to find user by phone :%s", err)
-	}
-	if userData.ID != 0 {
-		return fmt.Errorf("User already exist with this phone number")
-	}
-
-	userData, err = u.userRepo.FindUserByEmail(user.Email)
-	if err != nil {
-		return fmt.Errorf("Failed to find user by email :%s", err)
-	}
-	if userData.ID != 0 {
-		return fmt.Errorf("User already exist with this email address")
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	if err != nil {
-		return fmt.Errorf("failed to generate hash from password :%s", err)
-	}
-
-	user.Password = string(hashedPassword)
-
-	if _, err := u.userRepo.CreateUser(user); err != nil {
-		return fmt.Errorf("Failed to save user on db, user sign up failed :%s", err)
-	}
-
-	return nil
-}
-
-func (u *userUseCase) ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error) {
-	userData, err := u.userRepo.FindUserByPhone(user.Phone)
-	if err != nil {
-		return response.UserData{}, err
-	} else if userData.ID == 0 {
-		return response.UserData{}, fmt.Errorf("User dont have an account")
-	} else if userData.IsBlocked {
-		return response.UserData{}, fmt.Errorf("User have been blocked")
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(user.Password)); err != nil {
-		return response.UserData{}, fmt.Errorf("incorrect password")
-	}
-
-	userData.Password = ""
-	return userData, nil
-
 }
 
 func (u *userUseCase) FindUserById(userID int) (response.UserData, error) {
@@ -123,7 +73,7 @@ func (u *userUseCase) AddNewAddress(userID int, address request.Address) error {
 
 		setDefaultAddress, err := u.userRepo.SetDefaultAddressStatus(true, int(createdAddress.ID), userID)
 		if err != nil {
-			return fmt.Errorf("failed to set default address :%s", err)
+			return fmt.Errorf("Failed to set default address :%s", err)
 		}
 
 		if setDefaultAddress.ID == 0 {

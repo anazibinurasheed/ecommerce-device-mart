@@ -16,7 +16,9 @@ type OrderUseCase interface {
 	GetUserWallet(userID int) (response.Wallet, error)
 	CreateUserWallet(userID int) error
 	ValidateWalletPayment(userID int) error
-	CreateInvoice(orderID int) ([]byte, error)
+	CreateInvoice(orderID int) (response.Invoice, error)
+	MonthlySalesReport() (response.MonthlySalesReport, error)
+	GetWalletHistory(userID int) ([]response.WalletTransactionHistory, error)
 }
 
 // type OrderUseCase interface {

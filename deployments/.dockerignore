@@ -1,0 +1,18 @@
+.dockerignore
+docker-compose.yml
+
+#exclude git history and configuaration
+.git/
+.gitignore
+
+# Custom
+.vscode/
+
+notes/
+notes
+
+postgres-configmap.yml
+postgres-k8s.yml
+postgres-secret.yml
+devicemart-k8s.yml
+deployments

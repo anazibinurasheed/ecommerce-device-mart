@@ -13,4 +13,7 @@ app1.html
 codeTrash.txt
 postgres-secret.yml
 postgres-configmap.yml
-
+out.pdf
+demoPrograms
+notes
+.gitignore

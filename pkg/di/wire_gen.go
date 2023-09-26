@@ -11,7 +11,7 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
-	"github.com/anazibinurasheed/project-device-mart/pkg/repository"
+	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
 	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 )
 
@@ -22,30 +22,30 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepository := repository.NewUserRepository(gormDB)
+	userRepository := repo.NewUserRepository(gormDB)
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
-	adminRepository := repository.NewAdminRepository(gormDB)
+	adminRepository := repo.NewAdminRepository(gormDB)
 	adminUseCase := usecase.NewAdminUseCase(adminRepository, userRepository)
 	adminHandler := handler.NewAdminHandler(adminUseCase)
-	productRepository := repository.NewProductRepository(gormDB)
-	orderRepository := repository.NewOrderRepository(gormDB)
+	productRepository := repo.NewProductRepository(gormDB)
+	orderRepository := repo.NewOrderRepository(gormDB)
 	productUseCase := usecase.NewProductUseCase(productRepository, orderRepository)
 	productHandler := handler.NewProductHandler(productUseCase)
 	commonUseCase := usecase.NewCommonUseCase(userRepository, adminRepository)
-	commonHandler := handler.NewCommonHandler(commonUseCase)
-	cartRepository := repository.NewCartRepository(gormDB)
-	couponRepository := repository.NewCouponRepository(gormDB)
+	commonHandler := handler.NewAuthHandler(commonUseCase)
+	cartRepository := repo.NewCartRepository(gormDB)
+	couponRepository := repo.NewCouponRepository(gormDB)
 	cartUseCase := usecase.NewCartUseCase(cartRepository, couponRepository)
 	cartHandler := handler.NewCartHandler(cartUseCase)
-	paymentRepository := repository.NewPaymentRepository(gormDB)
+	paymentRepository := repo.NewPaymentRepository(gormDB)
 	orderUseCase := usecase.NewOrderUseCase(userRepository, cartUseCase, paymentRepository, orderRepository, couponRepository, productRepository)
 	orderHandler := handler.NewOrderHandler(orderUseCase)
 	couponUseCase := usecase.NewCouponUseCase(couponRepository)
 	couponHandler := handler.NewCouponHandler(couponUseCase)
-	refferalRepository := repository.NewReferralRepository(gormDB)
-	refferalUseCase := usecase.NewRefferalUseCase(refferalRepository, orderRepository)
-	refferalHandler := handler.NewReferralHandler(refferalUseCase)
-	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, refferalHandler)
+	referralRepository := repo.NewReferralRepository(gormDB)
+	referralUseCase := usecase.NewReferralUseCase(referralRepository, orderRepository)
+	referralHandler := handler.NewReferralHandler(referralUseCase)
+	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
 	return serverHTTP, nil
 }

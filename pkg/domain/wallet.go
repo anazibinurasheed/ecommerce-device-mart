@@ -16,5 +16,4 @@ type WalletTransactionHistory struct {
 	User            User      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Amount          float32   `gorm:"not null"`
 	TransactionType string    `gorm:"not null"` // "credit" or "debit"
-	AmountDisplay   string    `gorm:"not null"`
 }

@@ -12,5 +12,5 @@ type OldPassword struct {
 	Password string `json:"old_password" binding:"required"`
 }
 type Phone struct {
-	Phone int `json:"phone" binding:"required,min=2,max=10"`
+	Phone int `json:"phone" validate:"required,min=10" binding:"required"`
 }

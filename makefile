@@ -15,10 +15,10 @@ ${BINARY_DIR}:
 	mkdir -p $(BINARY_DIR)
 
 build: ${BINARY_DIR} ## Compile the code, build Executable File
-	$(GOCMD) build -o $(BINARY_DIR) -v ./cmd/api
+	$(GOCMD) build -o $(BINARY_DIR) -v ./cmd/main
 
 run: ## Start application
-	$(GOCMD) run ./cmd/api
+	$(GOCMD) run ./cmd/main
 
 
 
@@ -45,7 +45,7 @@ wire: ## Generate wire_gen.go
 	cd pkg/di && wire
 
 swag: ## Generate swagger docs
-	swag init -g pkg/api/server.go -o ./cmd/api/docs
+	swag init -g pkg/api/server.go -o ./api/docs
 swag-fmt: ##Format swagger annotations
 	swag fmt pkg/api
 help: ## Display this help screen
