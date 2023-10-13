@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
@@ -24,22 +23,7 @@ func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
 	}
 }
 
-var (
-	//phoneDataMap
-	// The phoneDataMap is a map used to store users' phone numbers retrieved from an API.
-	// The stored phone number will be used for OTP verification and to fill up sign up credentials without asking the user to enter
-	// the phone number again.
-	// It is stored in the map with a unique key.
-	// The unique key will be passed to the frontend.
-	//From the frontend, the key will then be passed to the next API that requires the phone number.
-	// Once the user completes all the authentication steps, the phone number will be deleted from the phoneDataMap, and the phone number,
-	//along with other user sign up credentials, will be inserted into the database.
-	//Theme : To decrease the amount of database operations
-	phoneDataMap = make(map[string]string)
-	//Here we are using normal map instead of sync.Map so we should ensure  not to come  race condition .
-	//phoneDataMutex is for preventing from race condition.
-	phoneDataMutex = new(sync.Mutex)
-)
+var contact = helper.NewPhone()
 
 // SULogin godoc.
 //
@@ -69,7 +53,7 @@ func (ah *AuthHandler) SULogin(c *gin.Context) {
 		return
 	}
 
-	TokenString, err := helper.GenerateJwtToken(001) //for su admin
+	TokenString, err := helper.GenerateJwtToken(001)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -78,8 +62,6 @@ func (ah *AuthHandler) SULogin(c *gin.Context) {
 
 	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
 	c.SetCookie("SudoAdminAuthorization", TokenString, MaxAge, "", "", false, true)
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("AdminAuthorization", TokenString, MaxAge, "", "", false, true) /////////////////
 	c.SetSameSite(http.SameSiteLaxMode)
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
@@ -109,28 +91,25 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 		return
 	}
 
-	Phone, err := ch.authUseCase.ValidateSignUpRequest(body)
+	phone, err := ch.authUseCase.ValidateSignUpRequest(body)
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	phoneDataMutex.Lock()
-	uid := helper.GenerateUniqueID()
-	phoneDataMap[uid] = fmt.Sprint(Phone)
-	phoneDataMutex.Unlock()
+	uuid := helper.GenerateUniqueID()
+	fmt.Println(phone)
+	contact.Set(uuid, fmt.Sprint(phone))
 
-	go helper.GoClean(phoneDataMap, uid, phoneDataMutex)
+	go contact.Clean(uuid)
 
 	go func() {
 		time.Sleep(65 * time.Second)
-		phoneDataMutex.Lock()
-		fmt.Println(phoneDataMap)
-		phoneDataMutex.Unlock()
+		contact.Print(uuid)
 	}()
 
-	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uid, nil)
+	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uuid, nil)
 	c.JSON(http.StatusAccepted, response)
 }
 
@@ -155,17 +134,22 @@ func (ch *AuthHandler) VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	phoneDataMutex.Lock()
-	number, ok := phoneDataMap[body.UUID]
-	phoneDataMutex.Unlock()
+	phone, ok, _ := contact.Get(body.UUID)
+	if ok {
+		contact.Verified(body.UUID, phone)
+	}
+
 	if !ok {
 		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("otp expired").Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	status, err := helper.CheckOtp(number, body.Otp)
+	status, err := helper.CheckOtp(phone, body.Otp)
 	if err != nil {
+
+		contact.NotVerified(body.UUID, phone)
+
 		response := response.ResponseMessage(400, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
@@ -211,24 +195,33 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 
 	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
 	//use of these variable also mentioned near to the declaration.
-	phoneDataMutex.Lock()
-	Phone, ok := phoneDataMap[body.UUID]
-	phoneDataMutex.Unlock()
-	if !ok {
-		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("otp expired").Error())
+	phoneStr, ok, verified := contact.Get(body.Uuid)
+
+	switch {
+	case !ok:
+		fmt.Println("entered")
+		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("otp not verified").Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
-	}
 
-	Number, err := strconv.Atoi(Phone)
+	case !verified:
+		fmt.Println("entered 2")
+		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("invalid try, user not verified otp").Error())
+		c.JSON(http.StatusUnauthorized, response)
+		return
+
+	}
+	fmt.Println(contact)
+	fmt.Println(phoneStr)
+	phone, err := strconv.Atoi(phoneStr)
 	if err != nil {
-		response := response.ResponseMessage(200, "Failed.", nil, err.Error())
+		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 
 	}
 
-	body.Phone = Number
+	body.Phone = phone
 
 	err = u.authUseCase.SignUp(body)
 	if err != nil {
@@ -237,9 +230,7 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 		return
 	}
 
-	phoneDataMutex.Lock()
-	delete(phoneDataMap, body.UUID)
-	phoneDataMutex.Unlock()
+	contact.Delete(body.Uuid)
 
 	response := response.ResponseMessage(200, "Success, account created", nil, nil)
 	c.JSON(http.StatusOK, response)
