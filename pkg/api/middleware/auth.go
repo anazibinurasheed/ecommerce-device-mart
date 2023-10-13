@@ -35,7 +35,6 @@ func AuthChangePass(c *gin.Context) {
 	}
 }
 
-
 func TokenAuth(c *gin.Context, name string) bool {
 	tokenString, err := c.Cookie(name + "Authorization")
 
