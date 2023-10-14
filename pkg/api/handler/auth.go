@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	request "github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -15,6 +16,7 @@ import (
 
 type AuthHandler struct {
 	authUseCase services.AuthUseCase
+	token       auth.TokenManager
 }
 
 func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
@@ -53,16 +55,14 @@ func (ah *AuthHandler) SULogin(c *gin.Context) {
 		return
 	}
 
-	TokenString, err := helper.GenerateJwtToken(001)
+	TokenString, err := ah.token.GenerateAdminToken()
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
-	c.SetCookie("SudoAdminAuthorization", TokenString, MaxAge, "", "", false, true)
-	c.SetSameSite(http.SameSiteLaxMode)
+	ah.token.SetTokenHeader(c, TokenString)
 
 	response := response.ResponseMessage(200, "Success", nil, nil)
 	c.JSON(http.StatusOK, response)
@@ -99,7 +99,6 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 	}
 
 	uuid := helper.GenerateUniqueID()
-	fmt.Println(phone)
 	contact.Set(uuid, fmt.Sprint(phone))
 
 	go contact.Clean(uuid)
@@ -107,6 +106,7 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 	go func() {
 		time.Sleep(65 * time.Second)
 		contact.Print(uuid)
+		fmt.Println(contact)
 	}()
 
 	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uuid, nil)
@@ -125,7 +125,7 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Router			/verify-otp [post]
-func (ch *AuthHandler) VerifyOTP(c *gin.Context) {
+func (ah *AuthHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -161,11 +161,6 @@ func (ch *AuthHandler) VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	tokenString, _ := helper.GenerateJwtToken(0)
-	maxAge := int(time.Now().Add(time.Minute * 30).Unix())
-	c.SetCookie("PhoneAuthorization", tokenString, maxAge, "", "", false, true)
-	c.SetSameSite(http.SameSiteLaxMode)
-
 	response := response.ResponseMessage(202, "Success, verified phone number", body.UUID, nil)
 	c.JSON(http.StatusAccepted, response)
 }
@@ -193,30 +188,25 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 		return
 	}
 
-	//phoneDataMutex and phoneDataMap declared on the top of common.go file .
-	//use of these variable also mentioned near to the declaration.
 	phoneStr, ok, verified := contact.Get(body.Uuid)
 
 	switch {
 	case !ok:
-		fmt.Println("entered")
 		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("otp not verified").Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
 
 	case !verified:
-		fmt.Println("entered 2")
 		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("invalid try, user not verified otp").Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
 
 	}
-	fmt.Println(contact)
-	fmt.Println(phoneStr)
+
 	phone, err := strconv.Atoi(phoneStr)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 
 	}
@@ -268,35 +258,30 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	TokenString, err := helper.GenerateJwtToken(UserData.ID)
+	TokenString, err := uh.token.GenerateUserToken(UserData.ID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	var coockieName = "UserAuthorization"
+	uh.token.SetTokenHeader(c, TokenString)
 
-	MaxAge := int(time.Now().Add(time.Hour * 24 * 30).Unix())
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(coockieName, TokenString, MaxAge, "", "", false, true)
+	response := response.ResponseMessage(200, "Login success", gin.H{"token": TokenString}, nil)
 
-	response := response.ResponseMessage(200, "Login success", nil, nil)
 	c.JSON(http.StatusOK, response)
 }
 
 // @Summary		User Logout
 // @Description	Logs out user and remove cookie from browser.
 // @Tags			auth
+// @Security		JWT
 // @Accept			json
 // @Produce		json
-// @Success		200	{object}	response.Response{}
+// @Success		202	{object}	response.Response{}
 // @Router			/logout [post]
-func (uh *AuthHandler) Logout(c *gin.Context) {
-
-	helper.DeleteCookie("AdminAuthorization", c)
-	helper.DeleteCookie("SudoAdminAuthorization", c)
-	helper.DeleteCookie("UserAuthorization", c)
+func (ah *AuthHandler) Logout(c *gin.Context) {
+	ah.token.RemoveToken(c)
 
 	response := response.ResponseMessage(200, "Logged out, success", nil, nil)
 	c.JSON(http.StatusAccepted, response)

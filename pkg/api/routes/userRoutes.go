@@ -1,23 +1,23 @@
 package routes
 
 import (
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
 
 	router.POST("/send-otp", authHandler.SendOTP)
 	router.POST("/verify-otp", authHandler.VerifyOTP)
-	router.POST("/sign-up", middleware.Verified, authHandler.UserSignUp)
+	router.POST("/sign-up", authHandler.UserSignUp)
 	router.POST("/login", authHandler.UserLogin)
 	router.POST("/logout", authHandler.Logout)
 	router.POST("/webhook", orderHandler.WebhookHandler)
 
 	// Authentication middleware
-	router.Use(middleware.UserAuthRequired)
+	router.Use(auth.UserAuthRequired)
 	{
 		profile := router.Group("/profile")
 		{

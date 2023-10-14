@@ -1091,7 +1091,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.CartItems"
                         }
                     },
                     "500": {
@@ -1520,6 +1520,11 @@ const docTemplate = `{
         },
         "/logout": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Logs out user and remove cookie from browser.",
                 "consumes": [
                     "application/json"
@@ -1532,8 +1537,8 @@ const docTemplate = `{
                 ],
                 "summary": "User Logout",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1846,6 +1851,11 @@ const docTemplate = `{
         },
         "/product/": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all available products for the user.",
                 "consumes": [
                     "application/json"
@@ -2283,6 +2293,13 @@ const docTemplate = `{
                 "summary": "Change user password",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Change password request body",
                         "name": "body",
                         "in": "body",
@@ -2460,7 +2477,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "validate the user password based on the provided old password and give access to password change api.",
+                "description": "validate the user password based on the provided old password and return a Id in success response to send to next Api as query with name uuid.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3044,6 +3061,46 @@ const docTemplate = `{
                 }
             }
         },
+        "response.Cart": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "cart_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.CartItems": {
+            "type": "object",
+            "properties": {
+                "discount": {
+                    "type": "number"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Cart"
+                    }
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -3056,6 +3113,13 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -8,16 +8,25 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJwtToken(userId int) (string, error) {
+const (
+	userID    = "userID"
+	expiresAt = "expires_at"
+	role      = "role"
+)
+
+func GenerateToken(userId int, roleName string) (tokenString string, err error) {
+	maxAge := time.Now().Add((time.Hour * 24 * 30)).Unix()
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID":     userId,
-		"expires_at": time.Now().Add((time.Hour * 24 * 30)).Unix(),
+		userID:    userId,
+		expiresAt: maxAge,
+		role:      roleName,
 	})
 
-	tokenString, err := token.SignedString([]byte(config.GetConfig().JwtSecret))
+	tokenString, err = token.SignedString([]byte(config.GetConfig().JwtSecret))
 	if err != nil {
-		return "", fmt.Errorf("Failed to sign JWT access token :%s", err)
+		return "", fmt.Errorf("failed to sign access token :%s", err)
 	}
 
-	return tokenString, err
+	return
 }

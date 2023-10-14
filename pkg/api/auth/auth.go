@@ -1,0 +1,221 @@
+package auth
+
+// import (
+// 	"fmt"
+// 	"net/http"
+// 	"time"
+
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
+// 	"github.com/gin-gonic/gin"
+// 	"github.com/golang-jwt/jwt"
+// )
+
+// type auth struct {
+// }
+
+// func NewAuth() *auth {
+// 	return &auth{}
+// }
+
+// func (a *auth) UserAuthRequired(c *gin.Context) {
+// 	if !a.TokenAuth(c, "User") {
+// 		return
+// 	}
+
+// }
+
+// func (a *auth) AdminAuthRequired(c *gin.Context) {
+// 	if !a.TokenAuth(c, "SudoAdmin") {
+// 		return
+// 	}
+// }
+
+// func (a *auth) Verified(c *gin.Context) {
+// 	if !a.TokenAuth(c, "Phone") {
+// 		return
+// 	}
+// }
+
+// func (a *auth) AuthChangePass(c *gin.Context) {
+// 	if !a.TokenAuth(c, "PassChange") {
+// 		return
+// 	}
+// }
+// // unAuthorized sets appropriate response into the header for un-authorized entry.
+// func (a *auth) unAuthorized(c *gin.Context) {
+// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 		"StatusCode": 401,
+// 		"msg":        "Unauthorized User",
+// 	})
+// }
+
+// // tExpired sets the appropriate response for expired token.
+// func (a *auth) tExpired(c *gin.Context) {
+
+// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 		"StatusCode": 401,
+// 		"msg":        "Token expired",
+// 	})
+// }
+// func (a *auth) TokenAuth(c *gin.Context, name string) bool {
+// 	tokenString := c.Request.Header.Get(name + "Authorization")
+
+// 	if tokenString == "" {
+// 		a.unAuthorized(c)
+// 		return false
+// 	}
+
+// 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+// 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+// 		if !ok {
+// 			return nil, fmt.Errorf("Unexpected signing method:%v", token.Header["alg"])
+// 		}
+// 		return []byte(config.GetConfig().JwtSecret), nil
+// 	})
+
+// 	if err != nil {
+// 		a.unAuthorized(c)
+// 		return false
+// 	}
+
+// 	claims, ok := token.Claims.(jwt.MapClaims)
+
+// 	if ok && token.Valid {
+
+// 		if float64(time.Now().Unix()) > claims["expires_at"].(float64) {
+// 			a.tExpired(c)
+// 			return false
+// 		}
+
+// 		c.Set("userID", fmt.Sprint(claims["userID"]))
+// 		return true
+// 	} else {
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 			"StatusCode": 401,
+// 			"Msg":        "Invalid claims",
+// 		})
+// 		return false
+// 	}
+// }
+
+import (
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/anazibinurasheed/project-device-mart/pkg/config"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+)
+
+const (
+	unauthorizedStatus = http.StatusUnauthorized
+	statusCode         = "statusCode"
+	message            = "message"
+)
+
+// AuthMiddleware provides authentication and authorization functionality.
+type AuthMiddleware struct{}
+
+// NewAuthMiddleware creates a new instance of the authentication middleware.
+func NewAuthMiddleware() *AuthMiddleware {
+	return &AuthMiddleware{}
+}
+
+// unauthorized sets an appropriate response for unauthorized access.
+func (a *AuthMiddleware) unauthorized(c *gin.Context) {
+	c.JSON(http.StatusUnauthorized, gin.H{
+		statusCode: unauthorizedStatus,
+		message:    "Unauthorized User",
+	})
+	c.Abort()
+}
+
+// tokenExpired sets an appropriate response for expired tokens.
+func (a *AuthMiddleware) tokenExpired(c *gin.Context) {
+	c.JSON(http.StatusUnauthorized, gin.H{
+		statusCode: unauthorizedStatus,
+		message:    "Token expired",
+	})
+	c.Abort()
+}
+
+// tokenAuth checks the user's token for authentication.
+func (a *AuthMiddleware) tokenAuth(c *gin.Context, role string) bool {
+	tokenString := c.Request.Header.Get("Authorization")
+	fmt.Println(tokenString)
+	if tokenString == "" {
+		a.unauthorized(c)
+		return false
+	}
+
+	val := strings.SplitN(tokenString, " ", 2)
+	if len(val) < 2 {
+		a.unauthorized(c)
+		return false
+	}
+
+	tokenString = val[1]
+	fmt.Println("token string")
+	fmt.Println(tokenString)
+	token, err := a.parseToken(tokenString)
+
+	if err != nil {
+		a.unauthorized(c)
+		return false
+	}
+	fmt.Println("1")
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		if float64(time.Now().Unix()) > claims["expires_at"].(float64) {
+			a.tokenExpired(c)
+			return false
+		}
+
+		fmt.Println(claims["role"])
+		if claims["role"] != role {
+			a.unauthorized(c)
+			return false
+		}
+
+		c.Set("userID", fmt.Sprint(claims["userID"]))
+		return true
+	}
+
+	c.JSON(http.StatusUnauthorized, gin.H{
+		statusCode: unauthorizedStatus,
+		message:    "Invalid claims",
+	})
+	c.Abort()
+	return false
+}
+
+func (a *AuthMiddleware) parseToken(tokenString string) (token *jwt.Token, err error) {
+
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(config.GetConfig().JwtSecret), nil
+
+	})
+}
+
+// UserAuthRequired enforces user authentication.
+func (a *AuthMiddleware) UserAuthRequired(c *gin.Context) {
+	if !a.tokenAuth(c, "user") {
+		return
+	}
+}
+
+// AdminAuthRequired enforces admin authentication.
+func (a *AuthMiddleware) AdminAuthRequired(c *gin.Context) {
+	if !a.tokenAuth(c, "admin") {
+		return
+	}
+}

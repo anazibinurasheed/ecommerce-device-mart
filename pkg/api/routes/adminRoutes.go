@@ -1,17 +1,18 @@
 package routes
 
 import (
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
 
 	router.POST("/su-login", authHandler.SULogin)
 
-	router.Use(middleware.AdminAuthRequired)
+	router.Use(auth.AdminAuthRequired)
 	{
 
 		category := router.Group("/category")

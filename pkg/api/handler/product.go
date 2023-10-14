@@ -392,6 +392,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //	@Tags			products
 //	@Accept			json
 //	@Produce		json
+// @Security Bearer
 //	@Param			page	query		int	true	"Page number"				default(1)
 //	@Param			count	query		int	true	"Number of items per page"	default(10)
 //	@Success		200		{object}	response.Response
