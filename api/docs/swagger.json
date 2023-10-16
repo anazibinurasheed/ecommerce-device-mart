@@ -1084,7 +1084,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.CartItems"
                         }
                     },
                     "500": {
@@ -1513,6 +1513,11 @@
         },
         "/logout": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Logs out user and remove cookie from browser.",
                 "consumes": [
                     "application/json"
@@ -1525,8 +1530,8 @@
                 ],
                 "summary": "User Logout",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1839,6 +1844,11 @@
         },
         "/product/": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all available products for the user.",
                 "consumes": [
                     "application/json"
@@ -1870,9 +1880,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Product"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -2276,6 +2298,13 @@
                 "summary": "Change user password",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Change password request body",
                         "name": "body",
                         "in": "body",
@@ -2453,7 +2482,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "validate the user password based on the provided old password and give access to password change api.",
+                "description": "validate the user password based on the provided old password and return a Id in success response to send to next Api as query with name uuid.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3037,6 +3066,78 @@
                 }
             }
         },
+        "response.Cart": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "cart_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.CartItems": {
+            "type": "object",
+            "properties": {
+                "discount": {
+                    "type": "number"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Cart"
+                    }
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "response.Product": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_blocked": {
+                    "type": "boolean"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_description": {
+                    "type": "string"
+                },
+                "product_image": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -3049,6 +3150,13 @@
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

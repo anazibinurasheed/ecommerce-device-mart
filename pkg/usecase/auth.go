@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
@@ -8,6 +9,10 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	InvalidCredentials = errors.New("Invalid credentials")
 )
 
 type authUseCase struct {
@@ -23,7 +28,7 @@ func NewCommonUseCase(userRepo interfaces.UserRepository, adminRepo interfaces.A
 
 }
 
-func (ac *authUseCase) SudoAdminLogin(sudoData request.SudoLoginData) error {
+func (ac *authUseCase) SudoAdminLogin(sudoData request.AdminLogin) error {
 	adminCredentials, err := ac.adminRepo.FindAdminCredentials()
 	if err != nil {
 		return err
@@ -35,7 +40,7 @@ func (ac *authUseCase) SudoAdminLogin(sudoData request.SudoLoginData) error {
 		return nil
 
 	} else {
-		return fmt.Errorf("Invalid credentials")
+		return InvalidCredentials
 	}
 }
 

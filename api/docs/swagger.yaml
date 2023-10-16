@@ -169,6 +169,53 @@ definitions:
     - razorpay_payment_id
     - razorpay_signature
     type: object
+  response.Cart:
+    properties:
+      brand:
+        type: string
+      cart_id:
+        type: integer
+      price:
+        type: integer
+      product_id:
+        type: integer
+      product_name:
+        type: string
+      qty:
+        type: integer
+    type: object
+  response.CartItems:
+    properties:
+      discount:
+        type: number
+      items:
+        items:
+          $ref: '#/definitions/response.Cart'
+        type: array
+      total:
+        type: number
+    type: object
+  response.Product:
+    properties:
+      brand:
+        type: string
+      category_id:
+        type: integer
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+      sku:
+        type: string
+    type: object
   response.Response:
     properties:
       data: {}
@@ -900,7 +947,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/response.CartItems'
         "500":
           description: Internal Server Error
           schema:
@@ -1192,10 +1239,12 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
       summary: User Logout
       tags:
       - auth
@@ -1426,9 +1475,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1441,6 +1495,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Display all products to the user
       tags:
       - products
@@ -1693,6 +1749,11 @@ paths:
       - application/json
       description: Change the password of the authenticated user
       parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: integer
       - description: Change password request body
         in: body
         name: body
@@ -1812,7 +1873,7 @@ paths:
       consumes:
       - application/json
       description: validate the user password based on the provided old password and
-        give access to password change api.
+        return a Id in success response to send to next Api as query with name uuid.
       parameters:
       - description: User's old password
         in: body
@@ -2032,4 +2093,9 @@ paths:
       summary: User wallet transaction history
       tags:
       - wallet
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

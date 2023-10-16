@@ -28,7 +28,7 @@ func Paginate(page, count int) (startIndex, endIndex int) {
 }
 
 func GetIDFromContext(c *gin.Context) (int, error) {
-	userIDStr := c.GetString("userId")
+	userIDStr := c.GetString("userID")
 	userID, err := strconv.Atoi(userIDStr)
 	return userID, err
 }
