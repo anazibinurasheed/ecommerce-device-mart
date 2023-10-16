@@ -27,7 +27,7 @@ func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
 
 var contact = helper.NewPhone()
 
-// SULogin godoc.
+// AdminLogin godoc.
 //
 //	@Summary		Admin Login
 //	@Description	For admin login.
@@ -39,9 +39,9 @@ var contact = helper.NewPhone()
 //	@Failure		400		{object}	response.Response
 //	@Failure		401		{object}	response.Response
 //	@Failure		500		{object}	response.Response
-//	@Router			/admin/su-login [post]
-func (ah *AuthHandler) SULogin(c *gin.Context) {
-	var body request.SudoLoginData
+//	@Router			/admin/login [post]
+func (ah *AuthHandler) AdminLogin(c *gin.Context) {
+	var body request.AdminLogin
 	if err := c.BindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -50,7 +50,7 @@ func (ah *AuthHandler) SULogin(c *gin.Context) {
 
 	err := ah.authUseCase.SudoAdminLogin(body)
 	if err != nil {
-		response := response.ResponseMessage(401, "Failed", nil, err.Error())
+		response := response.ResponseMessage(401, "Invalid credentials", nil, err.Error())
 		c.JSON(http.StatusUnauthorized, response)
 		return
 	}

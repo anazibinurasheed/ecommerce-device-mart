@@ -6,10 +6,8 @@ import (
 )
 
 type AuthUseCase interface {
-	// SudoAdminLogin logs in as a super admin with sudo privileges.
-	SudoAdminLogin(sudoData request.SudoLoginData) error
-
-	ValidateSignUpRequest(phone request.Phone) (int, error)
+	SudoAdminLogin(sudoData request.AdminLogin) error
 	SignUp(user request.SignUpData) error
+	ValidateSignUpRequest(phone request.Phone) (int, error)
 	ValidateUserLoginCredentials(user request.LoginData) (response.UserData, error)
 }

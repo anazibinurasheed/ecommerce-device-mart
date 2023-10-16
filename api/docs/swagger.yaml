@@ -195,6 +195,27 @@ definitions:
       total:
         type: number
     type: object
+  response.Product:
+    properties:
+      brand:
+        type: string
+      category_id:
+        type: integer
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+      sku:
+        type: string
+    type: object
   response.Response:
     properties:
       data: {}
@@ -1454,9 +1475,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
         "400":
           description: Bad Request
           schema:

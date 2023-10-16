@@ -10,7 +10,7 @@ import (
 func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
 
-	router.POST("/su-login", authHandler.SULogin)
+	router.POST("/login", authHandler.AdminLogin)
 
 	router.Use(auth.AdminAuthRequired)
 	{
