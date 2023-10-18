@@ -6,22 +6,22 @@ import (
 )
 
 type ProductRepository interface {
-	CreateCategory(category request.Category) (response.Category, error)
+	CreateCategory(category request.Category) error
 	ReadCategory(startIndex int, endIndex int) ([]response.Category, error)
-	UpdateCategory(categoryID int, category request.Category) (response.Category, error)
-	BlockCategoryFromDatabase(categoryID int) (response.Category, error)
-	UnBlockCategoryFromDatabase(categoryID int) (response.Category, error)
+	UpdateCategory(categoryID int, category request.Category) error
+	BlockCategoryByID(categoryID int) error
+	UnBlockCategoryByID(categoryID int) error
 	FindCategoryByName(name string) (response.Category, error)
 	FindCategoryByID(categoryID int) (response.Category, error)
 
-	InsertNewProductToDatabase(product request.Product) (response.Product, error)
+	CreateProduct(product request.Product) error
 	ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error)
 	ViewAllProductsToUser(startIndex, endIndex int) ([]response.Product, error)
-	UpdateProductToDatabase(productID int, product request.Product) (response.Product, error)
-	BlockProductFromDatabase(productID int) (response.Product, error)
-	UnblockProductFromDatabase(productID int) (response.Product, error)
+	UpdateProduct(productID int, product request.Product) error
+	BlockProduct(productID int) error
+	UnblockProduct(productID int) error
 	FindProductByName(paramName string) (response.Product, error)
-	FindProductById(productID int) (response.Product, error)
+	FindProductByID(productID int) (response.Product, error)
 
 	FindUserRatingOnProduct(userID, productID int) (response.Rating, error)
 	InsertProductRating(rating request.Rating) error

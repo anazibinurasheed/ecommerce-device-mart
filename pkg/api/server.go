@@ -4,6 +4,7 @@ import (
 	"log"
 
 	_ "github.com/anazibinurasheed/project-device-mart/api/docs"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/routes"
 
@@ -24,6 +25,10 @@ import (
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
+//	@securitydefinitions.apikey	Bearer
+//	@in							header
+//	@name						Authorization
+
 //	@host		localhost:3000
 //	@BasePath	/api/v1
 
@@ -31,7 +36,7 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler, productHandler *handler.ProductHandler, commonHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler) *ServerHTTP {
+func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler, productHandler *handler.ProductHandler, commonHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) *ServerHTTP {
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -39,9 +44,9 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 	router.LoadHTMLGlob("web/template/*.html")
 
-	routes.UserRoutes(router.Group("/api/v1"), userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
+	routes.UserRoutes(router.Group("/api/v1"), userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler, auth)
 
-	routes.AdminRoutes(router.Group("/api/v1/admin"), userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler)
+	routes.AdminRoutes(router.Group("/api/v1/admin"), userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler, auth)
 
 	return &ServerHTTP{
 

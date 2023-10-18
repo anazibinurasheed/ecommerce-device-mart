@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
@@ -22,6 +21,8 @@ func NewUserHandler(useCase services.UserUseCase) *UserHandler {
 		userUseCase: useCase,
 	}
 }
+
+var passwordManager = helper.NewPasswordManager()
 
 // GetAddAddressPage godoc
 //
@@ -196,7 +197,7 @@ func (uh *UserHandler) Profile(c *gin.Context) {
 // ChangePasswordRequest handles the request to change user password.
 //
 //	@Summary		Change user password request
-//	@Description	validate the user password based on the provided old password and give access to password change api.
+//	@Description	validate the user password based on the provided old password and return a Id in success response to send to next Api as query with name uuid.
 //	@Tags			user profile
 //	@Accept			json
 //	@Produce		json
@@ -222,19 +223,12 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
+	uuid := helper.GenerateUniqueID()
+	passwordManager.Set(userId, uuid)
 
-	TokenString, err := helper.GenerateJwtToken(userId)
-	if err != nil {
-		response := response.ResponseMessage(500, "Failed to generate jwt token", nil, err.Error())
-		c.JSON(http.StatusInternalServerError, response)
-		return
-	}
-
-	MaxAge := int(time.Now().Add(time.Minute * 30).Unix())
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("PassChangeAuthorization", TokenString, MaxAge, "", "", false, true)
-
-	response := response.ResponseMessage(200, "Success", nil, nil)
+	response := response.ResponseMessage(200, "Success", gin.H{
+		"uuid": uuid,
+	}, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -245,6 +239,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 //	@Tags			user profile
 //	@Accept			json
 //	@Produce		json
+//	@Param			uuid	path		int						true	"uuid"
 //	@Param			body	body		request.ChangePassword	true	"Change password request body"
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
@@ -258,16 +253,25 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	userId, _ := helper.GetIDFromContext(c)
+	userID, _ := helper.GetIDFromContext(c)
+	uuid := c.Query("uuid")
+	ok := passwordManager.Check(uuid, userID)
 
-	err := uh.userUseCase.ChangeUserPassword(body, userId, c)
-	if err != nil {
-		response := response.ResponseMessage(500, "Failed to change password", nil, err.Error())
+	err := uh.userUseCase.ChangeUserPassword(body, userID, c)
+	if err != nil || !ok {
+		var errr interface{}
+		if !ok {
+			errr = "invalid request user not verified"
+
+		} else {
+			errr = err.Error()
+		}
+		response := response.ResponseMessage(500, "Failed to change password", nil, errr)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	helper.DeleteCookie("PassChangeAuth", c)
+	passwordManager.Remove(userID)
 
 	response := response.ResponseMessage(200, "Success, password changed", nil, nil)
 	c.JSON(http.StatusOK, response)

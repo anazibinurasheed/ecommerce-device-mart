@@ -145,7 +145,7 @@ func (od *orderDatabase) ChangeOrderStatusByID(statusID int, orderID int) (respo
 	return UpdatedOrder, err
 }
 
-func (od *orderDatabase) FindOrderDataByUserIDAndProductID(userID, productID int) (response.OrderLine, error) {
+func (od *orderDatabase) FindOrderByUserIDAndProductID(userID, productID int) (response.OrderLine, error) {
 	var OrderData response.OrderLine
 
 	query := `SELECT * FROM order_lines WHERE user_id= $1 AND product_id=$2 ;`

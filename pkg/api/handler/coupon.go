@@ -42,15 +42,7 @@ func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 		return
 	}
 
-	err := helper.ValidateInputStruct(body)
-	if err != nil {
-		response := response.ResponseMessage(400, "Unable to process without filling up required credentials", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-
-	}
-
-	err = ch.coupenUseCase.CreateCoupons(body)
+	err := ch.coupenUseCase.CreateCoupons(body)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -78,12 +70,6 @@ func (ch *CouponHandler) UpdateCoupon(c *gin.Context) {
 	var body request.Coupon
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid Input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-	err := helper.ValidateInputStruct(body)
-	if err != nil {
-		response := response.ResponseMessage(400, "Unable to process without filling up required credentials", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}

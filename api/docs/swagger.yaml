@@ -26,6 +26,16 @@ definitions:
     - phone_number
     - pincode
     type: object
+  request.AdminLogin:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   request.Category:
     properties:
       category_name:
@@ -146,16 +156,6 @@ definitions:
     - username
     - uuid
     type: object
-  request.SudoLoginData:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
   request.VerifyPayment:
     properties:
       razorpay_order_id:
@@ -169,6 +169,53 @@ definitions:
     - razorpay_payment_id
     - razorpay_signature
     type: object
+  response.Cart:
+    properties:
+      brand:
+        type: string
+      cart_id:
+        type: integer
+      price:
+        type: integer
+      product_id:
+        type: integer
+      product_name:
+        type: string
+      qty:
+        type: integer
+    type: object
+  response.CartItems:
+    properties:
+      discount:
+        type: number
+      items:
+        items:
+          $ref: '#/definitions/response.Cart'
+        type: array
+      total:
+        type: number
+    type: object
+  response.Product:
+    properties:
+      brand:
+        type: string
+      category_id:
+        type: integer
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+      sku:
+        type: string
+    type: object
   response.Response:
     properties:
       data: {}
@@ -177,6 +224,11 @@ definitions:
         type: string
       status-code:
         type: integer
+    type: object
+  response.Token:
+    properties:
+      token:
+        type: string
     type: object
 host: localhost:3000
 info:
@@ -208,21 +260,52 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, category created
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to create new category
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Create a new category
+      security:
+      - Bearer: []
+      summary: Create category
       tags:
       - admin category management
-  /admin/category/all-category:
+  /admin/category/block-category/{categoryID}:
+    put:
+      description: Blocks a category with the specified ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success, category has been blocked
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to retrieve param from URL
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to block category
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Block a category
+      tags:
+      - admin category management
+  /admin/category/categories:
     get:
       description: Retrieves all categories available.
       parameters:
@@ -242,41 +325,20 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: List out all categories
-      tags:
-      - admin category management
-  /admin/category/block-category/{categoryID}:
-    put:
-      description: Blocks a category with the specified ID.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to bind page info from request
           schema:
             $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
+        "503":
+          description: Failed to retrieve categories
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Block a category
+      security:
+      - Bearer: []
+      summary: List out all categories
       tags:
       - admin category management
   /admin/category/unblock-category/{categoryID}:
@@ -294,17 +356,19 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, category unblocked
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to block category
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Unblock a category
       tags:
       - admin category management
@@ -329,20 +393,61 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, category updated
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to update category
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Update a category
       tags:
       - admin category management
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Admin can login using username and password.
+      parameters:
+      - description: Admin login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.AdminLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Token'
+              type: object
+        "400":
+          description: Failed, input does not meet validation criteria
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to generate token
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Admin Login
+      tags:
+      - auth
   /admin/orders:
     get:
       description: Retrieves all order overview data.
@@ -435,46 +540,38 @@ paths:
       summary: Get order management data
       tags:
       - admin order management
-  /admin/products/add-product/{categoryID}:
-    post:
+  /admin/product/block-product/{productID}:
+    put:
       consumes:
       - application/json
-      description: Creates a new product with the specified details.
+      description: Blocks a product with the specified ID.
       parameters:
-      - description: Category ID
+      - description: Product ID
         in: path
-        name: categoryID
+        name: productID
         required: true
         type: integer
-      - description: Product details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/request.Product'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, product blocked
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "403":
-          description: Forbidden
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to block product
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Create a new product
+      security:
+      - Bearer: []
+      summary: Block a product
       tags:
       - admin product management
-  /admin/products/all-products:
+  /admin/product/products:
     get:
       description: Retrieves a list of all products including blocked.
       parameters:
@@ -494,54 +591,30 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Product'
+                  type: array
+              type: object
         "400":
-          description: Bad Request
+          description: Failed to bind page info from request
           schema:
             $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
+        "500":
+          description: Failed to fetch products
           schema:
             $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Display all products to admin
+      security:
+      - Bearer: []
+      summary: Display  products to admin
       tags:
       - admin product management
-  /admin/products/block-product/{productID}:
-    put:
-      consumes:
-      - application/json
-      description: Blocks a product with the specified ID.
-      parameters:
-      - description: Product ID
-        in: path
-        name: productID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Block a product
-      tags:
-      - admin product management
-  /admin/products/unblock-product/{productID}:
+  /admin/product/unblock-product/{productID}:
     put:
       description: Unblocks a product with the specified ID.
       parameters:
@@ -565,10 +638,12 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Unblock a product
       tags:
       - admin product management
-  /admin/products/update-product/{productID}:
+  /admin/product/update-product/{productID}:
     put:
       consumes:
       - application/json
@@ -589,18 +664,61 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, product updated
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
+        "500":
+          description: Failed update product
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Update a product
+      tags:
+      - admin product management
+  /admin/products/add-product/{categoryID}:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product with the specified details.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Product details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success, added new product
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed, category not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Failed, product already exist with same name
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to create product
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a new product
       tags:
       - admin product management
   /admin/promotions/all-coupons:
@@ -756,40 +874,6 @@ paths:
       summary: Monthly sales report
       tags:
       - sales-report
-  /admin/su-login:
-    post:
-      consumes:
-      - application/json
-      description: For admin login.
-      parameters:
-      - description: Sudo admin login credentials
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/request.SudoLoginData'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Admin Login
-      tags:
-      - auth
   /admin/user-management/block-user/{userID}:
     put:
       consumes:
@@ -900,7 +984,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/response.CartItems'
         "500":
           description: Internal Server Error
           schema:
@@ -1059,6 +1143,42 @@ paths:
       summary: List products by category
       tags:
       - products
+  /category/categories:
+    get:
+      description: Retrieves all categories available.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to bind page info from request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Failed to retrieve categories
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List out all categories
+      tags:
+      - admin category management
   /checkout:
     get:
       description: Displays the checkout details for the current user.
@@ -1188,14 +1308,16 @@ paths:
     post:
       consumes:
       - application/json
-      description: Logs out user and remove cookie from browser.
+      description: Logs out user and removes token from the header.
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Logged out, success
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: User Logout
       tags:
       - auth
@@ -1426,9 +1548,14 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1441,6 +1568,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Display all products to the user
       tags:
       - products
@@ -1693,6 +1822,11 @@ paths:
       - application/json
       description: Change the password of the authenticated user
       parameters:
+      - description: uuid
+        in: path
+        name: uuid
+        required: true
+        type: integer
       - description: Change password request body
         in: body
         name: body
@@ -1812,7 +1946,7 @@ paths:
       consumes:
       - application/json
       description: validate the user password based on the provided old password and
-        give access to password change api.
+        return a Id in success response to send to next Api as query with name uuid.
       parameters:
       - description: User's old password
         in: body
@@ -2032,4 +2166,9 @@ paths:
       summary: User wallet transaction history
       tags:
       - wallet
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

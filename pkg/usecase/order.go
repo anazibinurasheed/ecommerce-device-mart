@@ -514,7 +514,7 @@ func (ou *orderUseCase) CreateInvoice(orderID int) (response.Invoice, error) {
 		return response.Invoice{}, fmt.Errorf("Failed to fetch order by id")
 	}
 
-	product, err := ou.productRepo.FindProductById(invoiceData.ProductID)
+	product, err := ou.productRepo.FindProductByID(invoiceData.ProductID)
 	if err != nil {
 		return response.Invoice{}, fmt.Errorf("Failed to get product data :%s", err)
 	}
@@ -556,7 +556,7 @@ func (ou *orderUseCase) MonthlySalesReport() (response.MonthlySalesReport, error
 		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find product :%s", err)
 	}
 
-	product, err := ou.productRepo.FindProductById(topSelling.ProductID)
+	product, err := ou.productRepo.FindProductByID(topSelling.ProductID)
 	if err != nil {
 		return response.MonthlySalesReport{}, fmt.Errorf("Failed to find product :%s", err)
 	}

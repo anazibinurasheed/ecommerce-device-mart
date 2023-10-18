@@ -27,6 +27,11 @@ const docTemplate = `{
     "paths": {
         "/admin/category/add-category": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Creates a new category based on the provided category name.",
                 "consumes": [
                     "application/json"
@@ -37,7 +42,7 @@ const docTemplate = `{
                 "tags": [
                     "admin category management"
                 ],
-                "summary": "Create a new category",
+                "summary": "Create category",
                 "parameters": [
                     {
                         "description": "Category name",
@@ -51,19 +56,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, category created",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed, input does not meet validation criteria",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to create new category",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -71,8 +76,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/category/all-category": {
+        "/admin/category/block-category/{categoryID}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Blocks a category with the specified ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin category management"
+                ],
+                "summary": "Block a category",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, category has been blocked",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to retrieve param from URL",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to block category",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/category/categories": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all categories available.",
                 "produces": [
                     "application/json"
@@ -101,54 +157,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/category/block-category/{categoryID}": {
-            "put": {
-                "description": "Blocks a category with the specified ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin category management"
-                ],
-                "summary": "Block a category",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to bind page info from request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "503": {
+                        "description": "Failed to retrieve categories",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -158,6 +179,11 @@ const docTemplate = `{
         },
         "/admin/category/unblock-category/{categoryID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Unblocks a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -180,19 +206,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, category unblocked",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to block category",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -202,6 +228,11 @@ const docTemplate = `{
         },
         "/admin/category/update-category/{categoryID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Updates a category with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -233,19 +264,83 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, category updated",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to update category",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/login": {
+            "post": {
+                "description": "Admin can login using username and password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Admin Login",
+                "parameters": [
+                    {
+                        "description": "Admin login credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AdminLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Token"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Failed, input does not meet validation criteria",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to generate token",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -389,123 +484,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/products/add-product/{categoryID}": {
-            "post": {
-                "description": "Creates a new product with the specified details.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin product management"
-                ],
-                "summary": "Create a new product",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Product details",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.Product"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/products/all-products": {
-            "get": {
-                "description": "Retrieves a list of all products including blocked.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin product management"
-                ],
-                "summary": "Display all products to admin",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/products/block-product/{productID}": {
+        "/admin/product/block-product/{productID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Blocks a product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -528,19 +513,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, product blocked",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "503": {
-                        "description": "Service Unavailable",
+                    "500": {
+                        "description": "Failed to block product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -548,8 +533,83 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/products/unblock-product/{productID}": {
+        "/admin/product/products": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves a list of all products including blocked.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin product management"
+                ],
+                "summary": "Display  products to admin",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Product"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to bind page info from request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch products",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/product/unblock-product/{productID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Unblocks a product with the specified ID.",
                 "produces": [
                     "application/json"
@@ -589,8 +649,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/products/update-product/{productID}": {
+        "/admin/product/update-product/{productID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Updates an existing product with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -622,19 +687,83 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, product updated",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed, input does not meet validation criteria",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "503": {
-                        "description": "Service Unavailable",
+                    "500": {
+                        "description": "Failed update product",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/products/add-product/{categoryID}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Creates a new product with the specified details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin product management"
+                ],
+                "summary": "Create a new product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Product details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, added new product",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed, category not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Failed, product already exist with same name",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -875,58 +1004,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/su-login": {
-            "post": {
-                "description": "For admin login.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Admin Login",
-                "parameters": [
-                    {
-                        "description": "Sudo admin login credentials",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.SudoLoginData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/admin/user-management/block-user/{userID}": {
             "put": {
                 "description": "Blocks a user with the specified ID.",
@@ -1091,7 +1168,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.CartItems"
                         }
                     },
                     "500": {
@@ -1260,6 +1337,61 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/categories": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves all categories available.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin category management"
+                ],
+                "summary": "List out all categories",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to bind page info from request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "503": {
+                        "description": "Failed to retrieve categories",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1520,7 +1652,12 @@ const docTemplate = `{
         },
         "/logout": {
             "post": {
-                "description": "Logs out user and remove cookie from browser.",
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Logs out user and removes token from the header.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1532,8 +1669,8 @@ const docTemplate = `{
                 ],
                 "summary": "User Logout",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Logged out, success",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1846,6 +1983,11 @@ const docTemplate = `{
         },
         "/product/": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all available products for the user.",
                 "consumes": [
                     "application/json"
@@ -1877,9 +2019,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Product"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -2283,6 +2437,13 @@ const docTemplate = `{
                 "summary": "Change user password",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "uuid",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Change password request body",
                         "name": "body",
                         "in": "body",
@@ -2460,7 +2621,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "validate the user password based on the provided old password and give access to password change api.",
+                "description": "validate the user password based on the provided old password and return a Id in success response to send to next Api as query with name uuid.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2834,6 +2995,21 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AdminLogin": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "request.Category": {
             "type": "object",
             "required": [
@@ -3010,21 +3186,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request.SudoLoginData": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "request.VerifyPayment": {
             "type": "object",
             "required": [
@@ -3044,6 +3205,78 @@ const docTemplate = `{
                 }
             }
         },
+        "response.Cart": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "cart_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.CartItems": {
+            "type": "object",
+            "properties": {
+                "discount": {
+                    "type": "number"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Cart"
+                    }
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "response.Product": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_blocked": {
+                    "type": "boolean"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_description": {
+                    "type": "string"
+                },
+                "product_image": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -3056,6 +3289,21 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "response.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

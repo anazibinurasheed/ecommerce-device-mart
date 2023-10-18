@@ -13,7 +13,7 @@ type OrderRepository interface {
 	GetOrderStatuses() ([]response.OrderStatus, error)
 	InsertOrder(request.NewOrder) (response.OrderLine, error)
 	ChangeOrderStatusByID(statusID int, orderID int) (response.OrderLine, error)
-	FindOrderDataByUserIDAndProductID(userID, productID int) (response.OrderLine, error)
+	FindOrderByUserIDAndProductID(userID, productID int) (response.OrderLine, error)
 	FindOrderStatusByID(statusID int) (string, error)
 	GetAllOrderData(startIndex, endIndex int) ([]response.Orders, error)
 	FindOrderByID(orderID int) (response.OrderLine, error)
