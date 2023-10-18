@@ -46,7 +46,7 @@ wire: ## Generate wire_gen.go
 
 swag: ## Generate swagger docs
 	swag init -g pkg/api/server.go -o ./api/docs
-swag-fmt: ##Format swagger annotations
+fmt: ##Format swagger annotations
 	swag fmt pkg/api
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

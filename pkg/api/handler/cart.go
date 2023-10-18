@@ -60,14 +60,14 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(5)
 //	@Produce		json
-//	@Success		200	{object}	 response.CartItems
+//	@Success		200	{object}	response.CartItems
 //	@Failure		500	{object}	response.Response
 //	@Router			/cart [get]
 func (ch *CartHandler) ViewCart(c *gin.Context) {
 
 	userID, _ := helper.GetIDFromContext(c)
 
-	CartItems, err := ch.cartUseCase.ViewCart(userID) 
+	CartItems, err := ch.cartUseCase.ViewCart(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)

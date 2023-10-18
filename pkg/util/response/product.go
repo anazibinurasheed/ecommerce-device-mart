@@ -16,6 +16,10 @@ type Product struct {
 	IsBlocked           bool   `json:"is_blocked"`
 }
 
+// ProductSlice is a type to specify detailed API specification on swagger.
+// Not used anywhere in the program except the swagger documentation. 
+type ProductSlice = []Product
+
 type ProductItem struct {
 	ID                  uint     `json:"id"`
 	CategoryID          int      `json:"category_id"`

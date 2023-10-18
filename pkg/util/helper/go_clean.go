@@ -6,18 +6,6 @@ import (
 	"time"
 )
 
-type data struct {
-	Phone      string
-	IsVerified bool
-}
-
-// A phone implements the user auth related functionalities.
-type phone struct {
-	details map[string]data //store phone for otp verification
-	mutex   *sync.Mutex     // unMutex is mutex for unverifiedData
-
-}
-
 // A passwordManager implements passwordManager related functionalities.
 type passwordManager struct {
 	details map[int]string
@@ -64,6 +52,18 @@ func NewPhone() phone {
 		details: make(map[string]data),
 		mutex:   &sync.Mutex{},
 	}
+}
+
+type data struct {
+	Phone      string
+	IsVerified bool
+}
+
+// A phone implements the user auth related functionalities.
+type phone struct {
+	details map[string]data //store phone for otp verification
+	mutex   *sync.Mutex     // unMutex is mutex for unverifiedData
+
 }
 
 // Clean deletes the details after a specific duration if user is not verified

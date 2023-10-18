@@ -17,6 +17,7 @@ import (
 type AuthHandler struct {
 	authUseCase services.AuthUseCase
 	token       auth.TokenManager
+	subHandler  helper.SubHandler
 }
 
 func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
@@ -27,44 +28,44 @@ func NewAuthHandler(useCase services.AuthUseCase) *AuthHandler {
 
 var contact = helper.NewPhone()
 
-// SULogin godoc.
+// AdminLogin godoc.
 //
 //	@Summary		Admin Login
-//	@Description	For admin login.
+//	@Description	Admin can login using username and password.
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		request.SudoLoginData	true	"Sudo admin login credentials"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
-//	@Failure		401		{object}	response.Response
-//	@Failure		500		{object}	response.Response
-//	@Router			/admin/su-login [post]
-func (ah *AuthHandler) SULogin(c *gin.Context) {
-	var body request.SudoLoginData
-	if err := c.BindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+//	@Param			body	body		request.AdminLogin						true	"Admin login credentials"
+//	@Success		200		{object}	response.Response{data=response.Token}	"Login success"
+//	@Failure		400		{object}	response.Response						"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response						"Failed, input does not meet validation criteria"
+//	@Failure		401		{object}	response.Response						"Invalid credentials"
+//	@Failure		500		{object}	response.Response						"Failed to generate token"
+//	@Router			/admin/login [post]
+func (a *AuthHandler) AdminLogin(c *gin.Context) {
+	var body request.AdminLogin
+	if !a.subHandler.BindRequest(c, &body) {
 		return
 	}
 
-	err := ah.authUseCase.SudoAdminLogin(body)
+	err := a.authUseCase.AdminLogin(body)
 	if err != nil {
-		response := response.ResponseMessage(401, "Failed", nil, err.Error())
-		c.JSON(http.StatusUnauthorized, response)
+		response := response.ResponseMessage(statusUnauthorized, "Invalid credentials", nil, err.Error())
+		c.JSON(statusUnauthorized, response)
 		return
 	}
 
-	TokenString, err := ah.token.GenerateAdminToken()
+	TokenString, err := a.token.GenerateAdminToken()
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed", nil, err.Error())
-		c.JSON(http.StatusInternalServerError, response)
+		response := response.ResponseMessage(500, "Failed to generate token", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
 		return
 	}
 
-	ah.token.SetTokenHeader(c, TokenString)
+	a.token.SetTokenHeader(c, TokenString)
+	token := &response.Token{Tkn: TokenString}
 
-	response := response.ResponseMessage(200, "Success", nil, nil)
+	response := response.ResponseMessage(200, "Login success", token, nil)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -84,10 +85,6 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	if !helper.ValidateData(c, &body) {
 		return
 	}
 
@@ -184,10 +181,6 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 		return
 	}
 
-	if !helper.ValidateData(c, &body) {
-		return
-	}
-
 	phoneStr, ok, verified := contact.Get(body.Uuid)
 
 	switch {
@@ -247,10 +240,6 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 		return
 	}
 
-	if !helper.ValidateData(c, &body) {
-		return
-	}
-
 	UserData, err := uh.authUseCase.ValidateUserLoginCredentials(body)
 	if err != nil {
 		response := response.ResponseMessage(401, "Failed", nil, err.Error())
@@ -272,17 +261,17 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary		User Logout
-// @Description	Logs out user and remove cookie from browser.
-// @Tags			auth
-// @Security		JWT
-// @Accept			json
-// @Produce		json
-// @Success		202	{object}	response.Response{}
-// @Router			/logout [post]
+//	@Summary		User Logout
+//	@Description	Logs out user and removes token from the header.
+//	@Security		Bearer
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		202	{object}	response.Response	"Logged out, success"
+//	@Router			/logout [post]
 func (ah *AuthHandler) Logout(c *gin.Context) {
 	ah.token.RemoveToken(c)
 
-	response := response.ResponseMessage(200, "Logged out, success", nil, nil)
-	c.JSON(http.StatusAccepted, response)
+	response := response.ResponseMessage(statusAccepted, "Log out, success", nil, nil)
+	c.JSON(statusAccepted, response)
 }

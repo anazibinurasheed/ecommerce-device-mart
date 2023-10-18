@@ -69,10 +69,6 @@ func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
 		repo.NewReferralRepository,
 
-
-	
-
-
 		http.NewServerHTTP)
 
 	return &http.ServerHTTP{}, nil

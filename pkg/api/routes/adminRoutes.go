@@ -10,7 +10,7 @@ import (
 func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
 	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
 
-	router.POST("/su-login", authHandler.SULogin)
+	router.POST("/login", authHandler.AdminLogin)
 
 	router.Use(auth.AdminAuthRequired)
 	{
@@ -18,16 +18,16 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 		category := router.Group("/category")
 		{
 			category.POST("/add-category", productHandler.CreateCategory)
-			category.GET("/all-category", productHandler.ReadAllCategories)
+			category.GET("/categories", productHandler.ReadAllCategories)
 			category.PUT("/update-category/:categoryID", productHandler.UpdateCategory)
 			category.PUT("/block-category/:categoryID", productHandler.BlockCategory)
 			category.PUT("/unblock-category/:categoryID", productHandler.UnBlockCategory)
 
 		}
 
-		products := router.Group("/products")
+		products := router.Group("/product")
 		{
-			products.GET("/all-products", productHandler.DisplayAllProductsToAdmin)
+			products.GET("/products", productHandler.ShowProductsToAdmin)
 			products.POST("/add-product/:categoryID", productHandler.CreateProduct)
 			products.PUT("/update-product/:productID", productHandler.UpdateProduct)
 			products.PUT("/block-product/:productID", productHandler.BlockProduct)

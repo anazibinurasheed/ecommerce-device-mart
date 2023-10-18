@@ -239,7 +239,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 //	@Tags			user profile
 //	@Accept			json
 //	@Produce		json
-//	@Param			uuid	path		int	true	"uuid"
+//	@Param			uuid	path		int						true	"uuid"
 //	@Param			body	body		request.ChangePassword	true	"Change password request body"
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response

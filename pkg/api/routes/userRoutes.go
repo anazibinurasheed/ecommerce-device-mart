@@ -49,6 +49,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 		product := router.Group("/product")
 		{
 			product.GET("/", productHandler.DisplayAllProductsToUser)
+			product.GET("/categories", productHandler.Categories)
 			product.GET("/:productID", productHandler.ViewIndividualProduct)
 			product.POST("/search", productHandler.SearchProducts)
 			product.GET("/rating/:productID", productHandler.ValidateRatingRequest)

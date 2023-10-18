@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
@@ -8,6 +9,19 @@ import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
+)
+
+var (
+	ErrRecordAlreadyExist = errors.New("record already exist")
+	ErrCategoryNotFound   = errors.New("referenced category not found")
+	ErrNoRecord           = errors.New("record not found")
+	ErrInProcessing       = errors.New("currently processing the order, not completed yet")
+)
+
+const (
+	delivered = "Delivered"
+	cancelled = "Cancelled"
+	returned  = "Returned"
 )
 
 type productUseCase struct {
@@ -23,19 +37,15 @@ func NewProductUseCase(productRepo interfaces.ProductRepository, orderRepo inter
 
 }
 
-func (pu *productUseCase) CreateNewCategory(category request.Category) error {
-	doCategoryExist, err := pu.productRepo.FindCategoryByName(category.CategoryName)
-	if doCategoryExist.ID != 0 {
-		return fmt.Errorf("Category already exist with this name")
+func (pu *productUseCase) CreateCategory(category request.Category) error {
+	existingCategory, err := pu.productRepo.FindCategoryByName(category.CategoryName)
+	if existingCategory.ID != 0 {
+		return ErrRecordAlreadyExist
 	}
 
-	NewCategory, err := pu.productRepo.CreateCategory(category)
+	err = pu.productRepo.CreateCategory(category)
 	if err != nil {
 		return fmt.Errorf("Failed to create category : %s", err)
-	}
-
-	if NewCategory.ID == 0 {
-		return fmt.Errorf("Failed to verify created category")
 	}
 
 	return nil
@@ -50,57 +60,43 @@ func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Cat
 		return nil, fmt.Errorf("Failed to find categories :%s", err)
 	}
 
-	fmt.Println(listOfAllCategories)
-
 	return listOfAllCategories, nil
 }
 
-func (pu *productUseCase) UpdateCategoryWithID(productID int, category request.Category) error {
-	updatedCategory, err := pu.productRepo.UpdateCategory(productID, category)
+func (pu *productUseCase) UpdateCategoryByID(productID int, category request.Category) error {
+	err := pu.productRepo.UpdateCategory(productID, category)
 	if err != nil {
 		return fmt.Errorf("Failed to update category :%s", err)
 	}
 
-	if updatedCategory.ID == 0 {
-		return fmt.Errorf("Failed to verify updated category")
-	}
-
 	return nil
 }
 
-func (pu *productUseCase) BlockCategoryWithID(categoryID int) error {
-	blockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
+func (pu *productUseCase) BlockCategoryByID(categoryID int) error {
+	err := pu.productRepo.BlockCategoryByID(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	if blockedCategory.ID == 0 {
-		return fmt.Errorf("Failed to verify the blocked category")
-	}
-
 	return nil
 }
 
-func (pu *productUseCase) UnBlockCategoryWithID(categoryID int) error {
-	unBlockedCategory, err := pu.productRepo.BlockCategoryFromDatabase(categoryID)
+func (pu *productUseCase) UnBlockCategoryByID(categoryID int) error {
+	err := pu.productRepo.UnBlockCategoryByID(categoryID)
 	if err != nil {
 		return fmt.Errorf("Failed to block category :%s", err)
 	}
 
-	if unBlockedCategory.ID == 0 {
-		return fmt.Errorf("Failed to verify blocked category")
-	}
-
 	return nil
 }
 
-func (pu *productUseCase) CreateNewProduct(product request.Product) error {
+func (pu *productUseCase) CreateProduct(product request.Product) error {
 	category, err := pu.productRepo.FindCategoryByID(product.CategoryID)
 	if err != nil {
 		return fmt.Errorf("failed to find category: %s", err)
 	}
 	if category.ID == 0 {
-		return fmt.Errorf("category not found")
+		return ErrCategoryNotFound
 	}
 
 	product.Brand = category.Category_Name
@@ -111,15 +107,12 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 		return fmt.Errorf("failed to find product by name: %s", err)
 	}
 	if existingProduct.ID != 0 {
-		return fmt.Errorf("product already exists with the same name")
+		return ErrRecordAlreadyExist
 	}
 
-	newProduct, err := pu.productRepo.InsertNewProductToDatabase(product)
+	err = pu.productRepo.CreateProduct(product)
 	if err != nil {
 		return fmt.Errorf("failed to create new product: %s", err)
-	}
-	if newProduct.ID == 0 {
-		return fmt.Errorf("failed to verify created product")
 	}
 
 	return nil
@@ -128,12 +121,12 @@ func (pu *productUseCase) CreateNewProduct(product request.Product) error {
 func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response.Product, error) {
 	startIndex, endIndex := helper.Paginate(page, count)
 
-	listOfAllProducts, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
+	products, err := pu.productRepo.ViewAllProductsToAdmin(startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
 
-	return listOfAllProducts, nil
+	return products, nil
 }
 
 func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
@@ -147,41 +140,34 @@ func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]
 	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductWithID(productID int, update request.Product) error {
-	updatedProduct, err := pu.productRepo.UpdateProductToDatabase(productID, update)
+func (pu *productUseCase) UpdateProductByID(productID int, update request.Product) error {
+	err := pu.productRepo.UpdateProduct(productID, update)
 	if err != nil {
 		return fmt.Errorf("Failed to update product :%s", err)
 	}
-	if updatedProduct.ID == 0 {
-		return fmt.Errorf("Failed to verify the updated product")
-	}
+
 	return nil
 }
 
-func (pu *productUseCase) BlockProductWithID(productID int) error {
-	blockedProduct, err := pu.productRepo.BlockProductFromDatabase(productID)
+func (pu *productUseCase) BlockProductByID(productID int) error {
+	err := pu.productRepo.BlockProduct(productID)
 	if err != nil {
 		return fmt.Errorf("Failed to block product :%s", err)
 	}
-	if blockedProduct.ID == 0 {
-		return fmt.Errorf("Failed to verify updated product")
-	}
+
 	return nil
 }
 
-func (pu *productUseCase) UnBlockProductWithID(productID int) error {
-	unBlockedProduct, err := pu.productRepo.UnblockProductFromDatabase(productID)
+func (pu *productUseCase) UnBlockProductByID(productID int) error {
+	err := pu.productRepo.UnblockProduct(productID)
 	if err != nil {
 		return fmt.Errorf("Failed unblock product :%s", err)
-	}
-	if unBlockedProduct.ID == 0 {
-		return fmt.Errorf("Failed to verify unblocked product")
 	}
 	return nil
 }
 
 func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, error) {
-	product, err := pd.productRepo.FindProductById(productID)
+	product, err := pd.productRepo.FindProductByID(productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
@@ -215,24 +201,27 @@ func (pu *productUseCase) ValidateProductRatingRequest(userID, productID int) er
 		return fmt.Errorf("Failed to find user rating")
 	}
 	if rating.ID != 0 {
-		return fmt.Errorf("User already done rating on this product")
+		return ErrRecordAlreadyExist
 	}
 
-	orderData, err := pu.orderRepo.FindOrderDataByUserIDAndProductID(userID, productID)
+	orderData, err := pu.orderRepo.FindOrderByUserIDAndProductID(userID, productID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order details")
 	}
+	
 	if orderData.ID == 0 {
-		return fmt.Errorf("User have not purchased the product")
+		return ErrNoRecord
 	}
+	
 	status, err := pu.orderRepo.FindOrderStatusByID(orderData.OrderStatusID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order status")
 	}
 
-	if status != "Delivered" {
-		return fmt.Errorf("Only delivered purchase can do rating.")
+	if status != delivered || status != returned {
+		return ErrInProcessing
 	}
+
 	return nil
 }
 
