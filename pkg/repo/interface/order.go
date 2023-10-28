@@ -9,8 +9,6 @@ import (
 
 type OrderRepository interface {
 	GetUserOrderHistory(userID, startIndex, endIndex int) ([]response.Orders, error)
-	GetStatusPending() (response.OrderStatus, error)
-	GetOrderStatuses() ([]response.OrderStatus, error)
 	InsertOrder(request.NewOrder) (response.OrderLine, error)
 	ChangeOrderStatusByID(statusID int, orderID int) (response.OrderLine, error)
 	FindOrderByUserIDAndProductID(userID, productID int) (response.OrderLine, error)
@@ -18,11 +16,13 @@ type OrderRepository interface {
 	GetAllOrderData(startIndex, endIndex int) ([]response.Orders, error)
 	FindOrderByID(orderID int) (response.OrderLine, error)
 	FindOrdersBoughtUsingCoupon(couponID int) ([]response.OrderLine, error)
-	GetStatusCancelled() (response.OrderStatus, error)
 	InitializeNewUserWallet(userID int) (response.Wallet, error)
 	FindUserWalletByID(userID int) (response.Wallet, error)
 	UpdateUserWalletBalance(userID int, amount float32) (response.Wallet, error)
 	GetStatusReturned() (response.OrderStatus, error)
+	GetStatusCancelled() (response.OrderStatus, error)
+	GetStatusPending() (response.OrderStatus, error)
+	GetOrderStatuses() ([]response.OrderStatus, error)
 	GetInvoiceDataByID(orderID int) (response.Orders, error)
 	//
 	UpdateWalletTransactionHistory(update request.WalletTransactionHistory) (response.WalletTransactionHistory, error)

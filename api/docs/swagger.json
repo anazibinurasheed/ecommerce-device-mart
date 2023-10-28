@@ -122,7 +122,7 @@
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieves all categories available.",
+                "description": "Retrieves all available categories.",
                 "produces": [
                     "application/json"
                 ],
@@ -152,7 +152,22 @@
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Category"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -343,6 +358,11 @@
         },
         "/admin/orders": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all order overview data.",
                 "produces": [
                     "application/json"
@@ -387,6 +407,11 @@
         },
         "/admin/orders/management": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves order management data.",
                 "produces": [
                     "application/json"
@@ -431,6 +456,11 @@
         },
         "/admin/orders/{orderID}/update-status/{statusID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Updates the status of an order with the specified ID.",
                 "produces": [
                     "application/json"
@@ -622,19 +652,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, unblocked product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "503": {
-                        "description": "Service Unavailable",
+                    "500": {
+                        "description": "Failed to unblock product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -766,6 +796,11 @@
         },
         "/admin/promotions/all-coupons": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "List out all the created coupons to the admin.",
                 "produces": [
                     "application/json"
@@ -792,6 +827,11 @@
         },
         "/admin/promotions/block-coupon/{couponID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Block the existing coupon by id.",
                 "produces": [
                     "application/json"
@@ -811,19 +851,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, coupon blocked",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to block coupon",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -833,6 +873,11 @@
         },
         "/admin/promotions/create-coupon": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Create a new coupon with the provided details",
                 "consumes": [
                     "application/json"
@@ -856,20 +901,20 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Success, created new coupon",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed, input does not meet validation criteria",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to create coupon",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -879,6 +924,11 @@
         },
         "/admin/promotions/unblock-coupon/{couponID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Unblock the existing coupon by id.",
                 "produces": [
                     "application/json"
@@ -904,7 +954,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -920,6 +970,11 @@
         },
         "/admin/promotions/update-coupon/{couponID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Create a new coupon with the provided details",
                 "consumes": [
                     "application/json"
@@ -957,13 +1012,13 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to update coupon",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -973,6 +1028,11 @@
         },
         "/admin/sales-report": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Sales report of last 30 days from the requested time",
                 "produces": [
                     "application/json"
@@ -983,13 +1043,25 @@
                 "summary": "Monthly sales report",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "No orders created yet",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.MonthlySalesReport"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to generate the sales report",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -999,6 +1071,11 @@
         },
         "/admin/user-management/block-user/{userID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Blocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -1021,19 +1098,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, user has been blocked",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to block user",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1043,6 +1120,11 @@
         },
         "/admin/user-management/unblock-user/{userID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Unblocks a user with the specified ID.",
                 "consumes": [
                     "application/json"
@@ -1087,6 +1169,11 @@
         },
         "/admin/user-management/view-all-users": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "List of all users",
                 "produces": [
                     "application/json"
@@ -1117,11 +1204,26 @@
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.UserData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
-                    "501": {
-                        "description": "Failed",
+                    "500": {
+                        "description": "Failed to fetch users",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1131,6 +1233,11 @@
         },
         "/cart": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves the cart items for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1175,6 +1282,11 @@
         },
         "/cart/add/{productID}": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Adds a product to the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1216,6 +1328,11 @@
         },
         "/cart/remove/{productID}": {
             "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Removes a product from the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1257,6 +1374,11 @@
         },
         "/cart/{productID}/decrement": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Decrements the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1298,6 +1420,11 @@
         },
         "/cart/{productID}/increment": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Increments the quantity of a product in the cart for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1337,63 +1464,13 @@
                 }
             }
         },
-        "/category/categories": {
+        "/category/{categoryID}": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieves all categories available.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin category management"
-                ],
-                "summary": "List out all categories",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Failed to bind page info from request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "503": {
-                        "description": "Failed to retrieve categories",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/category/{categoryID}": {
-            "get": {
                 "description": "Lists products based on the provided category ID.",
                 "consumes": [
                     "application/json"
@@ -1454,6 +1531,11 @@
         },
         "/checkout": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Displays the checkout details for the current user.",
                 "produces": [
                     "application/json"
@@ -1480,6 +1562,11 @@
         },
         "/coupon/apply": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Apply the coupon and if valid provide coupon discount",
                 "consumes": [
                     "application/json"
@@ -1526,6 +1613,11 @@
         },
         "/coupon/available": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get a list of available coupons for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -1552,6 +1644,11 @@
         },
         "/coupon/remove/{couponID}": {
             "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Remove the applied coupon from the user's coupon tracking.",
                 "produces": [
                     "application/json"
@@ -1673,6 +1770,11 @@
         },
         "/orders": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves the order history of the current user.",
                 "produces": [
                     "application/json"
@@ -1717,6 +1819,11 @@
         },
         "/orders/cancel/{orderID}": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Cancel the order. For online payments, the amount will be added to the user's wallet. For cash on delivery orders,will be marked as cancelled.\nIf the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.",
                 "consumes": [
                     "application/json"
@@ -1761,6 +1868,11 @@
         },
         "/orders/invoice/{orderID}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Download the invoice as a PDF file.",
                 "produces": [
                     "application/pdf"
@@ -1802,6 +1914,11 @@
         },
         "/orders/return/{orderID}": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Return the order if the order is valid for return.Amount will be added to the user's wallet.\nIf the user has used a coupon for the order, the discount amount will be recalculated based\non the percentage used and deducted from the refunding amount.",
                 "consumes": [
                     "application/json"
@@ -1846,6 +1963,11 @@
         },
         "/payment/cod-confirm": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Confirms the cash on delivery (COD) delivery for the current user.",
                 "produces": [
                     "application/json"
@@ -1872,6 +1994,11 @@
         },
         "/payment/online": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Make payment using razorpay page .",
                 "produces": [
                     "application/json"
@@ -1895,6 +2022,11 @@
         },
         "/payment/online/process": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Verify razorpay payment using razorpay credentials .",
                 "produces": [
                     "application/json"
@@ -1944,6 +2076,11 @@
         },
         "/payment/wallet": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "User can purchase using wallet",
                 "produces": [
                     "application/json"
@@ -2030,19 +2167,83 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to bind page info from request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Failed to retrieve products",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/categories": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves all available categories.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "List out all categories",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Category"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to bind page info from request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "503": {
-                        "description": "Service Unavailable",
+                        "description": "Failed to retrieve categories",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2052,6 +2253,11 @@
         },
         "/product/rating/{productID}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Validates if the user is authorized to rate a product.",
                 "consumes": [
                     "application/json"
@@ -2074,19 +2280,31 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success, user is valid for rating the product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "User doesn't purchased this product",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "User already rated this product",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve user id from context",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2094,6 +2312,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Adds a new rating for a product.",
                 "consumes": [
                     "application/json"
@@ -2153,6 +2376,11 @@
         },
         "/product/search": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Searches for products based on the provided search input",
                 "consumes": [
                     "application/json"
@@ -2213,6 +2441,11 @@
         },
         "/product/{productID}": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves details of a product with the specified ID.",
                 "produces": [
                     "application/json"
@@ -2232,19 +2465,31 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.ProductItem"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Failed to retrieve param from URL",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "503": {
-                        "description": "Service Unavailable",
+                    "500": {
+                        "description": "Failed to fetch product",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2254,6 +2499,11 @@
         },
         "/profile": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves the profile information for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -2280,6 +2530,11 @@
         },
         "/profile/add-address": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves the list of states for address selection.",
                 "produces": [
                     "application/json"
@@ -2304,6 +2559,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Adds a new address for the user.",
                 "consumes": [
                     "application/json"
@@ -2350,6 +2610,11 @@
         },
         "/profile/address-default/{addressID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Sets the specified address as the default address for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -2391,6 +2656,11 @@
         },
         "/profile/addresses": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Retrieves all addresses for the user.",
                 "produces": [
                     "application/json"
@@ -2417,6 +2687,11 @@
         },
         "/profile/change-password": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Change the password of the authenticated user",
                 "consumes": [
                     "application/json"
@@ -2470,6 +2745,11 @@
         },
         "/profile/delete-address/{addressID}": {
             "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Deletes an address by its ID.",
                 "produces": [
                     "application/json"
@@ -2506,6 +2786,9 @@
         "/profile/edit-username": {
             "post": {
                 "security": [
+                    {
+                        "Bearer": []
+                    },
                     {
                         "ApiKeyAuth": []
                     }
@@ -2556,6 +2839,11 @@
         },
         "/profile/update-address/{addressID}": {
             "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Updates an existing address for the user.",
                 "consumes": [
                     "application/json"
@@ -2611,6 +2899,9 @@
             "post": {
                 "security": [
                     {
+                        "Bearer": []
+                    },
+                    {
                         "ApiKeyAuth": []
                     }
                 ],
@@ -2661,6 +2952,9 @@
         "/referral/claim": {
             "post": {
                 "security": [
+                    {
+                        "Bearer": []
+                    },
                     {
                         "ApiKeyAuth": []
                     }
@@ -2717,6 +3011,11 @@
         },
         "/referral/get-code": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get the referral code of the currently logged-in user",
                 "produces": [
                     "application/json"
@@ -2869,6 +3168,11 @@
         },
         "/wallet/": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Get the wallet details for the authenticated user.",
                 "produces": [
                     "application/json"
@@ -2895,6 +3199,11 @@
         },
         "/wallet/create": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "Initialize the wallet for the authenticated user.",
                 "consumes": [
                     "application/json"
@@ -2924,6 +3233,11 @@
         },
         "/wallet/history": {
             "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "This endpoint will show all the wallet transaction history of the user.",
                 "produces": [
                     "application/json"
@@ -3238,6 +3552,52 @@
                 }
             }
         },
+        "response.Category": {
+            "type": "object",
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.MonthlySalesReport": {
+            "type": "object",
+            "properties": {
+                "average_order_value": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "report_from": {
+                    "type": "string"
+                },
+                "sales_growth_percentage": {
+                    "type": "number"
+                },
+                "top_selling_brand": {
+                    "type": "string"
+                },
+                "top_selling_product": {
+                    "type": "string"
+                },
+                "total_coupon_incentive": {
+                    "type": "number"
+                },
+                "total_quantity_sold": {
+                    "type": "integer"
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "total_sales_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.Product": {
             "type": "object",
             "properties": {
@@ -3270,6 +3630,61 @@
                 }
             }
         },
+        "response.ProductItem": {
+            "type": "object",
+            "properties": {
+                "brand": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_blocked": {
+                    "type": "boolean"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "product_description": {
+                    "type": "string"
+                },
+                "product_image": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "rating_and_reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Rating"
+                    }
+                },
+                "sku": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Rating": {
+            "type": "object",
+            "properties": {
+                "desription": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "rating_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -3287,6 +3702,29 @@
             "type": "object",
             "properties": {
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.UserData": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "is_blocked": {
+                    "type": "boolean"
+                },
+                "phone": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
                     "type": "string"
                 }
             }

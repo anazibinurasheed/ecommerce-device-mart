@@ -28,6 +28,7 @@ func NewOrderHandler(useCase services.OrderUseCase) *OrderHandler {
 //	@Summary		Checkout page
 //	@Description	Displays the checkout details for the current user.
 //	@Tags			checkout
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -52,6 +53,7 @@ func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
 //	@Summary		Confirm COD delivery
 //	@Description	Confirms the cash on delivery (COD) delivery for the current user.
 //	@Tags			checkout
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -77,6 +79,7 @@ func (oh *OrderHandler) ConfirmCodDelivery(c *gin.Context) {
 //	@Summary		Make payment razorpay
 //	@Description	Make payment using razorpay page .
 //	@Tags			checkout
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200
 //	@Failure		500	{object}	response.Response
@@ -102,6 +105,7 @@ func (oh *OrderHandler) GetOnlinePayment(c *gin.Context) {
 //	@Summary		Verify razorpay payment
 //	@Description	Verify razorpay payment using razorpay credentials .
 //	@Tags			checkout
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			body	body		request.VerifyPayment	true	"Payment details"
 //	@Success		200		{object}	response.Response
@@ -143,6 +147,7 @@ func (oh *OrderHandler) ProcessOnlinePayment(c *gin.Context) {
 //	@Summary		Get order history
 //	@Description	Retrieves the order history of the current user.
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
@@ -182,6 +187,7 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 //	@Summary		Get order management data
 //	@Description	Retrieves order management data.
 //	@Tags			admin order management
+//	@Security		Bearer
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
@@ -219,6 +225,7 @@ func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
 //	@Summary		Get all order overview data
 //	@Description	Retrieves all order overview data.
 //	@Tags			admin order management
+//	@Security		Bearer
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
@@ -262,6 +269,7 @@ func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
 //	@Summary		Update order status
 //	@Description	Updates the status of an order with the specified ID.
 //	@Tags			admin order management
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			orderID		path		int	true	"Order ID"
 //	@Param			statusID	path		int	true	"Status ID"
@@ -304,6 +312,7 @@ func (oh *OrderHandler) UpdateOrderStatus(c *gin.Context) {
 //	@Description	Cancel the order. For online payments, the amount will be added to the user's wallet. For cash on delivery orders,will be marked as cancelled.
 //	@Description	If the user has used a coupon for the order, the discount amount will be recalculated based on the percentage used and deducted from the refunding amount.
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			orderID	path		int	true	"Order ID"
@@ -336,6 +345,7 @@ func (oh *OrderHandler) CancelOrder(c *gin.Context) {
 //	@Description	Return the order if the order is valid for return.Amount will be added to the user's wallet.
 //	@Description	If the user has used a coupon for the order, the discount amount will be recalculated based
 //	@Description	on the percentage used and deducted from the refunding amount.
+//	@Security		Bearer
 //	@Tags			user orders
 //	@Accept			json
 //	@Produce		json
@@ -366,6 +376,7 @@ func (oh *OrderHandler) ReturnOrder(c *gin.Context) {
 //	@Summary		Download invoice
 //	@Description	Download the invoice as a PDF file.
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Produce		application/pdf
 //	@Param			orderID	path		int	true	"Order ID"
 //	@Success		200		{object}	response.Response
@@ -396,6 +407,7 @@ func (oh *OrderHandler) CreateInvoice(c *gin.Context) {
 //	@Summary		Create user wallet
 //	@Description	Initialize the wallet for the authenticated user.
 //	@Tags			wallet
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	response.Response
@@ -421,6 +433,7 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //	@Summary		View user wallet
 //	@Description	Get the wallet details for the authenticated user.
 //	@Tags			wallet
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -474,6 +487,7 @@ func (od *OrderHandler) WebhookHandler(c *gin.Context) {
 //	@Summary		Pay using wallet
 //	@Description	User can purchase using wallet
 //	@Tags			checkout
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		400	{object}	response.Response
@@ -504,6 +518,7 @@ func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
 //	@Summary		User wallet transaction history
 //	@Description	This endpoint will show all the wallet transaction history of the user.
 //	@Tags			wallet
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -527,10 +542,11 @@ func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 //	@Summary		Monthly sales report
 //	@Description	Sales report of last 30 days from the requested time
 //	@Tags			sales-report
+//	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport} "Success"
-//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport} "No orders created yet"
-//	@Failure		500	{object}	response.Response "Failed to generate the sales report"
+//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport}	"Success"
+//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport}	"No orders created yet"
+//	@Failure		500	{object}	response.Response									"Failed to generate the sales report"
 //	@Router			/admin/sales-report [get]
 func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
 	salesReport, err := od.orderUseCase.MonthlySalesReport()

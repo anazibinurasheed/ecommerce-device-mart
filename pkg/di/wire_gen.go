@@ -47,7 +47,7 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	referralRepository := repo.NewReferralRepository(gormDB)
 	referralUseCase := usecase.NewReferralUseCase(referralRepository, orderRepository)
 	referralHandler := handler.NewReferralHandler(referralUseCase)
-	auth := auth.NewAuthMiddleware()
+	auth := auth.NewAuthMiddleware(userUseCase)
 
 	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler, auth)
 	return serverHTTP, nil

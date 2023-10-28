@@ -51,7 +51,7 @@ func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
 	if err != nil {
 		return response.CheckOut{}, fmt.Errorf("Failed to retrieve checkout details %s", err)
 	}
-	
+
 	if len(addresses) == 0 {
 		return response.CheckOut{}, fmt.Errorf("User don't have an address")
 	}

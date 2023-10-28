@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
+	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -18,11 +19,13 @@ const (
 )
 
 // AuthMiddleware provides authentication and authorization functionality.
-type AuthMiddleware struct{}
+type AuthMiddleware struct {
+	userUseCase services.UserUseCase
+}
 
 // NewAuthMiddleware creates a new instance of the authentication middleware.
-func NewAuthMiddleware() *AuthMiddleware {
-	return &AuthMiddleware{}
+func NewAuthMiddleware(useCase services.UserUseCase) *AuthMiddleware {
+	return &AuthMiddleware{userUseCase: useCase}
 }
 
 // unauthorized sets an appropriate response for unauthorized access.
@@ -43,6 +46,14 @@ func (a *AuthMiddleware) tokenExpired(c *gin.Context) {
 	c.Abort()
 }
 
+func (a *AuthMiddleware) checkIsBlockedUser(userID int) (ok bool) {
+	userData, err := a.userUseCase.FindUserById(userID)
+	if err != nil {
+		return false
+	}
+	return !userData.IsBlocked
+}
+
 // tokenAuth checks the user's token for authentication.
 func (a *AuthMiddleware) tokenAuth(c *gin.Context, role string) bool {
 	tokenString := c.Request.Header.Get("Authorization")
@@ -59,15 +70,13 @@ func (a *AuthMiddleware) tokenAuth(c *gin.Context, role string) bool {
 	}
 
 	tokenString = val[1]
-	fmt.Println("token string")
-	fmt.Println(tokenString)
+
 	token, err := a.parseToken(tokenString)
 
 	if err != nil {
 		a.unauthorized(c)
 		return false
 	}
-	fmt.Println("1")
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
@@ -76,7 +85,6 @@ func (a *AuthMiddleware) tokenAuth(c *gin.Context, role string) bool {
 			return false
 		}
 
-		fmt.Println(claims["role"])
 		if claims["role"] != role {
 			a.unauthorized(c)
 			return false

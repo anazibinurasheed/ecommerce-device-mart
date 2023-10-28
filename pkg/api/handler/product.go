@@ -27,8 +27,8 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 //
 //	@Summary		Create category
 //	@Description	Creates a new category based on the provided category name.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Category	true	"Category name"
@@ -63,15 +63,15 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 // ReadAllCategories godoc
 //
 //	@Summary		List out all categories
-//	@Description	Retrieves all categories available.
-//	@Security		Bearer
+//	@Description	Retrieves all available categories.
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			page	query		int					true	"Page number"				default(1)
-//	@Param			count	query		int					true	"Number of items per page"	default(10)
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
 //	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
-//	@Failure		400		{object}	response.Response	"Failed to bind page info from request"
-//	@Failure		503		{object}	response.Response	"Failed to retrieve categories"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		503		{object}	response.Response							"Failed to retrieve categories"
 //	@Router			/admin/category/categories [get]
 func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 	page, count, ok := p.subHandler.GetPageNCount(c)
@@ -95,16 +95,16 @@ func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 // Categories godoc
 //
 //	@Summary		List out all categories
-//	@Description	Retrieves all categories available.
+//	@Description	Retrieves all available categories.
+//	@Tags			products
 //	@Security		Bearer
-//	@Tags			admin category management
 //	@Produce		json
-//	@Param			page	query		int					true	"Page number"				default(1)
-//	@Param			count	query		int					true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response	"Success"
-//	@Failure		400		{object}	response.Response	"Failed to bind page info from request"
-//	@Failure		503		{object}	response.Response	"Failed to retrieve categories"
-//	@Router			/category/categories [get]
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
+//	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		503		{object}	response.Response							"Failed to retrieve categories"
+//	@Router			/product/categories [get]
 func (p *ProductHandler) Categories(c *gin.Context) {
 	page, count, ok := p.subHandler.GetPageNCount(c)
 	if !ok {
@@ -126,8 +126,8 @@ func (p *ProductHandler) Categories(c *gin.Context) {
 //
 //	@Summary		Update a category
 //	@Description	Updates a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
@@ -164,8 +164,8 @@ func (p *ProductHandler) UpdateCategory(c *gin.Context) {
 //
 //	@Summary		Block a category
 //	@Description	Blocks a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
 //	@Success		200			{object}	response.Response	"Success, category has been blocked"
@@ -193,8 +193,8 @@ func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 //
 //	@Summary		Unblock a category
 //	@Description	Unblocks a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
@@ -223,8 +223,8 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 //
 //	@Summary		Create a new product
 //	@Description	Creates a new product with the specified details.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
@@ -236,7 +236,7 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 //	@Failure		400			{object}	response.Response	"Failed, category not found"
 //	@Failure		409			{object}	response.Response	"Failed, product already exist with same name"
 //	@Failure		500			{object}	response.Response	"Failed to create product"
-//	@Router			/admin/products/add-product/{categoryID} [post]
+//	@Router			/admin/product/add-product/{categoryID} [post]
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	var body request.Product
 	if !ph.subHandler.BindRequest(c, &body) {
@@ -279,14 +279,14 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 //
 //	@Summary		Display  products to admin
 //	@Description	Retrieves a list of all products including blocked.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			page	query		int												true	"Page number"				default(1)
-//	@Param			count	query		int												true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response{data=response.ProductSlice}	"Success"
-//	@Failure		400		{object}	response.Response								"Failed to bind page info from request"
-//	@Failure		500		{object}	response.Response								"Failed to fetch products"
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
+//	@Success		200		{object}	response.Response{data=[]response.Product}	"Success"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		500		{object}	response.Response							"Failed to fetch products"
 //	@Router			/admin/product/products [get]
 func (ph *ProductHandler) ShowProductsToAdmin(c *gin.Context) {
 	page, count, ok := ph.subHandler.GetPageNCount(c)
@@ -310,8 +310,8 @@ func (ph *ProductHandler) ShowProductsToAdmin(c *gin.Context) {
 //
 //	@Summary		Update a product
 //	@Description	Updates an existing product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -348,8 +348,8 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 //
 //	@Summary		Block a product
 //	@Description	Blocks a product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -378,13 +378,13 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 //
 //	@Summary		Unblock a product
 //	@Description	Unblocks a product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response "Success, unblocked product"
-//  @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
-//	@Failure		500			{object}	response.Response "Failed to unblock product"
+//	@Param			productID	path		int					true	"Product ID"
+//	@Success		200			{object}	response.Response	"Success, unblocked product"
+//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response	"Failed to unblock product"
 //	@Router			/admin/product/unblock-product/{productID} [put]
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, ok := ph.subHandler.ParamInt(c, "productID")
@@ -407,8 +407,8 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //
 //	@Summary		Display all products to the user
 //	@Description	Retrieves all available products for the user.
-//	@Security		Bearer
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			page	query		int											true	"Page number"				default(1)
@@ -439,6 +439,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 //	@Summary		View a product
 //	@Description	Retrieves details of a product with the specified ID.
 //	@Tags			products
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int												true	"Product ID"
 //	@Success		200			{object}	response.Response{data=response.ProductItem}	"Success"
@@ -466,8 +467,8 @@ func (pd *ProductHandler) ViewIndividualProduct(c *gin.Context) {
 //
 //	@Summary		Validate product rating request
 //	@Description	Validates if the user is authorized to rate a product.
-//	@Security		Bearer
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -517,6 +518,7 @@ func (pd *ProductHandler) ValidateRatingRequest(c *gin.Context) {
 //	@Summary		Add product rating
 //	@Description	Adds a new rating for a product.
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int				true	"Product ID"
@@ -566,6 +568,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 //	@Summary		Search Products
 //	@Description	Searches for products based on the provided search input
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			search	query		string	true	"Search input"
@@ -614,6 +617,7 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Summary		List products by category
 //	@Description	Lists products based on the provided category ID.
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int	true	"Category ID"

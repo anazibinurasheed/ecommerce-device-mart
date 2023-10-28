@@ -1,75 +1,75 @@
-//go:build wireinject
-// +build wireinject
+// //go:build wireinject
+// // +build wireinject
 
 package di
 
-import (
-	http "github.com/anazibinurasheed/project-device-mart/pkg/api"
-	"github.com/anazibinurasheed/project-device-mart/pkg/config"
-	"github.com/anazibinurasheed/project-device-mart/pkg/db"
-	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
-	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
+// import (
+// 	http "github.com/anazibinurasheed/project-device-mart/pkg/api"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
 
-	"github.com/google/wire"
-)
+// 	"github.com/google/wire"
+// )
 
-func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
+// func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
 
-	wire.Build(
+// 	wire.Build(
 
-		db.ConnectToDatabase,
+// 		db.ConnectToDatabase,
 
-		handler.NewAdminHandler,
+// 		handler.NewAdminHandler,
 
-		handler.NewUserHandler,
+// 		handler.NewUserHandler,
 
-		handler.NewProductHandler,
+// 		handler.NewProductHandler,
 
-		handler.NewCartHandler,
+// 		handler.NewCartHandler,
 
-		handler.NewCommonHandler,
+// 		handler.NewCommonHandler,
 
-		handler.NewOrderHandler,
+// 		handler.NewOrderHandler,
 
-		handler.NewCouponHandler,
+// 		handler.NewCouponHandler,
 
-		handler.NewReferralHandler,
+// 		handler.NewReferralHandler,
 
-		usecase.NewAdminUseCase,
+// 		usecase.NewAdminUseCase,
 
-		usecase.NewUserUseCase,
+// 		usecase.NewUserUseCase,
 
-		usecase.NewProductUseCase,
+// 		usecase.NewProductUseCase,
 
-		usecase.NewCommonUseCase,
+// 		usecase.NewCommonUseCase,
 
-		usecase.NewCartUseCase,
+// 		usecase.NewCartUseCase,
 
-		usecase.NewOrderUseCase,
+// 		usecase.NewOrderUseCase,
 
-		usecase.NewCouponUseCase,
+// 		usecase.NewCouponUseCase,
 
-		usecase.NewReferralUseCase,
+// 		usecase.NewReferralUseCase,
 
-		repo.NewAdminRepository,
+// 		repo.NewAdminRepository,
 
-		repo.NewUserRepository,
+// 		repo.NewUserRepository,
 
-		repo.NewProductRepository,
+// 		repo.NewProductRepository,
 
-		repo.NewCartRepository,
+// 		repo.NewCartRepository,
 
-		repo.NewPaymentRepository,
+// 		repo.NewPaymentRepository,
 
-		repo.NewOrderRepository,
+// 		repo.NewOrderRepository,
 
-		repo.NewCouponRepository,
+// 		repo.NewCouponRepository,
 
-		repo.NewReferralRepository,
+// 		repo.NewReferralRepository,
 
-		http.NewServerHTTP)
+// 		http.NewServerHTTP)
 
-	return &http.ServerHTTP{}, nil
-}
+// 	return &http.ServerHTTP{}, nil
+// }
