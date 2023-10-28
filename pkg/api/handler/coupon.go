@@ -158,7 +158,7 @@ func (ch *CouponHandler) UnBlockCoupon(c *gin.Context) {
 //	@Security		Bearer
 //	@Tags			promotions
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Coupon}
 //	@Failure		500	{object}	response.Response
 //	@Router			/admin/promotions/all-coupons  [get]
 func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {

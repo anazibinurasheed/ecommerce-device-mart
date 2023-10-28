@@ -57,7 +57,7 @@ func (a *AuthHandler) AdminLogin(c *gin.Context) {
 
 	TokenString, err := a.token.GenerateAdminToken()
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed to generate token", nil, err.Error())
+		response := response.ResponseMessage(statusInternalServerError, "Failed to generate token", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
 		return
 	}
@@ -65,8 +65,8 @@ func (a *AuthHandler) AdminLogin(c *gin.Context) {
 	a.token.SetTokenHeader(c, TokenString)
 	token := &response.Token{Tkn: TokenString}
 
-	response := response.ResponseMessage(200, "Login success", token, nil)
-	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(statusOK, "Login success", token, nil)
+	c.JSON(statusOK, response)
 }
 
 // SendOTP godoc
@@ -77,21 +77,20 @@ func (a *AuthHandler) AdminLogin(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Phone	true	"Phone number"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
+//	@Success		200		{object}	response.Response{data=response.Uuid}
+//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
 //	@Router			/send-otp [post]
-func (ch *AuthHandler) SendOTP(c *gin.Context) {
+func (a *AuthHandler) SendOTP(c *gin.Context) {
 	var body request.Phone
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+	if !a.subHandler.BindRequest(c, &body) {
 		return
 	}
 
-	phone, err := ch.authUseCase.ValidateSignUpRequest(body)
+	phone, err := a.authUseCase.ValidateSignUpRequest(body)
 	if err != nil {
-		response := response.ResponseMessage(400, "Failed", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+		response := response.ResponseMessage(statusBadRequest, "Failed", nil, err.Error())
+		c.JSON(statusBadRequest, response)
 		return
 	}
 
@@ -106,8 +105,9 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 		fmt.Println(contact)
 	}()
 
-	response := response.ResponseMessage(202, "Success, otp sended.The otp will be expire within 1 minute.", uuid, nil)
-	c.JSON(http.StatusAccepted, response)
+	data := response.Uuid{Uuid: uuid}
+	response := response.ResponseMessage(statusOK, "Success, otp sended.The otp will be expire within 3 minute.", data, nil)
+	c.JSON(statusOK, response)
 }
 
 // VerifyOTP godoc
@@ -118,16 +118,16 @@ func (ch *AuthHandler) SendOTP(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Otp	true	"OTP"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
-//	@Failure		401		{object}	response.Response
+//	@Success		200		{object}	response.Response{data=response.Uuid}  "Success, verified phone number"
+//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
+//	@Failure		400		{object}	response.Response "Failed to verify otp"
+//	@Failure		400		{object}	response.Response "Incorrect otp"
+//	@Failure		500		{object}	response.Response	"OTP expired"
 //	@Router			/verify-otp [post]
-func (ah *AuthHandler) VerifyOTP(c *gin.Context) {
+func (a *AuthHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
-
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+	if !a.subHandler.BindRequest(c, &body) {
 		return
 	}
 
@@ -137,29 +137,31 @@ func (ah *AuthHandler) VerifyOTP(c *gin.Context) {
 	}
 
 	if !ok {
-		response := response.ResponseMessage(500, "Failed", nil, fmt.Errorf("otp expired").Error())
-		c.JSON(http.StatusInternalServerError, response)
+		response := response.ResponseMessage(statusInternalServerError, "OTP expired", nil, "unable to find phone number")
+		c.JSON(statusInternalServerError, response)
 		return
 	}
 
 	status, err := helper.CheckOtp(phone, body.Otp)
+
 	if err != nil {
-
 		contact.NotVerified(body.UUID, phone)
-
-		response := response.ResponseMessage(400, "Failed", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+		response := response.ResponseMessage(statusBadRequest, "Failed to verify otp", nil, err.Error())
+		c.JSON(statusBadRequest, response)
 		return
 	}
 
 	if status == "incorrect" {
-		response := response.ResponseMessage(400, "Incorrect otp", nil, nil)
-		c.JSON(http.StatusBadRequest, response)
+		response := response.ResponseMessage(statusBadRequest, "Incorrect otp", nil, nil)
+		c.JSON(statusBadRequest, response)
 		return
 	}
 
-	response := response.ResponseMessage(202, "Success, verified phone number", body.UUID, nil)
-	c.JSON(http.StatusAccepted, response)
+	data := response.Uuid{
+		Uuid: body.UUID,
+	}
+	response := response.ResponseMessage(statusOK, "Success, verified phone number", data, nil)
+	c.JSON(statusOK, response)
 }
 
 // UserSignUp is the handler function for user sign-up.
@@ -170,14 +172,15 @@ func (ah *AuthHandler) VerifyOTP(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.SignUpData	true	"User Sign-Up Data"
-//	@Success		200		{object}	response.Response
-//	@Failure		400		{object}	response.Response
-//	@Router			/sign-up [post]
+//	@Success		201		{object}	response.Response "Success, account created"
+//
+// @Failure	400	{object}	response.Response	"Failed to bind JSON inputs from request"
+//
+//	 @Failure	400	{object}	response.Response	"Failed, input does not meet validation criteria"
+//		@Router			/sign-up [post]
 func (u *AuthHandler) UserSignUp(c *gin.Context) {
 	var body request.SignUpData
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+	if !u.subHandler.BindRequest(c, &body) {
 		return
 	}
 
@@ -185,21 +188,21 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 
 	switch {
 	case !ok:
-		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("otp not verified").Error())
-		c.JSON(http.StatusUnauthorized, response)
+		response := response.ResponseMessage(statusUnauthorized, "User not verified OTP", nil, "phone not found")
+		c.JSON(statusUnauthorized, response)
 		return
 
 	case !verified:
-		response := response.ResponseMessage(401, "Failed.", nil, fmt.Errorf("invalid try, user not verified otp").Error())
-		c.JSON(http.StatusUnauthorized, response)
+		response := response.ResponseMessage(statusUnauthorized, "Failed not verified OTP", nil, "invalid try, user not verified otp")
+		c.JSON(statusUnauthorized, response)
 		return
 
 	}
 
 	phone, err := strconv.Atoi(phoneStr)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed.", nil, err.Error())
-		c.JSON(http.StatusInternalServerError, response)
+		response := response.ResponseMessage(statusInternalServerError, "Failed unable to convert type", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
 		return
 
 	}
@@ -215,8 +218,8 @@ func (u *AuthHandler) UserSignUp(c *gin.Context) {
 
 	contact.Delete(body.Uuid)
 
-	response := response.ResponseMessage(200, "Success, account created", nil, nil)
-	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(statusCreated, "Success, account created", nil, nil)
+	c.JSON(statusCreated, response)
 }
 
 // UserLogin godoc
@@ -261,14 +264,14 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-//	@Summary		User Logout
-//	@Description	Logs out user and removes token from the header.
-//	@Security		Bearer
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Success		202	{object}	response.Response	"Logged out, success"
-//	@Router			/logout [post]
+// @Summary		User Logout
+// @Description	Logs out user and removes token from the header.
+// @Security		Bearer
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Success		202	{object}	response.Response	"Logged out, success"
+// @Router			/logout [post]
 func (ah *AuthHandler) Logout(c *gin.Context) {
 	ah.token.RemoveToken(c)
 
