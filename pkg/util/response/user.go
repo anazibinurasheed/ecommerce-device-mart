@@ -3,14 +3,14 @@ package response
 import "time"
 
 type UserData struct {
-	ID        int    `json:"user_id"`
-	UserName  string `json:"user_name"`
-	Email     string `json:"email"`
-	Phone     int    `json:"phone"`
-	Password  string `json:"password,omitempty"`
-	IsAdmin   bool   `json:"is_admin"`
-	IsBlocked bool   `json:"is_blocked"`
-	CreatedAt time.Time
+	ID        int       `json:"user_id"`
+	UserName  string    `json:"user_name"`
+	Email     string    `json:"email"`
+	Phone     int       `json:"phone"`
+	Password  string    `json:"-"`
+	IsAdmin   bool      `json:"-"`
+	IsBlocked bool      `json:"is_blocked"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Address struct {
@@ -26,17 +26,18 @@ type Address struct {
 	State            string `json:"state"`
 	Landmark         string `json:"landmark"`
 	AlternativePhone string `json:"alternative_phone"`
-	IsDefault        bool
+	IsDefault        bool   `json:"is_default"`
 }
+
 type States struct {
 	ID   uint   `json:"id"`
 	Name string `json:"state_name"`
 }
 
 type Profile struct {
-	ID        int
-	UserName  string
-	Email     string
-	Phone     int
-	Addresses []Address
+	ID        int       `json:"user_id"`
+	UserName  string    `json:"username"`
+	Email     string    `json:"email"`
+	Phone     int       `json:"phone"`
+	Addresses []Address `json:"addresses"`
 }
