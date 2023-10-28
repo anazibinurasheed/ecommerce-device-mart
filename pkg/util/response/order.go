@@ -2,7 +2,7 @@ package response
 
 import "time"
 
-// No external connections
+//No external connections
 type OrderLine struct {
 	ID              uint      `json:"id"`
 	UserID          uint      `json:"user_id"`
@@ -23,11 +23,11 @@ type Orders struct {
 	ProductImage    string  `json:"product_image"`
 	ProductName     string  `json:"product_name"`
 	ProductPrice    float32 `json:"product_price"`
-	OrderStatusID   int     `json:"order_status_id"`
+	OrderStatusID   int     `json:"-"`
 	OrderStatus     string  `json:"order_status"`
-	PaymentMethodID int     `json:"payment_method_id"`
+	PaymentMethodID int     `json:"-"`
 	PaymentMethod   string  `json:"payment_method"`
-	AddressesID     int     `json:"delivery_address_id"`
+	AddressesID     int     `json:"-"`
 	DeliveryAddress string  `json:"delivery_address"`
 }
 

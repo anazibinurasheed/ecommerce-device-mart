@@ -69,7 +69,7 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 //	@Produce		json
 //	@Param			page	query		int					true	"Page number"				default(1)
 //	@Param			count	query		int					true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response	"Success"
+//	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
 //	@Failure		400		{object}	response.Response	"Failed to bind page info from request"
 //	@Failure		503		{object}	response.Response	"Failed to retrieve categories"
 //	@Router			/admin/category/categories [get]
@@ -382,9 +382,9 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 //	@Tags			admin product management
 //	@Produce		json
 //	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response
-//	@Failure		400			{object}	response.Response
-//	@Failure		503			{object}	response.Response
+//	@Success		200			{object}	response.Response "Success, unblocked product"
+//  @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response "Failed to unblock product"
 //	@Router			/admin/product/unblock-product/{productID} [put]
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, ok := ph.subHandler.ParamInt(c, "productID")
@@ -399,8 +399,8 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success, unblocked product", nil, nil)
-	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(statusOK, "Success, unblocked product", nil, nil)
+	c.JSON(statusOK, response)
 }
 
 // DisplayAllProductsToUser godoc

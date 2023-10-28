@@ -208,11 +208,11 @@ func (pu *productUseCase) ValidateProductRatingRequest(userID, productID int) er
 	if err != nil {
 		return fmt.Errorf("Failed to find order details")
 	}
-	
+
 	if orderData.ID == 0 {
 		return ErrNoRecord
 	}
-	
+
 	status, err := pu.orderRepo.FindOrderStatusByID(orderData.OrderStatusID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order status")

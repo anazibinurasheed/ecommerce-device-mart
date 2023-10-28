@@ -173,12 +173,6 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 		return
 	}
 
-	if len(orderHistory) == 0 {
-		response := response.ResponseMessage(404, "No data available", nil, nil)
-		c.JSON(http.StatusNotFound, response)
-		return
-	}
-
 	response := response.ResponseMessage(200, "Success", orderHistory, nil)
 	c.JSON(http.StatusOK, response)
 }
@@ -506,6 +500,7 @@ func (od *OrderHandler) PayUsingWallet(c *gin.Context) {
 }
 
 // WalletTransactionHistory godoc
+//
 //	@Summary		User wallet transaction history
 //	@Description	This endpoint will show all the wallet transaction history of the user.
 //	@Tags			wallet
@@ -533,24 +528,25 @@ func (od *OrderHandler) WalletTransactionHistory(c *gin.Context) {
 //	@Description	Sales report of last 30 days from the requested time
 //	@Tags			sales-report
 //	@Produce		json
-//	@Success		200	{object}	response.Response
-//	@Failure		500	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport} "Success"
+//	@Success		200	{object}	response.Response{data=response.MonthlySalesReport} "No orders created yet"
+//	@Failure		500	{object}	response.Response "Failed to generate the sales report"
 //	@Router			/admin/sales-report [get]
 func (od *OrderHandler) MonthlySalesReport(c *gin.Context) {
 	salesReport, err := od.orderUseCase.MonthlySalesReport()
 
 	if err == usecase.ErrNoOrders {
-		response := response.ResponseMessage(http.StatusOK, "No orders created yet", salesReport, nil)
-		c.JSON(http.StatusOK, response)
+		response := response.ResponseMessage(statusOK, "No orders created yet", salesReport, nil)
+		c.JSON(statusOK, response)
 		return
 	}
 
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed to generate the sales report", nil, err.Error())
-		c.JSON(http.StatusInternalServerError, response)
+		response := response.ResponseMessage(statusInternalServerError, "Failed to generate the sales report", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success", salesReport, nil)
-	c.JSON(http.StatusInternalServerError, response)
+	response := response.ResponseMessage(statusOK, "Success", salesReport, nil)
+	c.JSON(statusOK, response)
 }
