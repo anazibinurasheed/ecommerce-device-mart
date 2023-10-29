@@ -24,6 +24,7 @@ type OrderStatus struct {
 	ID     uint   `gorm:"not null;primaryKey"`
 	Status string `gorm:"not null;unique"`
 }
+
 type OrderLine struct {
 	ID              uint          `gorm:"not null;primaryKey"`
 	UserID          uint          `gorm:"not null"`
