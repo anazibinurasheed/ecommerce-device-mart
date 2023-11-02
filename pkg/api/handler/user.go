@@ -183,7 +183,7 @@ func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
 //	@Tags			user profile
 //	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=response.Profile}
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile [get]
 func (uh *UserHandler) Profile(c *gin.Context) {

@@ -114,8 +114,6 @@ definitions:
     type: object
   request.Product:
     properties:
-      category_id:
-        type: integer
       price:
         type: integer
       product_description:
@@ -169,6 +167,35 @@ definitions:
     - razorpay_payment_id
     - razorpay_signature
     type: object
+  response.Address:
+    properties:
+      address_line:
+        type: string
+      alternative_phone:
+        type: string
+      district:
+        type: string
+      id:
+        type: integer
+      is_default:
+        type: boolean
+      landmark:
+        type: string
+      locality:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      pincode:
+        type: string
+      state:
+        type: string
+      state_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   response.Cart:
     properties:
       brand:
@@ -202,6 +229,46 @@ definitions:
       id:
         type: integer
     type: object
+  response.Checkout:
+    properties:
+      delivery_address:
+        items:
+          $ref: '#/definitions/response.Address'
+        type: array
+      discount:
+        type: number
+      items:
+        items:
+          $ref: '#/definitions/response.Cart'
+        type: array
+      payment_options:
+        items:
+          $ref: '#/definitions/response.PaymentMethod'
+        type: array
+      total:
+        type: number
+    type: object
+  response.Coupon:
+    properties:
+      code:
+        type: string
+      coupon_name:
+        type: string
+      discount_max_amount:
+        type: number
+      discount_percentage:
+        type: number
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      min_order_value:
+        type: number
+      valid_from:
+        type: string
+      valid_till:
+        type: string
+    type: object
   response.MonthlySalesReport:
     properties:
       average_order_value:
@@ -224,6 +291,50 @@ definitions:
         type: number
       total_sales_count:
         type: integer
+    type: object
+  response.OrderManagement:
+    properties:
+      order_statuses:
+        items:
+          $ref: '#/definitions/response.OrderStatus'
+        type: array
+      orders:
+        items:
+          $ref: '#/definitions/response.Orders'
+        type: array
+    type: object
+  response.OrderStatus:
+    properties:
+      id:
+        type: integer
+      order_status:
+        type: string
+    type: object
+  response.Orders:
+    properties:
+      delivery_address:
+        type: string
+      order_id:
+        type: integer
+      order_status:
+        type: string
+      payment_method:
+        type: string
+      product_id:
+        type: integer
+      product_image:
+        type: string
+      product_name:
+        type: string
+      product_price:
+        type: number
+    type: object
+  response.PaymentMethod:
+    properties:
+      id:
+        type: integer
+      method:
+        type: string
     type: object
   response.Product:
     properties:
@@ -269,6 +380,21 @@ definitions:
           $ref: '#/definitions/response.Rating'
         type: array
       sku:
+        type: string
+    type: object
+  response.Profile:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/response.Address'
+        type: array
+      email:
+        type: string
+      phone:
+        type: integer
+      user_id:
+        type: integer
+      username:
         type: string
     type: object
   response.Rating:
@@ -558,7 +684,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Orders'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -624,7 +757,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.OrderManagement'
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -634,6 +772,47 @@ paths:
       summary: Get order management data
       tags:
       - admin order management
+  /admin/product/add-product/{categoryID}:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product with the specified details.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Product details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success, added new product
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed, category not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Failed, product already exist with same name
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to create product
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a new product
+      tags:
+      - admin product management
   /admin/product/block-product/{productID}:
     put:
       consumes:
@@ -774,47 +953,6 @@ paths:
       summary: Update a product
       tags:
       - admin product management
-  /admin/products/add-product/{categoryID}:
-    post:
-      consumes:
-      - application/json
-      description: Creates a new product with the specified details.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      - description: Product details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/request.Product'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success, added new product
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Failed, category not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "409":
-          description: Failed, product already exist with same name
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Failed to create product
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Create a new product
-      tags:
-      - admin product management
   /admin/promotions/all-coupons:
     get:
       description: List out all the created coupons to the admin.
@@ -824,7 +962,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Coupon'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -945,7 +1090,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful,coupon updated
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -1288,7 +1433,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Checkout'
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -1314,7 +1464,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -1339,7 +1489,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Coupon'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -1362,7 +1519,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -1451,7 +1608,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Orders'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -1901,7 +2065,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Profile'
+              type: object
         "500":
           description: Internal Server Error
           schema:
@@ -2252,9 +2421,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
       summary: Send sign up OTP to Phone
@@ -2275,12 +2449,12 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Success, account created
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
       summary: User Sign-Up after otp validation
@@ -2303,15 +2477,20 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, verified phone number
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: Bad Request
+          description: Incorrect otp
           schema:
             $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
+        "500":
+          description: OTP expired
           schema:
             $ref: '#/definitions/response.Response'
       summary: Verify sign up  OTP

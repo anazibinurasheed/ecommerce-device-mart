@@ -30,7 +30,7 @@ func NewOrderHandler(useCase services.OrderUseCase) *OrderHandler {
 //	@Tags			checkout
 //	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=response.Checkout}
 //	@Failure		500	{object}	response.Response
 //	@Router			/checkout [get]
 func (oh *OrderHandler) CheckOutPage(c *gin.Context) {
@@ -151,7 +151,7 @@ func (oh *OrderHandler) ProcessOnlinePayment(c *gin.Context) {
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Orders}
 //	@Failure		500	{object}	response.Response
 //	@Router			/orders [get]
 func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
@@ -191,7 +191,7 @@ func (oh *OrderHandler) UserOrderHistory(c *gin.Context) {
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=response.OrderManagement}
 //	@Failure		500	{object}	response.Response
 //	@Router			/admin/orders/management [get]
 func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
@@ -229,7 +229,7 @@ func (oh *OrderHandler) GetOrderManagementPage(c *gin.Context) {
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(10)
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Orders}
 //	@Failure		500	{object}	response.Response
 //	@Router			/admin/orders [get]
 func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
@@ -254,11 +254,6 @@ func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
 		return
 	}
 
-	if len(AllOrders) == 0 {
-		response := response.ResponseMessage(404, "No data available", nil, nil)
-		c.JSON(http.StatusNotFound, response)
-		return
-	}
 
 	response := response.ResponseMessage(200, "Success", AllOrders, nil)
 	c.JSON(http.StatusOK, response)
@@ -435,7 +430,7 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //	@Tags			wallet
 //	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{response.Wallet}
 //	@Failure		500	{object}	response.Response
 //	@Router			/wallet/ [get]
 func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {

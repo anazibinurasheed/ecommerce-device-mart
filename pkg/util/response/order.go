@@ -56,7 +56,7 @@ type MonthlySalesReport struct {
 	TotalRevenue          float32 `json:"total_revenue"`
 }
 
-type CheckOut struct {
+type Checkout struct {
 	Address        []Address       `json:"delivery_address"`
 	Cart           []Cart          `json:"items"`
 	Discount       float32         `json:"discount"`

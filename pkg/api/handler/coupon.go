@@ -62,9 +62,9 @@ func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			couponID	path		int				true	"coupon ID"
-//	@Param			body		body		request.Coupon	true	"Coupon details"
-//	@Success		200			{object}	response.Response
+//	@Param			couponID	path		int					true	"coupon ID"
+//	@Param			body		body		request.Coupon		true	"Coupon details"
+//	@Success		200			{object}	response.Response	"Successful,coupon updated"
 //	@Failure		400			{object}	response.Response	"Failed to bind JSON inputs from request"
 //	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
 //	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
@@ -181,8 +181,8 @@ func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		string	true	"Coupon code"
-//	@Success		200		{object}	response.Response
+//	@Param			body	body		string				true	"Coupon code"
+//	@Success		200		{object}	response.Response	"Success"
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
 //	@Router			/coupon/apply [post]
@@ -214,7 +214,7 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 //	@Tags			coupon
 //	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Coupon}
 //	@Failure		500	{object}	response.Response
 //	@Router			/coupon/available [get]
 func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
@@ -244,8 +244,8 @@ func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
 //	@Tags			coupon
 //	@Security		Bearer
 //	@Produce		json
-//	@Param			couponID	path		int	true	"Coupon ID"
-//	@Success		200			{object}	response.Response
+//	@Param			couponID	path		int					true	"Coupon ID"
+//	@Success		200			{object}	response.Response	"Success"
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
 //	@Router			/coupon/remove/{couponID} [delete]

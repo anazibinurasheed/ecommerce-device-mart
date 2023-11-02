@@ -117,13 +117,13 @@ func (a *AuthHandler) SendOTP(c *gin.Context) {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		request.Otp	true	"OTP"
-//	@Success		200		{object}	response.Response{data=response.Uuid}  "Success, verified phone number"
-//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		400		{object}	response.Response "Failed to verify otp"
-//	@Failure		400		{object}	response.Response "Incorrect otp"
-//	@Failure		500		{object}	response.Response	"OTP expired"
+//	@Param			body	body		request.Otp								true	"OTP"
+//	@Success		200		{object}	response.Response{data=response.Uuid}	"Success, verified phone number"
+//	@Failure		400		{object}	response.Response						"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response						"Failed, input does not meet validation criteria"
+//	@Failure		400		{object}	response.Response						"Failed to verify otp"
+//	@Failure		400		{object}	response.Response						"Incorrect otp"
+//	@Failure		500		{object}	response.Response						"OTP expired"
 //	@Router			/verify-otp [post]
 func (a *AuthHandler) VerifyOTP(c *gin.Context) {
 	var body request.Otp
@@ -172,12 +172,12 @@ func (a *AuthHandler) VerifyOTP(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.SignUpData	true	"User Sign-Up Data"
-//	@Success		201		{object}	response.Response "Success, account created"
+//	@Success		201		{object}	response.Response	"Success, account created"
 //
-// @Failure	400	{object}	response.Response	"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
 //
-//	 @Failure	400	{object}	response.Response	"Failed, input does not meet validation criteria"
-//		@Router			/sign-up [post]
+//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
+//	@Router			/sign-up [post]
 func (u *AuthHandler) UserSignUp(c *gin.Context) {
 	var body request.SignUpData
 	if !u.subHandler.BindRequest(c, &body) {
@@ -264,14 +264,14 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary		User Logout
-// @Description	Logs out user and removes token from the header.
-// @Security		Bearer
-// @Tags			auth
-// @Accept			json
-// @Produce		json
-// @Success		202	{object}	response.Response	"Logged out, success"
-// @Router			/logout [post]
+//	@Summary		User Logout
+//	@Description	Logs out user and removes token from the header.
+//	@Security		Bearer
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		202	{object}	response.Response	"Logged out, success"
+//	@Router			/logout [post]
 func (ah *AuthHandler) Logout(c *gin.Context) {
 	ah.token.RemoveToken(c)
 
