@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -623,7 +625,7 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Param			categoryID	path		int	true	"Category ID"
 //	@Param			page		query		int	true	"Page number"				default(1)
 //	@Param			count		query		int	true	"Number of items per page"	default(10)
-//	@Success		200			{object}	response.Response
+//	@Success		200			{object}	response.Response{data=[]response.Product}
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
 //	@Router			/category/{categoryID} [get]
@@ -657,4 +659,81 @@ func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 
 	response := response.ResponseMessage(200, "Success", Products, nil)
 	c.JSON(http.StatusBadRequest, response)
+}
+
+// func (ad *ProductHandler) UploadImage(c *gin.Context) {
+
+// 	form, err := c.MultipartForm()
+// 	if err != nil {
+// 		errorRes := response.ResponseMessage(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
+// 		c.JSON(http.StatusBadRequest, errorRes)
+// 		return
+// 	}
+
+// 	files := form.File["files"]
+
+// 	err = ad.productUseCase.UploadImageS3(files)
+// 	if err != nil {
+// 		errorRes := response.ClientResponse(http.StatusBadRequest, "error while uploading image", nil, err.Error())
+// 		c.JSON(http.StatusBadRequest, errorRes)
+// 		return
+// 	}
+
+// 	successRes := response.ClientResponse(http.StatusOK, "Successfully uploaded image to s3", nil, nil)
+// 	c.JSON(http.StatusOK, successRes)
+// }
+
+func (ad *ProductHandler) UploadImage(c *gin.Context) {
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		c.JSON(statusBadRequest, response)
+		return
+	}
+
+	if file == nil {
+		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
+		c.JSON(statusBadRequest, response)
+		return
+	}
+	log.Println(file.Filename)
+
+	// Upload the file to specific dst.
+	err = ad.productUseCase.UploadImage([]*multipart.FileHeader{file}, "category")
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success, image uploaded", nil, nil)
+	c.JSON(statusCreated, response)
+}
+
+func (ad *ProductHandler) UploadProductImage(c *gin.Context) {
+
+	// Multipart form
+	form, err := c.MultipartForm()
+	if err != nil {
+		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		c.JSON(statusBadRequest, response)
+		return
+	}
+	files := form.File["file"]
+	if files == nil || len(files) == 0 {
+		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
+		c.JSON(statusBadRequest, response)
+		return
+	}
+
+	err = ad.productUseCase.UploadImage(files, "product")
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success, images uploaded", nil, nil)
+	c.JSON(statusCreated, response)
 }

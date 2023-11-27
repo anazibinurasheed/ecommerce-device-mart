@@ -3,12 +3,14 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"mime/multipart"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
+	"github.com/google/uuid"
 )
 
 var (
@@ -271,4 +273,23 @@ func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int)
 
 	return products, nil
 
+}
+
+func (pu *productUseCase) UploadImage(files []*multipart.FileHeader, imageUUID string) error {
+	var dst string
+	if imageUUID == "category" {
+		dst = "./image_store/category/" + uuid.New().String()
+
+	} else if imageUUID == "product" {
+		dst = "./image_store/product/" + uuid.New().String()
+	}
+
+	for _, f := range files {
+		err := helper.ImageSaver(f, dst)
+		if err != nil {
+			return err
+		}
+	}
+	
+	return nil
 }

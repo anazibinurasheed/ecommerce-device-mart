@@ -11,12 +11,13 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
 
 	router.POST("/login", authHandler.AdminLogin)
-
+	router.POST("/product/image", productHandler.UploadProductImage)
 	router.Use(auth.AdminAuthRequired)
 	{
 
 		category := router.Group("/category")
 		{
+			category.POST("/add-image", productHandler.UploadImage)
 			category.POST("/add-category", productHandler.CreateCategory)
 			category.GET("/categories", productHandler.ReadAllCategories)
 			category.PUT("/update-category/:categoryID", productHandler.UpdateCategory)

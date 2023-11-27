@@ -1,6 +1,8 @@
 package interfaces
 
 import (
+	"mime/multipart"
+
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 )
@@ -22,4 +24,5 @@ type ProductUseCase interface {
 	InsertNewProductRating(userID, productID int, rating request.Rating) error
 	SearchProducts(search string, page, count int) ([]response.Product, error)
 	GetProductsByCategory(categoryID, page, count int) ([]response.Product, error)
+	UploadImage(files []*multipart.FileHeader, imageUUID string) error
 }

@@ -56,5 +56,5 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 func (s *ServerHTTP) Start() {
 
-	log.Fatal(s.engine.Run(":3000"))
+	log.Fatal(s.engine.Run(":8080"))
 }
