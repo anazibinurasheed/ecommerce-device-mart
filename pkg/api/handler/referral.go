@@ -25,6 +25,7 @@ func NewReferralHandler(useCase services.ReferralUseCase) *ReferralHandler {
 //	@Summary		Get the referral code for the current user
 //	@Description	Get the referral code of the currently logged-in user
 //	@Tags			referral
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response	"Success."
 //	@Failure		500	{object}	response.Response	"Failed."
@@ -48,6 +49,7 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Summary		Apply referral code for referral bonus.
 //	@Description	Apply a  referral code  to get wallet money,
 //	@Tags			referral
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body	string	true	"Referral code to apply"

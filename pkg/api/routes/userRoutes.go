@@ -1,13 +1,13 @@
 package routes
 
 import (
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *middleware.AuthMiddleware) {
 
 	router.POST("/send-otp", authHandler.SendOTP)
 	router.POST("/verify-otp", authHandler.VerifyOTP)
@@ -46,10 +46,18 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			wallet.GET("/history", orderHandler.WalletTransactionHistory)
 		}
 
+		category := router.Group("/category")
+		{
+			category.GET("/all", productHandler.Categories)
+			category.GET("/image/:categoryID", productHandler.GetCategoryImage)
+
+		}
+
 		product := router.Group("/product")
 		{
+			product.GET("/images/:productID", productHandler.GetProductImages)
 			product.GET("/", productHandler.DisplayAllProductsToUser)
-			product.GET("/categories", productHandler.Categories)
+			// product.GET("/categories", productHandler.Categories)
 			product.GET("/:productID", productHandler.ViewIndividualProduct)
 			product.POST("/search", productHandler.SearchProducts)
 			product.GET("/rating/:productID", productHandler.ValidateRatingRequest)

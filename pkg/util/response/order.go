@@ -23,16 +23,16 @@ type Orders struct {
 	ProductImage    string  `json:"product_image"`
 	ProductName     string  `json:"product_name"`
 	ProductPrice    float32 `json:"product_price"`
-	OrderStatusID   int     `json:"order_status_id"`
+	OrderStatusID   int     `json:"-"`
 	OrderStatus     string  `json:"order_status"`
-	PaymentMethodID int     `json:"payment_method_id"`
+	PaymentMethodID int     `json:"-"`
 	PaymentMethod   string  `json:"payment_method"`
-	AddressesID     int     `json:"delivery_address_id"`
+	AddressesID     int     `json:"-"`
 	DeliveryAddress string  `json:"delivery_address"`
 }
 
 type Invoice struct {
-	Date            time.Time //
+	Date            time.Time `json:"date"`
 	OrderDate       string    `json:"order_date"`
 	OrderID         int       `json:"order_id"`
 	DeliveryAddress string    `json:"delivery_address"`
@@ -56,7 +56,7 @@ type MonthlySalesReport struct {
 	TotalRevenue          float32 `json:"total_revenue"`
 }
 
-type CheckOut struct {
+type Checkout struct {
 	Address        []Address       `json:"delivery_address"`
 	Cart           []Cart          `json:"items"`
 	Discount       float32         `json:"discount"`

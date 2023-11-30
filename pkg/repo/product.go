@@ -17,19 +17,12 @@ func NewProductRepository(DB *gorm.DB) interfaces.ProductRepository {
 	return &productDatabase{DB: DB}
 }
 
-// func (pd *productDatabase) CreateCategory(category request.Category) (response.Category, error) {
-// 	var NewCategory response.Category
-// 	query := "INSERT INTO Categories (Category_Name) VALUES($1) RETURNING *;"
-// 	err := pd.DB.Raw(query, category.CategoryName).Scan(&NewCategory).Error
+func (pd *productDatabase) CreateCategory(category request.Category) (response.Category, error) {
+	var result response.Category
+	query := "INSERT INTO Categories (Category_Name) VALUES($1) RETURNING *;"
+	err := pd.DB.Raw(query, category.CategoryName).Scan(&result).Error
 
-// 	return NewCategory, err
-// }
-
-func (p *productDatabase) CreateCategory(category request.Category) error {
-	query := "INSERT INTO Categories (Category_Name) VALUES($1);"
-	err := p.DB.Exec(query, category.CategoryName).Error
-
-	return err
+	return result, err
 }
 
 func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]response.Category, error) {
@@ -42,16 +35,6 @@ func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]respons
 	return ListOfAllCategories, err
 }
 
-// func (pd *productDatabase) UpdateCategory(categoryID int, category request.Category) (response.Category, error) {
-// 	var UpdatedCategory response.Category
-
-// 	query := "UPDATE Categories SET Category_Name = $1 WHERE ID = $2 RETURNING *;"
-
-// 	err := pd.DB.Raw(query, category.CategoryName, categoryID).Scan(&UpdatedCategory).Error
-
-// 	return UpdatedCategory, err
-// }
-
 func (pd *productDatabase) UpdateCategory(categoryID int, category request.Category) error {
 
 	query := "UPDATE Categories SET Category_Name = $1 WHERE ID = $2 ;"
@@ -60,7 +43,6 @@ func (pd *productDatabase) UpdateCategory(categoryID int, category request.Categ
 
 	return err
 }
-
 
 func (pd *productDatabase) BlockCategoryByID(categoryID int) error {
 	query := "Update Categories SET Is_blocked = true WHERE ID = $1 ;"
@@ -84,6 +66,7 @@ func (pd *productDatabase) FindCategoryByName(name string) (response.Category, e
 	return ResultOfFinding, err
 
 }
+
 func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, error) {
 	var ResultOfFinding response.Category
 	query := "SELECT * FROM Categories WHERE Id = $1 "
@@ -91,10 +74,11 @@ func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, 
 	return ResultOfFinding, err
 }
 
-func (pd *productDatabase) CreateProduct(product request.Product) error {
-	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8);"
-	err := pd.DB.Exec(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Error
-	return err
+func (pd *productDatabase) CreateProduct(product request.Product) (response.Product, error) {
+	var result response.Product
+	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) returning *;"
+	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&result).Error
+	return result, err
 }
 
 func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error) {
@@ -106,11 +90,8 @@ func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]r
 
 func (pd *productDatabase) UpdateProduct(productID int, updations request.Product) error {
 	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 ,Product_Image = $4 , Price = $5 WHERE ID = $6 ;"
-
 	err := pd.DB.Exec(query, updations.CategoryID, updations.ProductName, updations.ProductDescription, updations.ProductImage, updations.Price, productID).Error
-
 	return err
-
 }
 
 func (pd *productDatabase) BlockProduct(productID int) error {
@@ -118,16 +99,13 @@ func (pd *productDatabase) BlockProduct(productID int) error {
 	query := "UPDATE Products SET Is_Blocked = $1 WHERE ID = $2;"
 	err := pd.DB.Exec(query, status, productID).Error
 	return err
-
 }
 
 func (pd *productDatabase) UnblockProduct(productID int) error {
 	status := false
 	query := "UPDATE Products SET is_blocked = $1 WHERE id = $2 RETURNING *;"
 	err := pd.DB.Exec(query, status, productID).Error
-
 	return err
-
 }
 
 func (pd *productDatabase) FindProductByName(productName string) (response.Product, error) {
@@ -201,4 +179,29 @@ func (pd *productDatabase) GetProductsByCategory(categoryID int, startIndex, end
 	err := pd.DB.Raw(query, categoryID, startIndex, endIndex).Scan(&Products).Error
 	return Products, err
 
+}
+
+func (pd *productDatabase) InsertCategoryIMG(url string, categoryID int) error {
+	query := `insert into category_images (image_url, category_id) values ($1, $2)`
+	return pd.DB.Exec(query, url, categoryID).Error
+}
+
+func (pd *productDatabase) InsertProductIMG(url string, productID int) error {
+	query := `insert into product_images (image_url, product_id) values ($1, $2)`
+	return pd.DB.Exec(query, url, productID).Error
+}
+
+func (pd *productDatabase) GetProductImages(productID int) ([]response.ProductImages, error) {
+	images := make([]response.ProductImages, 0)
+	query := `select * from product_images where product_id = $1`
+
+	err := pd.DB.Raw(query, productID).Scan(&images).Error
+	return images, err
+}
+
+func (pd *productDatabase) GetCategoryImage(categoryID int) (response.CategoryImage, error) {
+	var image response.CategoryImage
+	query := `select * from category_images where category_id = $1`
+	err := pd.DB.Raw(query, categoryID).Scan(&image).Error
+	return image, err
 }

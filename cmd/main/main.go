@@ -17,10 +17,7 @@ func main() {
 	server, diErr := di.InitializeAPI(config)
 	if diErr != nil {
 		log.Fatal("cannot start server: ", diErr)
-	} else {
-
-		server.Start()
-
 	}
 
+	server.Start()
 }

@@ -1,14 +1,14 @@
 package routes
 
 import (
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *middleware.AuthMiddleware) {
 
 	router.POST("/login", authHandler.AdminLogin)
 
@@ -17,7 +17,9 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 
 		category := router.Group("/category")
 		{
+
 			category.POST("/add-category", productHandler.CreateCategory)
+			category.POST("/add-image/:categoryID", productHandler.UploadCategoryImage)
 			category.GET("/categories", productHandler.ReadAllCategories)
 			category.PUT("/update-category/:categoryID", productHandler.UpdateCategory)
 			category.PUT("/block-category/:categoryID", productHandler.BlockCategory)
@@ -27,8 +29,9 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 
 		products := router.Group("/product")
 		{
-			products.GET("/products", productHandler.ShowProductsToAdmin)
 			products.POST("/add-product/:categoryID", productHandler.CreateProduct)
+			products.POST("/add-images/:productID", productHandler.UploadProductImages)
+			products.GET("/products", productHandler.ShowProductsToAdmin)
 			products.PUT("/update-product/:productID", productHandler.UpdateProduct)
 			products.PUT("/block-product/:productID", productHandler.BlockProduct)
 			products.PUT("/unblock-product/:productID", productHandler.UnBlockProduct)
