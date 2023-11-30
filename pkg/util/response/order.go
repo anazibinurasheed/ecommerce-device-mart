@@ -2,7 +2,7 @@ package response
 
 import "time"
 
-//No external connections
+// No external connections
 type OrderLine struct {
 	ID              uint      `json:"id"`
 	UserID          uint      `json:"user_id"`
@@ -32,7 +32,7 @@ type Orders struct {
 }
 
 type Invoice struct {
-	Date            time.Time //
+	Date            time.Time `json:"date"`
 	OrderDate       string    `json:"order_date"`
 	OrderID         int       `json:"order_id"`
 	DeliveryAddress string    `json:"delivery_address"`
@@ -56,7 +56,7 @@ type MonthlySalesReport struct {
 	TotalRevenue          float32 `json:"total_revenue"`
 }
 
-type CheckOut struct {
+type Checkout struct {
 	Address        []Address       `json:"delivery_address"`
 	Cart           []Cart          `json:"items"`
 	Discount       float32         `json:"discount"`

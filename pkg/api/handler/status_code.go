@@ -9,4 +9,5 @@ const (
 	statusOK                  = http.StatusOK
 	statusConflict            = http.StatusConflict
 	statusBadRequest          = http.StatusBadRequest
+	statusCreated             = http.StatusCreated
 )

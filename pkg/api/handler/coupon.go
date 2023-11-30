@@ -25,17 +25,18 @@ func NewCouponHandler(useCase services.CouponUseCase) *CouponHandler {
 
 // CreateCoupon creates a new coupon.
 //
-//		@Summary		Create a new coupon
-//		@Description	Create a new coupon with the provided details
-//		@Tags			promotions
-//		@Accept			json
-//		@Produce		json
-//		@Param			body	body		request.Coupon	true	"Coupon details"
-//		@Success		201		{object}	response.Response  "Success, created new coupon"
-//	 @Failure	400	{object}	response.Response	"Failed to bind JSON inputs from request"
-//	 @Failure	400	{object}	response.Response	"Failed, input does not meet validation criteria"
-//		@Failure		500		{object}	response.Response "Failed to create coupon"
-//		@Router			/admin/promotions/create-coupon [post]
+//	@Summary		Create a new coupon
+//	@Description	Create a new coupon with the provided details
+//	@Tags			promotions
+//	@Security		Bearer
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		request.Coupon		true	"Coupon details"
+//	@Success		201		{object}	response.Response	"Success, created new coupon"
+//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
+//	@Failure		500		{object}	response.Response	"Failed to create coupon"
+//	@Router			/admin/promotions/create-coupon [post]
 func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 	var body request.Coupon
 	if !ch.subHandler.BindRequest(c, &body) {
@@ -55,19 +56,20 @@ func (ch *CouponHandler) CreateCoupon(c *gin.Context) {
 
 // UpdateCoupon  Updates existing  coupon by id .
 //
-//			@Summary		Updates the existing
-//			@Description	Create a new coupon with the provided details
-//			@Tags			promotions
-//			@Accept			json
-//			@Produce		json
-//			@Param			couponID	path		int				true	"coupon ID"
-//			@Param			body		body		request.Coupon	true	"Coupon details"
-//			@Success		200			{object}	response.Response
-//		 @Failure	400	{object}	response.Response	"Failed to bind JSON inputs from request"
-//		 @Failure	400	{object}	response.Response	"Failed, input does not meet validation criteria"
-//	 @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
-//			@Failure		500			{object}	response.Response  "Failed to update coupon"
-//			@Router			/admin/promotions/update-coupon/{couponID}  [put]
+//	@Summary		Updates the existing
+//	@Description	Create a new coupon with the provided details
+//	@Tags			promotions
+//	@Security		Bearer
+//	@Accept			json
+//	@Produce		json
+//	@Param			couponID	path		int					true	"coupon ID"
+//	@Param			body		body		request.Coupon		true	"Coupon details"
+//	@Success		200			{object}	response.Response	"Successful,coupon updated"
+//	@Failure		400			{object}	response.Response	"Failed to bind JSON inputs from request"
+//	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
+//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response	"Failed to update coupon"
+//	@Router			/admin/promotions/update-coupon/{couponID}  [put]
 func (ch *CouponHandler) UpdateCoupon(c *gin.Context) {
 	var body request.Coupon
 	if !ch.subHandler.BindRequest(c, &body) {
@@ -95,13 +97,12 @@ func (ch *CouponHandler) UpdateCoupon(c *gin.Context) {
 //	@Summary		Block coupon
 //	@Description	Block the existing coupon by id.
 //	@Tags			promotions
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			couponID	path		int	true	"coupon ID"
-//	@Success		200			{object}	response.Response  "Success, coupon blocked"
-//
-// @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
-//
-//	@Failure		500			{object}	response.Response "Failed to block coupon"
+//	@Param			couponID	path		int					true	"coupon ID"
+//	@Success		200			{object}	response.Response	"Success, coupon blocked"
+//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response	"Failed to block coupon"
 //	@Router			/admin/promotions/block-coupon/{couponID}  [put]
 func (ch *CouponHandler) BlockCoupon(c *gin.Context) {
 
@@ -123,15 +124,16 @@ func (ch *CouponHandler) BlockCoupon(c *gin.Context) {
 
 // BlockCoupon  godoc
 //
-//		@Summary		Unblock coupon
-//		@Description	Unblock the existing coupon by id.
-//		@Tags			promotions
-//		@Produce		json
-//		@Param			couponID	path		int	true	"coupon ID"
-//		@Success		200			{object}	response.Response
-//	 @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
-//		@Failure		500			{object}	response.Response
-//		@Router			/admin/promotions/unblock-coupon/{couponID}  [put]
+//	@Summary		Unblock coupon
+//	@Description	Unblock the existing coupon by id.
+//	@Tags			promotions
+//	@Security		Bearer
+//	@Produce		json
+//	@Param			couponID	path		int	true	"coupon ID"
+//	@Success		200			{object}	response.Response
+//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response
+//	@Router			/admin/promotions/unblock-coupon/{couponID}  [put]
 func (ch *CouponHandler) UnBlockCoupon(c *gin.Context) {
 	couponID, ok := ch.subHandler.ParamInt(c, "couponID")
 	if !ok {
@@ -153,9 +155,10 @@ func (ch *CouponHandler) UnBlockCoupon(c *gin.Context) {
 //
 //	@Summary		List out all coupons to admin
 //	@Description	List out all the created coupons to the admin.
+//	@Security		Bearer
 //	@Tags			promotions
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Coupon}
 //	@Failure		500	{object}	response.Response
 //	@Router			/admin/promotions/all-coupons  [get]
 func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
@@ -175,10 +178,11 @@ func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
 //	@Summary		Apply coupon
 //	@Description	Apply the coupon and if valid provide coupon discount
 //	@Tags			coupon
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		string	true	"Coupon code"
-//	@Success		200		{object}	response.Response
+//	@Param			body	body		string				true	"Coupon code"
+//	@Success		200		{object}	response.Response	"Success"
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
 //	@Router			/coupon/apply [post]
@@ -208,8 +212,9 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 //	@Summary		List available coupons for the user
 //	@Description	Get a list of available coupons for the authenticated user.
 //	@Tags			coupon
+//	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=[]response.Coupon}
 //	@Failure		500	{object}	response.Response
 //	@Router			/coupon/available [get]
 func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
@@ -237,9 +242,10 @@ func (ch *CouponHandler) ListOutAvailableCouponsToUser(c *gin.Context) {
 //	@Summary		Remove applied coupon
 //	@Description	Remove the applied coupon from the user's coupon tracking.
 //	@Tags			coupon
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			couponID	path		int	true	"Coupon ID"
-//	@Success		200			{object}	response.Response
+//	@Param			couponID	path		int					true	"Coupon ID"
+//	@Success		200			{object}	response.Response	"Success"
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
 //	@Router			/coupon/remove/{couponID} [delete]

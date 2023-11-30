@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -27,15 +29,15 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 //
 //	@Summary		Create category
 //	@Description	Creates a new category based on the provided category name.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		request.Category	true	"Category name"
-//	@Success		200		{object}	response.Response	"Success, category created"
-//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		500		{object}	response.Response	"Failed to create new category"
+//	@Param			body	body		request.Category							true	"Category name"
+//	@Success		200		{object}	response.Response{data=response.Category}	"Success, category created"
+//	@Failure		400		{object}	response.Response							"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response							"Failed, input does not meet validation criteria"
+//	@Failure		500		{object}	response.Response							"Failed to create new category"
 //	@Router			/admin/category/add-category [post]
 func (p *ProductHandler) CreateCategory(c *gin.Context) {
 	var body request.Category
@@ -43,7 +45,7 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	err := p.productUseCase.CreateCategory(body)
+	category, err := p.productUseCase.CreateCategory(body)
 	if err != nil {
 		statusCode, msg := statusInternalServerError, "Failed to create category"
 
@@ -56,22 +58,22 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success, category created", nil, nil)
+	response := response.ResponseMessage(200, "Success, category created", category, nil)
 	c.JSON(statusOK, response)
 }
 
 // ReadAllCategories godoc
 //
 //	@Summary		List out all categories
-//	@Description	Retrieves all categories available.
-//	@Security		Bearer
+//	@Description	Retrieves all available categories.
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			page	query		int					true	"Page number"				default(1)
-//	@Param			count	query		int					true	"Number of items per page"	default(10)
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
 //	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
-//	@Failure		400		{object}	response.Response	"Failed to bind page info from request"
-//	@Failure		503		{object}	response.Response	"Failed to retrieve categories"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		503		{object}	response.Response							"Failed to retrieve categories"
 //	@Router			/admin/category/categories [get]
 func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 	page, count, ok := p.subHandler.GetPageNCount(c)
@@ -95,16 +97,16 @@ func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 // Categories godoc
 //
 //	@Summary		List out all categories
-//	@Description	Retrieves all categories available.
+//	@Description	Retrieves all available categories.
+//	@Tags			category
 //	@Security		Bearer
-//	@Tags			admin category management
 //	@Produce		json
-//	@Param			page	query		int					true	"Page number"				default(1)
-//	@Param			count	query		int					true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response	"Success"
-//	@Failure		400		{object}	response.Response	"Failed to bind page info from request"
-//	@Failure		503		{object}	response.Response	"Failed to retrieve categories"
-//	@Router			/category/categories [get]
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
+//	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		503		{object}	response.Response							"Failed to retrieve categories"
+//	@Router			/category/all [get]
 func (p *ProductHandler) Categories(c *gin.Context) {
 	page, count, ok := p.subHandler.GetPageNCount(c)
 	if !ok {
@@ -126,8 +128,8 @@ func (p *ProductHandler) Categories(c *gin.Context) {
 //
 //	@Summary		Update a category
 //	@Description	Updates a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
@@ -164,8 +166,8 @@ func (p *ProductHandler) UpdateCategory(c *gin.Context) {
 //
 //	@Summary		Block a category
 //	@Description	Blocks a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
 //	@Success		200			{object}	response.Response	"Success, category has been blocked"
@@ -193,8 +195,8 @@ func (ph *ProductHandler) BlockCategory(c *gin.Context) {
 //
 //	@Summary		Unblock a category
 //	@Description	Unblocks a category with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin category management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int					true	"Category ID"
@@ -223,20 +225,20 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 //
 //	@Summary		Create a new product
 //	@Description	Creates a new product with the specified details.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			categoryID	path		int					true	"Category ID"
-//	@Param			body		body		request.Product		true	"Product details"
-//	@Success		200			{object}	response.Response	"Success, added new product"
-//	@Failure		400			{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
-//	@Failure		400			{object}	response.Response	"Failed, category not found"
-//	@Failure		409			{object}	response.Response	"Failed, product already exist with same name"
-//	@Failure		500			{object}	response.Response	"Failed to create product"
-//	@Router			/admin/products/add-product/{categoryID} [post]
+//	@Param			categoryID	path		int											true	"Category ID"
+//	@Param			body		body		request.Product								true	"Product details"
+//	@Success		200			{object}	response.Response{data=response.Product}	"Success, added new product"
+//	@Failure		400			{object}	response.Response							"Failed to bind JSON inputs from request"
+//	@Failure		400			{object}	response.Response							"Failed, input does not meet validation criteria"
+//	@Failure		400			{object}	response.Response							"Failed to retrieve param from URL"
+//	@Failure		400			{object}	response.Response							"Failed, category not found"
+//	@Failure		409			{object}	response.Response							"Failed, product already exist with same name"
+//	@Failure		500			{object}	response.Response							"Failed to create product"
+//	@Router			/admin/product/add-product/{categoryID} [post]
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	var body request.Product
 	if !ph.subHandler.BindRequest(c, &body) {
@@ -250,7 +252,7 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 
 	body.CategoryID = categoryID
 
-	err := ph.productUseCase.CreateProduct(body)
+	product, err := ph.productUseCase.CreateProduct(body)
 
 	if err != nil {
 		func() {
@@ -271,7 +273,7 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(statusOK, "Success, added new product", nil, nil)
+	response := response.ResponseMessage(statusOK, "Success, added new product", product, nil)
 	c.JSON(statusOK, response)
 }
 
@@ -279,14 +281,14 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 //
 //	@Summary		Display  products to admin
 //	@Description	Retrieves a list of all products including blocked.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			page	query		int												true	"Page number"				default(1)
-//	@Param			count	query		int												true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response{data=response.ProductSlice}	"Success"
-//	@Failure		400		{object}	response.Response								"Failed to bind page info from request"
-//	@Failure		500		{object}	response.Response								"Failed to fetch products"
+//	@Param			page	query		int											true	"Page number"				default(1)
+//	@Param			count	query		int											true	"Number of items per page"	default(10)
+//	@Success		200		{object}	response.Response{data=[]response.Product}	"Success"
+//	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
+//	@Failure		500		{object}	response.Response							"Failed to fetch products"
 //	@Router			/admin/product/products [get]
 func (ph *ProductHandler) ShowProductsToAdmin(c *gin.Context) {
 	page, count, ok := ph.subHandler.GetPageNCount(c)
@@ -310,8 +312,8 @@ func (ph *ProductHandler) ShowProductsToAdmin(c *gin.Context) {
 //
 //	@Summary		Update a product
 //	@Description	Updates an existing product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -348,8 +350,8 @@ func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
 //
 //	@Summary		Block a product
 //	@Description	Blocks a product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -378,13 +380,13 @@ func (ph *ProductHandler) BlockProduct(c *gin.Context) {
 //
 //	@Summary		Unblock a product
 //	@Description	Unblocks a product with the specified ID.
-//	@Security		Bearer
 //	@Tags			admin product management
+//	@Security		Bearer
 //	@Produce		json
-//	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response "Success, unblocked product"
-//  @Failure	400	{object}	response.Response	"Failed to retrieve param from URL"
-//	@Failure		500			{object}	response.Response "Failed to unblock product"
+//	@Param			productID	path		int					true	"Product ID"
+//	@Success		200			{object}	response.Response	"Success, unblocked product"
+//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
+//	@Failure		500			{object}	response.Response	"Failed to unblock product"
 //	@Router			/admin/product/unblock-product/{productID} [put]
 func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 	productID, ok := ph.subHandler.ParamInt(c, "productID")
@@ -407,8 +409,8 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //
 //	@Summary		Display all products to the user
 //	@Description	Retrieves all available products for the user.
-//	@Security		Bearer
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			page	query		int											true	"Page number"				default(1)
@@ -439,6 +441,7 @@ func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 //	@Summary		View a product
 //	@Description	Retrieves details of a product with the specified ID.
 //	@Tags			products
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int												true	"Product ID"
 //	@Success		200			{object}	response.Response{data=response.ProductItem}	"Success"
@@ -466,8 +469,8 @@ func (pd *ProductHandler) ViewIndividualProduct(c *gin.Context) {
 //
 //	@Summary		Validate product rating request
 //	@Description	Validates if the user is authorized to rate a product.
-//	@Security		Bearer
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int					true	"Product ID"
@@ -517,6 +520,7 @@ func (pd *ProductHandler) ValidateRatingRequest(c *gin.Context) {
 //	@Summary		Add product rating
 //	@Description	Adds a new rating for a product.
 //	@Tags			user orders
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			productID	path		int				true	"Product ID"
@@ -566,6 +570,7 @@ func (pd *ProductHandler) AddProductRating(c *gin.Context) {
 //	@Summary		Search Products
 //	@Description	Searches for products based on the provided search input
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			search	query		string	true	"Search input"
@@ -614,12 +619,13 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Summary		List products by category
 //	@Description	Lists products based on the provided category ID.
 //	@Tags			products
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			categoryID	path		int	true	"Category ID"
 //	@Param			page		query		int	true	"Page number"				default(1)
 //	@Param			count		query		int	true	"Number of items per page"	default(10)
-//	@Success		200			{object}	response.Response
+//	@Success		200			{object}	response.Response{data=[]response.Product}
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
 //	@Router			/category/{categoryID} [get]
@@ -652,5 +658,155 @@ func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	}
 
 	response := response.ResponseMessage(200, "Success", Products, nil)
-	c.JSON(http.StatusBadRequest, response)
+	c.JSON(statusOK, response)
+}
+
+//	@Summary		UploadCategoryImage
+//	@Description	Upload category images.
+//	@Tags			admin category management
+//	@Security		Bearer
+//	@Accept			mpfd
+//	@Produce		json
+//	@Param			categoryID	path		int					true	"Category ID"
+//	@Param			file		formData	file				true	"Image file to upload"
+//	@Success		201			{object}	response.Response	"success, image uploaded"
+//	@Failure		400			{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
+//	@Failure		500			{object}	response.Response	"failed to upload image"
+//	@Router			/admin/category/add-images/{categoryID} [post]
+func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		c.JSON(statusBadRequest, response)
+		return
+	}
+
+	if file == nil {
+		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
+		c.JSON(statusBadRequest, response)
+		return
+	}
+	log.Println(file.Filename)
+
+	categoryID, err := strconv.Atoi(c.Param("categoryID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	// Upload the file to specific dst.
+	err = ad.productUseCase.UploadCategoryImage([]*multipart.FileHeader{file}, categoryID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success, image uploaded", nil, nil)
+	c.JSON(statusCreated, response)
+}
+
+//	@Summary		UploadProductImages
+//	@Description	Upload product images.
+//	@Tags			admin product management
+//	@Security		Bearer
+//	@Accept			mpfd
+//	@Produce		json
+//	@Param			productID	path		int					true	"Product ID"
+//	@Param			file		formData	file				true	"Image file to upload"
+//	@Success		201			{object}	response.Response	"Success, images uploaded"
+//	@Failure		400			{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
+//	@Failure		500			{object}	response.Response	"Failed to upload image"
+//	@Router			/admin/product/add-images/{productID} [post]
+func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
+
+	// Multipart form
+	form, err := c.MultipartForm()
+	if err != nil {
+		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		c.JSON(statusBadRequest, response)
+		return
+	}
+
+	files := form.File["file"]
+	if files == nil || len(files) == 0 {
+		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
+		c.JSON(statusBadRequest, response)
+		return
+	}
+	productID, err := strconv.Atoi(c.Param("productID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	// Upload the file to specific dst.
+	err = ad.productUseCase.UploadProductImage(files, productID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success, images uploaded", nil, nil)
+	c.JSON(statusCreated, response)
+}
+
+
+//	@Summary		GetProductImages
+//	@Description	Get product images by product ID.
+//	@Tags			products
+//	@Security		Bearer
+//	@Produce		json
+//	@Param			productID	path		int	true	"Product ID"
+//	@Success		200			{object}	response.Response{data=[]response.ProductImages}"Success"
+//	@Failure		400			{object}	response.Response	"Invalid input"
+//	@Failure		500			{object}	response.Response	"Failed to get images"
+//	@Router			/product/images/{productID} [get]
+func (ad *ProductHandler) GetProductImages(c *gin.Context) {
+	productID, err := strconv.Atoi(c.Param("productID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	images, err := ad.productUseCase.GetProductImages(productID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success", images, nil)
+	c.JSON(statusOK, response)
+}
+
+
+//	@Summary		GetCategoryImage
+//	@Description	Get category image by category ID.
+//	@Tags			category
+//	@Security		Bearer
+//	@Produce		json
+//	@Param			categoryID	path		int												true	"Category ID"
+//	@Success		200			{object}	response.Response{data=response.CategoryImage}	"Success"
+//	@Failure		400			{object}	response.Response								"Invalid input"
+//	@Failure		500			{object}	response.Response								"Failed to get image"
+//	@Router			/category/image/{categoryID} [get]
+func (ad *ProductHandler) GetCategoryImage(c *gin.Context) {
+	categoryID, err := strconv.Atoi(c.Param("categoryID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	image, err := ad.productUseCase.GetCategoryImage(categoryID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success", image, nil)
+	c.JSON(statusOK, response)
 }

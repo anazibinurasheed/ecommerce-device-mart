@@ -45,28 +45,28 @@ func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services
 
 //safe for concurrent use by multiple goroutines without additional locking or coordination. Loads, stores, and deletes run in amortized constant time.
 
-func (ou *orderUseCase) CheckOutDetails(userID int) (response.CheckOut, error) {
+func (ou *orderUseCase) CheckOutDetails(userID int) (response.Checkout, error) {
 
 	addresses, err := ou.userRepo.GetAllUserAddresses(userID)
 	if err != nil {
-		return response.CheckOut{}, fmt.Errorf("Failed to retrieve checkout details %s", err)
+		return response.Checkout{}, fmt.Errorf("Failed to retrieve checkout details %s", err)
 	}
-	
+
 	if len(addresses) == 0 {
-		return response.CheckOut{}, fmt.Errorf("User don't have an address")
+		return response.Checkout{}, fmt.Errorf("User don't have an address")
 	}
 
 	cartItems, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
-		return response.CheckOut{}, fmt.Errorf("Failed to retrieve cart items %s", err)
+		return response.Checkout{}, fmt.Errorf("Failed to retrieve cart items %s", err)
 	}
 
 	paymentMethods, err := ou.paymentRepo.GetPaymentMethods()
 	if err != nil || paymentMethods == nil {
-		return response.CheckOut{}, fmt.Errorf("Failed to get payment methods %s", err)
+		return response.Checkout{}, fmt.Errorf("Failed to get payment methods %s", err)
 	}
 
-	return response.CheckOut{
+	return response.Checkout{
 		Address:        addresses,
 		Cart:           cartItems.Cart,
 		Total:          cartItems.Total,

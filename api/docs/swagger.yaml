@@ -114,8 +114,6 @@ definitions:
     type: object
   request.Product:
     properties:
-      category_id:
-        type: integer
       price:
         type: integer
       product_description:
@@ -169,6 +167,35 @@ definitions:
     - razorpay_payment_id
     - razorpay_signature
     type: object
+  response.Address:
+    properties:
+      address_line:
+        type: string
+      alternative_phone:
+        type: string
+      district:
+        type: string
+      id:
+        type: integer
+      is_default:
+        type: boolean
+      landmark:
+        type: string
+      locality:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      pincode:
+        type: string
+      state:
+        type: string
+      state_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   response.Cart:
     properties:
       brand:
@@ -195,6 +222,127 @@ definitions:
       total:
         type: number
     type: object
+  response.Category:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+    type: object
+  response.CategoryImage:
+    properties:
+      categoryID:
+        type: integer
+      imageUrl:
+        type: string
+    type: object
+  response.Checkout:
+    properties:
+      delivery_address:
+        items:
+          $ref: '#/definitions/response.Address'
+        type: array
+      discount:
+        type: number
+      items:
+        items:
+          $ref: '#/definitions/response.Cart'
+        type: array
+      payment_options:
+        items:
+          $ref: '#/definitions/response.PaymentMethod'
+        type: array
+      total:
+        type: number
+    type: object
+  response.Coupon:
+    properties:
+      code:
+        type: string
+      coupon_name:
+        type: string
+      discount_max_amount:
+        type: number
+      discount_percentage:
+        type: number
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      min_order_value:
+        type: number
+      valid_from:
+        type: string
+      valid_till:
+        type: string
+    type: object
+  response.MonthlySalesReport:
+    properties:
+      average_order_value:
+        type: number
+      date:
+        type: string
+      report_from:
+        type: string
+      sales_growth_percentage:
+        type: number
+      top_selling_brand:
+        type: string
+      top_selling_product:
+        type: string
+      total_coupon_incentive:
+        type: number
+      total_quantity_sold:
+        type: integer
+      total_revenue:
+        type: number
+      total_sales_count:
+        type: integer
+    type: object
+  response.OrderManagement:
+    properties:
+      order_statuses:
+        items:
+          $ref: '#/definitions/response.OrderStatus'
+        type: array
+      orders:
+        items:
+          $ref: '#/definitions/response.Orders'
+        type: array
+    type: object
+  response.OrderStatus:
+    properties:
+      id:
+        type: integer
+      order_status:
+        type: string
+    type: object
+  response.Orders:
+    properties:
+      delivery_address:
+        type: string
+      order_id:
+        type: integer
+      order_status:
+        type: string
+      payment_method:
+        type: string
+      product_id:
+        type: integer
+      product_image:
+        type: string
+      product_name:
+        type: string
+      product_price:
+        type: number
+    type: object
+  response.PaymentMethod:
+    properties:
+      id:
+        type: integer
+      method:
+        type: string
+    type: object
   response.Product:
     properties:
       brand:
@@ -216,6 +364,64 @@ definitions:
       sku:
         type: string
     type: object
+  response.ProductImages:
+    properties:
+      imageUrl:
+        type: string
+      productID:
+        type: integer
+    type: object
+  response.ProductItem:
+    properties:
+      brand:
+        type: string
+      category_id:
+        type: integer
+      id:
+        type: integer
+      is_blocked:
+        type: boolean
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_image:
+        type: string
+      product_name:
+        type: string
+      rating_and_reviews:
+        items:
+          $ref: '#/definitions/response.Rating'
+        type: array
+      sku:
+        type: string
+    type: object
+  response.Profile:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/response.Address'
+        type: array
+      email:
+        type: string
+      phone:
+        type: integer
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  response.Rating:
+    properties:
+      desription:
+        type: string
+      rating:
+        type: integer
+      rating_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
   response.Response:
     properties:
       data: {}
@@ -228,6 +434,21 @@ definitions:
   response.Token:
     properties:
       token:
+        type: string
+    type: object
+  response.UserData:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      is_blocked:
+        type: boolean
+      phone:
+        type: integer
+      user_id:
+        type: integer
+      user_name:
         type: string
     type: object
 host: localhost:3000
@@ -262,7 +483,12 @@ paths:
         "200":
           description: Success, category created
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Category'
+              type: object
         "400":
           description: Failed, input does not meet validation criteria
           schema:
@@ -274,6 +500,43 @@ paths:
       security:
       - Bearer: []
       summary: Create category
+      tags:
+      - admin category management
+  /admin/category/add-images/{categoryID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload category images.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success, image uploaded
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: "failed to get image from file\"\tor\t\"no files received to
+            the server"
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: failed to upload image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: UploadCategoryImage
       tags:
       - admin category management
   /admin/category/block-category/{categoryID}:
@@ -307,7 +570,7 @@ paths:
       - admin category management
   /admin/category/categories:
     get:
-      description: Retrieves all categories available.
+      description: Retrieves all available categories.
       parameters:
       - default: 1
         description: Page number
@@ -327,7 +590,14 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Category'
+                  type: array
+              type: object
         "400":
           description: Failed to bind page info from request
           schema:
@@ -470,11 +740,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Orders'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get all order overview data
       tags:
       - admin order management
@@ -507,6 +786,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Update order status
       tags:
       - admin order management
@@ -532,14 +813,104 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.OrderManagement'
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get order management data
       tags:
       - admin order management
+  /admin/product/add-images/{productID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload product images.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success, images uploaded
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: "Failed to get image from file\"\tor\t\"No files received to
+            the server\"\tor\t\"Invalid input"
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to upload image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: UploadProductImages
+      tags:
+      - admin product management
+  /admin/product/add-product/{categoryID}:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product with the specified details.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Product details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success, added new product
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
+        "400":
+          description: Failed, category not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Failed, product already exist with same name
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to create product
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a new product
+      tags:
+      - admin product management
   /admin/product/block-product/{productID}:
     put:
       consumes:
@@ -627,15 +998,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, unblocked product
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
+        "500":
+          description: Failed to unblock product
           schema:
             $ref: '#/definitions/response.Response'
       security:
@@ -680,47 +1051,6 @@ paths:
       summary: Update a product
       tags:
       - admin product management
-  /admin/products/add-product/{categoryID}:
-    post:
-      consumes:
-      - application/json
-      description: Creates a new product with the specified details.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      - description: Product details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/request.Product'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success, added new product
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Failed, category not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "409":
-          description: Failed, product already exist with same name
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Failed to create product
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Create a new product
-      tags:
-      - admin product management
   /admin/promotions/all-coupons:
     get:
       description: List out all the created coupons to the admin.
@@ -730,11 +1060,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Coupon'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: List out all coupons to admin
       tags:
       - promotions
@@ -751,17 +1090,19 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, coupon blocked
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to block coupon
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Block coupon
       tags:
       - promotions
@@ -780,18 +1121,20 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Success, created new coupon
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to create coupon
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Create a new coupon
       tags:
       - promotions
@@ -812,13 +1155,15 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Unblock coupon
       tags:
       - promotions
@@ -843,17 +1188,19 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful,coupon updated
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to update coupon
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Updates the existing
       tags:
       - promotions
@@ -864,13 +1211,20 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: No orders created yet
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.MonthlySalesReport'
+              type: object
         "500":
-          description: Internal Server Error
+          description: Failed to generate the sales report
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Monthly sales report
       tags:
       - sales-report
@@ -889,17 +1243,19 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, user has been blocked
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "500":
-          description: Internal Server Error
+          description: Failed to block user
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Block a user
       tags:
       - admin user management
@@ -929,6 +1285,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Unblock a user
       tags:
       - admin user management
@@ -954,11 +1312,20 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/response.Response'
-        "501":
-          description: Failed
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.UserData'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch users
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: View all users
       tags:
       - admin user management
@@ -989,6 +1356,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: View cart
       tags:
       - cart
@@ -1017,6 +1386,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Decrement product quantity in cart
       tags:
       - cart
@@ -1045,6 +1416,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Increment product quantity in cart
       tags:
       - cart
@@ -1072,6 +1445,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Add product to cart
       tags:
       - cart
@@ -1099,6 +1474,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Remove product from cart
       tags:
       - cart
@@ -1131,7 +1508,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Product'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1140,12 +1524,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: List products by category
       tags:
       - products
-  /category/categories:
+  /category/all:
     get:
-      description: Retrieves all categories available.
+      description: Retrieves all available categories.
       parameters:
       - default: 1
         description: Page number
@@ -1165,7 +1551,14 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Category'
+                  type: array
+              type: object
         "400":
           description: Failed to bind page info from request
           schema:
@@ -1178,7 +1571,41 @@ paths:
       - Bearer: []
       summary: List out all categories
       tags:
-      - admin category management
+      - category
+  /category/image/{categoryID}:
+    get:
+      description: Get category image by category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CategoryImage'
+              type: object
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to get image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: GetCategoryImage
+      tags:
+      - category
   /checkout:
     get:
       description: Displays the checkout details for the current user.
@@ -1188,11 +1615,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Checkout'
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Checkout page
       tags:
       - checkout
@@ -1212,7 +1646,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -1223,6 +1657,8 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Apply coupon
       tags:
       - coupon
@@ -1235,11 +1671,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Coupon'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: List available coupons for the user
       tags:
       - coupon
@@ -1256,7 +1701,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -1267,6 +1712,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Remove applied coupon
       tags:
       - coupon
@@ -1343,11 +1790,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Orders'
+                  type: array
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get order history
       tags:
       - user orders
@@ -1379,6 +1835,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Cancel an order
       tags:
       - user orders
@@ -1406,6 +1864,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Download invoice
       tags:
       - user orders
@@ -1438,6 +1898,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Return order
       tags:
       - user orders
@@ -1455,6 +1917,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Confirm COD delivery
       tags:
       - checkout
@@ -1470,6 +1934,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Make payment razorpay
       tags:
       - checkout
@@ -1502,6 +1968,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Verify razorpay payment
       tags:
       - checkout
@@ -1523,6 +1991,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Pay using wallet
       tags:
       - checkout
@@ -1557,15 +2027,11 @@ paths:
                   $ref: '#/definitions/response.Product'
               type: object
         "400":
-          description: Bad Request
+          description: Failed to bind page info from request
           schema:
             $ref: '#/definitions/response.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
+        "500":
+          description: Failed to retrieve products
           schema:
             $ref: '#/definitions/response.Response'
       security:
@@ -1586,18 +2052,61 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.ProductItem'
+              type: object
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
-        "503":
-          description: Service Unavailable
+        "500":
+          description: Failed to fetch product
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: View a product
+      tags:
+      - products
+  /product/images/{productID}:
+    get:
+      description: Get product images by product ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.ProductImages'
+                  type: array
+              type: object
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to get images
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: GetProductImages
       tags:
       - products
   /product/rating/{productID}:
@@ -1615,17 +2124,27 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, user is valid for rating the product
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed to retrieve param from URL
           schema:
             $ref: '#/definitions/response.Response'
         "401":
-          description: Unauthorized
+          description: User doesn't purchased this product
           schema:
             $ref: '#/definitions/response.Response'
+        "409":
+          description: User already rated this product
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to retrieve user id from context
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Validate product rating request
       tags:
       - user orders
@@ -1664,6 +2183,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Add product rating
       tags:
       - user orders
@@ -1705,6 +2226,8 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Search Products
       tags:
       - products
@@ -1717,11 +2240,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Profile'
+              type: object
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get user profile
       tags:
       - user profile
@@ -1739,6 +2269,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get the page for adding an address
       tags:
       - user profile
@@ -1768,6 +2300,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Add a new address
       tags:
       - user profile
@@ -1796,6 +2330,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Set default address
       tags:
       - user profile
@@ -1813,6 +2349,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get all addresses
       tags:
       - user profile
@@ -1848,6 +2386,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Change user password
       tags:
       - user profile
@@ -1871,6 +2411,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Delete an address
       tags:
       - user profile
@@ -1902,6 +2444,7 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       security:
+      - Bearer: []
       - ApiKeyAuth: []
       summary: Edit user username
       tags:
@@ -1938,6 +2481,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Update an address
       tags:
       - user profile
@@ -1970,6 +2515,7 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       security:
+      - Bearer: []
       - ApiKeyAuth: []
       summary: Change user password request
       tags:
@@ -2006,6 +2552,7 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       security:
+      - Bearer: []
       - ApiKeyAuth: []
       summary: Apply referral code for referral bonus.
       tags:
@@ -2024,6 +2571,8 @@ paths:
           description: Failed.
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Get the referral code for the current user
       tags:
       - referral
@@ -2047,9 +2596,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
       summary: Send sign up OTP to Phone
@@ -2070,12 +2624,12 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Success, account created
           schema:
             $ref: '#/definitions/response.Response'
         "400":
-          description: Bad Request
+          description: Failed, input does not meet validation criteria
           schema:
             $ref: '#/definitions/response.Response'
       summary: User Sign-Up after otp validation
@@ -2098,15 +2652,20 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success, verified phone number
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: Bad Request
+          description: Incorrect otp
           schema:
             $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
+        "500":
+          description: OTP expired
           schema:
             $ref: '#/definitions/response.Response'
       summary: Verify sign up  OTP
@@ -2126,6 +2685,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: View user wallet
       tags:
       - wallet
@@ -2145,6 +2706,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: Create user wallet
       tags:
       - wallet
@@ -2163,6 +2726,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: User wallet transaction history
       tags:
       - wallet

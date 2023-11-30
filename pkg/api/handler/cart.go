@@ -25,6 +25,7 @@ func NewCartHandler(useCase services.CartUseCase) *CartHandler {
 //	@Summary		Add product to cart
 //	@Description	Adds a product to the cart for the authenticated user.
 //	@Tags			cart
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int	true	"Product ID"
 //	@Success		200			{object}	response.Response
@@ -57,6 +58,7 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 //	@Summary		View cart
 //	@Description	Retrieves the cart items for the authenticated user.
 //	@Tags			cart
+//	@Security		Bearer
 //	@Param			page	query	int	true	"Page number"				default(1)
 //	@Param			count	query	int	true	"Number of items per page"	default(5)
 //	@Produce		json
@@ -84,6 +86,7 @@ func (ch *CartHandler) ViewCart(c *gin.Context) {
 //	@Summary		Increment product quantity in cart
 //	@Description	Increments the quantity of a product in the cart for the authenticated user.
 //	@Tags			cart
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int	true	"Product ID"
 //	@Success		200			{object}	response.Response
@@ -116,6 +119,7 @@ func (ch *CartHandler) IncrementQuantity(c *gin.Context) {
 //	@Summary		Decrement product quantity in cart
 //	@Description	Decrements the quantity of a product in the cart for the authenticated user.
 //	@Tags			cart
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int	true	"Product ID"
 //	@Success		200			{object}	response.Response
@@ -148,6 +152,7 @@ func (ch *CartHandler) DecrementQuantity(c *gin.Context) {
 //	@Summary		Remove product from cart
 //	@Description	Removes a product from the cart for the authenticated user.
 //	@Tags			cart
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			productID	path		int	true	"Product ID"
 //	@Success		200			{object}	response.Response

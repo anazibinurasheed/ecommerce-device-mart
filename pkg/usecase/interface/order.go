@@ -3,7 +3,7 @@ package interfaces
 import "github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 
 type OrderUseCase interface {
-	CheckOutDetails(userID int) (response.CheckOut, error)
+	CheckOutDetails(userID int) (response.Checkout, error)
 	ConfirmedOrder(userID int, paymentMethodID int) error
 	GetUserOrderHistory(userID, page, count int) ([]response.Orders, error)
 	GetOrderManagement(page, count int) (response.OrderManagement, error)

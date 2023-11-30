@@ -69,7 +69,7 @@ type phone struct {
 // Clean deletes the details after a specific duration if user is not verified
 func (p *phone) Clean(uuid string) {
 
-	time.Sleep(1 * time.Minute)
+	time.Sleep(3 * time.Minute)
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 

@@ -10,19 +10,24 @@ import (
 //config package is to load configurations from .env file
 
 type Config struct {
-	DBHost            string `mapstructure:"DB_HOST"`
-	DBName            string `mapstructure:"DB_NAME"`
-	DBUser            string `mapstructure:"DB_USER"`
-	DBPort            string `mapstructure:"DB_PORT"`
-	DBPassword        string `mapstructure:"DB_PASSWORD"`
-	AdminUsername     string `mapstructure:"ADMIN"`
-	AdminPassword     string `mapstructure:"ADMINPASS"`
-	JwtSecret         string `mapstructure:"JWT_SECRET"`
-	TwiliAccountSid   string `mapstructure:"TWILIO_ACCOUNT_SID"`
-	TwilioAuthToken   string `mapstructure:"TWILIO_AUTH_TOKEN"`
-	TwilioServiceSid  string `mapstructure:"VERIFY_SERVICE_SID"`
-	RazorPayKeyId     string `mapstructure:"RAZORPAY_KEY_ID"`
-	RazorPayKeySecret string `mapstructure:"RAZORPAY_KEY_SECRET"`
+	DBHost             string `mapstructure:"DB_HOST"`
+	DBName             string `mapstructure:"DB_NAME"`
+	DBUser             string `mapstructure:"DB_USER"`
+	DBPort             string `mapstructure:"DB_PORT"`
+	DBPassword         string `mapstructure:"DB_PASSWORD"`
+	AdminUsername      string `mapstructure:"ADMIN"`
+	AdminPassword      string `mapstructure:"ADMINPASS"`
+	JwtSecret          string `mapstructure:"JWT_SECRET"`
+	TwiliAccountSid    string `mapstructure:"TWILIO_ACCOUNT_SID"`
+	TwilioAuthToken    string `mapstructure:"TWILIO_AUTH_TOKEN"`
+	TwilioServiceSid   string `mapstructure:"VERIFY_SERVICE_SID"`
+	RazorPayKeyId      string `mapstructure:"RAZORPAY_KEY_ID"`
+	RazorPayKeySecret  string `mapstructure:"RAZORPAY_KEY_SECRET"`
+	AWSRegion          string `mapstructure:"AWS_REGION"`
+	AWSAccessKeyID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AWSSecretAccessKey string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	S3BucketName       string `mapstructure:"S3_BUCKET_NAME"`
+	S3BucketMediaPath  string `mapstructure:"S3_BUCKET_MEDIA_PATH"`
 }
 
 type AdminCredentials struct {
@@ -36,7 +41,9 @@ var (
 
 		"ADMINPASS", "JWT_SECRET", "TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "VERIFY_SERVICE_SID",
 
-		"RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET",
+		"RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "AWS_REGION", "AWS_ACCESS_KEY_ID",
+
+		"AWS_SECRET_ACCESS_KEY", "S3_BUCKET_CODENATION", "S3_BUCKET_CHAT_MEDIA_PATH",
 	}
 
 	config Config

@@ -29,6 +29,7 @@ var passwordManager = helper.NewPasswordManager()
 //	@Summary		Get the page for adding an address
 //	@Description	Retrieves the list of states for address selection.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -50,6 +51,7 @@ func (u *UserHandler) GetAddAddressPage(c *gin.Context) {
 //	@Summary		Add a new address
 //	@Description	Adds a new address for the user.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body		request.Address	true	"Address details"
@@ -83,6 +85,7 @@ func (uh *UserHandler) AddAddress(c *gin.Context) {
 //	@Summary		Update an address
 //	@Description	Updates an existing address for the user.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			addressID	path		int				true	"Address ID"
@@ -124,6 +127,7 @@ func (uh *UserHandler) UpdateAddress(c *gin.Context) {
 //	@Summary		Delete an address
 //	@Description	Deletes an address by its ID.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			addressID	path		int	true	"Address ID"
 //	@Success		200			{object}	response.Response
@@ -153,6 +157,7 @@ func (uh *UserHandler) DeleteAddress(c *gin.Context) {
 //	@Summary		Get all addresses
 //	@Description	Retrieves all addresses for the user.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Produce		json
 //	@Success		200	{object}	response.Response
 //	@Failure		500	{object}	response.Response
@@ -176,8 +181,9 @@ func (uh *UserHandler) GetAllAddresses(c *gin.Context) {
 //	@Summary		Get user profile
 //	@Description	Retrieves the profile information for the authenticated user.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Produce		json
-//	@Success		200	{object}	response.Response
+//	@Success		200	{object}	response.Response{data=response.Profile}
 //	@Failure		500	{object}	response.Response
 //	@Router			/profile [get]
 func (uh *UserHandler) Profile(c *gin.Context) {
@@ -199,6 +205,7 @@ func (uh *UserHandler) Profile(c *gin.Context) {
 //	@Summary		Change user password request
 //	@Description	validate the user password based on the provided old password and return a Id in success response to send to next Api as query with name uuid.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			body	body	request.OldPassword	true	"User's old password"
@@ -237,6 +244,7 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 //	@Summary		Change user password
 //	@Description	Change the password of the authenticated user
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Param			uuid	path		int						true	"uuid"
@@ -282,6 +290,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 //	@Summary		Set default address
 //	@Description	Sets the specified address as the default address for the authenticated user.
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Produce		json
 //	@Param			addressID	path		int	true	"Address ID"
 //	@Success		200			{object}	response.Response
@@ -314,6 +323,7 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 //	@Summary		Edit user username
 //	@Description	Edit the username of the authenticated user
 //	@Tags			user profile
+//	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth

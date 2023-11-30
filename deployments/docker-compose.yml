@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: store
+      POSTGRES_DB: devicemart
     networks: ## defining it because the postgres is a back-end network and it also has the connection with the front-end network else we cant connect with the different network without having any link
       - back-end 
       - front-end 
@@ -21,7 +21,7 @@ services:
       DB_USER: admin
       DB_PASSWORD: admin
       DB_PORT: 5432
-      DB_NAME: store
+      DB_NAME: devicemart
     depends_on:
       - postgres
     networks:
