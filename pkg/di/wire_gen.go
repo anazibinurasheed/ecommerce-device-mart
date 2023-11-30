@@ -8,7 +8,7 @@ package di
 
 import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/api"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
@@ -47,7 +47,7 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	referralRepository := repo.NewReferralRepository(gormDB)
 	referralUseCase := usecase.NewReferralUseCase(referralRepository, orderRepository)
 	referralHandler := handler.NewReferralHandler(referralUseCase)
-	auth := auth.NewAuthMiddleware(userUseCase)
+	auth := middleware.NewAuthMiddleware(userUseCase)
 
 	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler, auth)
 	return serverHTTP, nil

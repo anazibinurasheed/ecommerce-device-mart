@@ -4,8 +4,8 @@ import (
 	"log"
 
 	_ "github.com/anazibinurasheed/project-device-mart/api/docs"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/routes"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +36,7 @@ type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler, productHandler *handler.ProductHandler, commonHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *auth.AuthMiddleware) *ServerHTTP {
+func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.AdminHandler, productHandler *handler.ProductHandler, commonHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *middleware.AuthMiddleware) *ServerHTTP {
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -56,5 +56,5 @@ func NewServerHTTP(userHandler *handler.UserHandler, adminHandler *handler.Admin
 
 func (s *ServerHTTP) Start() {
 
-	log.Fatal(s.engine.Run(":8080"))
+	log.Fatal(s.engine.Run(":3000"))
 }

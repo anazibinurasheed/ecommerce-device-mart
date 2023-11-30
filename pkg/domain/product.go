@@ -30,6 +30,20 @@ type Rating struct {
 	Description string  `gorm:"not null"`
 }
 
+type CategoryImages struct {
+	ID         uint     `gorm:"primaryKey;unique;autoIncrement;not null"`
+	CategoryID uint     `gorm:"not null"`
+	Category   Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ImageURL   string
+}
+
+type ProductImages struct {
+	ID        uint    `gorm:"primaryKey;unique;autoIncrement;not null"`
+	ProductID int     `gorm:"not null"`
+	Product   Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ImageURL  string
+}
+
 // type ProductItem struct {
 // 	ID            uint    `gorm:"primaryKey;autoIncrement"`
 // 	ProductID     uint    `gorm:"not null"`

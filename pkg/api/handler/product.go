@@ -33,11 +33,11 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		request.Category	true	"Category name"
-//	@Success		200		{object}	response.Response	"Success, category created"
-//	@Failure		400		{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400		{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		500		{object}	response.Response	"Failed to create new category"
+//	@Param			body	body		request.Category							true	"Category name"
+//	@Success		200		{object}	response.Response{data=response.Category}	"Success, category created"
+//	@Failure		400		{object}	response.Response							"Failed to bind JSON inputs from request"
+//	@Failure		400		{object}	response.Response							"Failed, input does not meet validation criteria"
+//	@Failure		500		{object}	response.Response							"Failed to create new category"
 //	@Router			/admin/category/add-category [post]
 func (p *ProductHandler) CreateCategory(c *gin.Context) {
 	var body request.Category
@@ -45,7 +45,7 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	err := p.productUseCase.CreateCategory(body)
+	category, err := p.productUseCase.CreateCategory(body)
 	if err != nil {
 		statusCode, msg := statusInternalServerError, "Failed to create category"
 
@@ -58,7 +58,7 @@ func (p *ProductHandler) CreateCategory(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success, category created", nil, nil)
+	response := response.ResponseMessage(200, "Success, category created", category, nil)
 	c.JSON(statusOK, response)
 }
 
@@ -98,7 +98,7 @@ func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 //
 //	@Summary		List out all categories
 //	@Description	Retrieves all available categories.
-//	@Tags			products
+//	@Tags			category
 //	@Security		Bearer
 //	@Produce		json
 //	@Param			page	query		int											true	"Page number"				default(1)
@@ -106,7 +106,7 @@ func (p *ProductHandler) ReadAllCategories(c *gin.Context) {
 //	@Success		200		{object}	response.Response{data=[]response.Category}	"Success"
 //	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
 //	@Failure		503		{object}	response.Response							"Failed to retrieve categories"
-//	@Router			/product/categories [get]
+//	@Router			/category/all [get]
 func (p *ProductHandler) Categories(c *gin.Context) {
 	page, count, ok := p.subHandler.GetPageNCount(c)
 	if !ok {
@@ -229,15 +229,15 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			categoryID	path		int					true	"Category ID"
-//	@Param			body		body		request.Product		true	"Product details"
-//	@Success		200			{object}	response.Response	"Success, added new product"
-//	@Failure		400			{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		400			{object}	response.Response	"Failed to retrieve param from URL"
-//	@Failure		400			{object}	response.Response	"Failed, category not found"
-//	@Failure		409			{object}	response.Response	"Failed, product already exist with same name"
-//	@Failure		500			{object}	response.Response	"Failed to create product"
+//	@Param			categoryID	path		int											true	"Category ID"
+//	@Param			body		body		request.Product								true	"Product details"
+//	@Success		200			{object}	response.Response{data=response.Product}	"Success, added new product"
+//	@Failure		400			{object}	response.Response							"Failed to bind JSON inputs from request"
+//	@Failure		400			{object}	response.Response							"Failed, input does not meet validation criteria"
+//	@Failure		400			{object}	response.Response							"Failed to retrieve param from URL"
+//	@Failure		400			{object}	response.Response							"Failed, category not found"
+//	@Failure		409			{object}	response.Response							"Failed, product already exist with same name"
+//	@Failure		500			{object}	response.Response							"Failed to create product"
 //	@Router			/admin/product/add-product/{categoryID} [post]
 func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 	var body request.Product
@@ -252,7 +252,7 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 
 	body.CategoryID = categoryID
 
-	err := ph.productUseCase.CreateProduct(body)
+	product, err := ph.productUseCase.CreateProduct(body)
 
 	if err != nil {
 		func() {
@@ -273,7 +273,7 @@ func (ph *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	response := response.ResponseMessage(statusOK, "Success, added new product", nil, nil)
+	response := response.ResponseMessage(statusOK, "Success, added new product", product, nil)
 	c.JSON(statusOK, response)
 }
 
@@ -658,32 +658,22 @@ func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	}
 
 	response := response.ResponseMessage(200, "Success", Products, nil)
-	c.JSON(http.StatusBadRequest, response)
+	c.JSON(statusOK, response)
 }
 
-// func (ad *ProductHandler) UploadImage(c *gin.Context) {
-
-// 	form, err := c.MultipartForm()
-// 	if err != nil {
-// 		errorRes := response.ResponseMessage(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	files := form.File["files"]
-
-// 	err = ad.productUseCase.UploadImageS3(files)
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "error while uploading image", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	successRes := response.ClientResponse(http.StatusOK, "Successfully uploaded image to s3", nil, nil)
-// 	c.JSON(http.StatusOK, successRes)
-// }
-
-func (ad *ProductHandler) UploadImage(c *gin.Context) {
+//	@Summary		UploadCategoryImage
+//	@Description	Upload category images.
+//	@Tags			admin category management
+//	@Security		Bearer
+//	@Accept			mpfd
+//	@Produce		json
+//	@Param			categoryID	path		int					true	"Category ID"
+//	@Param			file		formData	file				true	"Image file to upload"
+//	@Success		201			{object}	response.Response	"success, image uploaded"
+//	@Failure		400			{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
+//	@Failure		500			{object}	response.Response	"failed to upload image"
+//	@Router			/admin/category/add-images/{categoryID} [post]
+func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -699,8 +689,14 @@ func (ad *ProductHandler) UploadImage(c *gin.Context) {
 	}
 	log.Println(file.Filename)
 
+	categoryID, err := strconv.Atoi(c.Param("categoryID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
 	// Upload the file to specific dst.
-	err = ad.productUseCase.UploadImage([]*multipart.FileHeader{file}, "category")
+	err = ad.productUseCase.UploadCategoryImage([]*multipart.FileHeader{file}, categoryID)
 	if err != nil {
 		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
@@ -711,7 +707,19 @@ func (ad *ProductHandler) UploadImage(c *gin.Context) {
 	c.JSON(statusCreated, response)
 }
 
-func (ad *ProductHandler) UploadProductImage(c *gin.Context) {
+//	@Summary		UploadProductImages
+//	@Description	Upload product images.
+//	@Tags			admin product management
+//	@Security		Bearer
+//	@Accept			mpfd
+//	@Produce		json
+//	@Param			productID	path		int					true	"Product ID"
+//	@Param			file		formData	file				true	"Image file to upload"
+//	@Success		201			{object}	response.Response	"Success, images uploaded"
+//	@Failure		400			{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
+//	@Failure		500			{object}	response.Response	"Failed to upload image"
+//	@Router			/admin/product/add-images/{productID} [post]
+func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 
 	// Multipart form
 	form, err := c.MultipartForm()
@@ -720,14 +728,21 @@ func (ad *ProductHandler) UploadProductImage(c *gin.Context) {
 		c.JSON(statusBadRequest, response)
 		return
 	}
+
 	files := form.File["file"]
 	if files == nil || len(files) == 0 {
 		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
 		c.JSON(statusBadRequest, response)
 		return
 	}
+	productID, err := strconv.Atoi(c.Param("productID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
 
-	err = ad.productUseCase.UploadImage(files, "product")
+	// Upload the file to specific dst.
+	err = ad.productUseCase.UploadProductImage(files, productID)
 	if err != nil {
 		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
@@ -736,4 +751,62 @@ func (ad *ProductHandler) UploadProductImage(c *gin.Context) {
 
 	response := response.ResponseMessage(statusOK, "success, images uploaded", nil, nil)
 	c.JSON(statusCreated, response)
+}
+
+
+//	@Summary		GetProductImages
+//	@Description	Get product images by product ID.
+//	@Tags			products
+//	@Security		Bearer
+//	@Produce		json
+//	@Param			productID	path		int	true	"Product ID"
+//	@Success		200			{object}	response.Response{data=[]response.ProductImages}"Success"
+//	@Failure		400			{object}	response.Response	"Invalid input"
+//	@Failure		500			{object}	response.Response	"Failed to get images"
+//	@Router			/product/images/{productID} [get]
+func (ad *ProductHandler) GetProductImages(c *gin.Context) {
+	productID, err := strconv.Atoi(c.Param("productID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	images, err := ad.productUseCase.GetProductImages(productID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success", images, nil)
+	c.JSON(statusOK, response)
+}
+
+
+//	@Summary		GetCategoryImage
+//	@Description	Get category image by category ID.
+//	@Tags			category
+//	@Security		Bearer
+//	@Produce		json
+//	@Param			categoryID	path		int												true	"Category ID"
+//	@Success		200			{object}	response.Response{data=response.CategoryImage}	"Success"
+//	@Failure		400			{object}	response.Response								"Invalid input"
+//	@Failure		500			{object}	response.Response								"Failed to get image"
+//	@Router			/category/image/{categoryID} [get]
+func (ad *ProductHandler) GetCategoryImage(c *gin.Context) {
+	categoryID, err := strconv.Atoi(c.Param("categoryID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	image, err := ad.productUseCase.GetCategoryImage(categoryID)
+	if err != nil {
+		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
+		c.JSON(statusInternalServerError, response)
+		return
+	}
+
+	response := response.ResponseMessage(statusOK, "success", image, nil)
+	c.JSON(statusOK, response)
 }

@@ -35,3 +35,13 @@ type Rating struct {
 	Rating      int    `json:"rating"`
 	Description string `json:"desription"`
 }
+
+type ProductImages struct {
+	ProductID int    `gorm:"product_id,omitempty"`
+	ImageUrl  string `gorm:"image_url,omitempty"`
+}
+
+type CategoryImage struct {
+	CategoryID int    `gorm:"category_id,omitempty"`
+	ImageUrl   string `gorm:"image_url,omitempty"`
+}

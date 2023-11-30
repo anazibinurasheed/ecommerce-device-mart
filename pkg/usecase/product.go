@@ -3,6 +3,8 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"mime/multipart"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
@@ -26,6 +28,11 @@ const (
 	returned  = "Returned"
 )
 
+const (
+	category = "category"
+	product  = "product"
+)
+
 type productUseCase struct {
 	productRepo interfaces.ProductRepository
 	orderRepo   interfaces.OrderRepository
@@ -39,18 +46,18 @@ func NewProductUseCase(productRepo interfaces.ProductRepository, orderRepo inter
 
 }
 
-func (pu *productUseCase) CreateCategory(category request.Category) error {
+func (pu *productUseCase) CreateCategory(category request.Category) (response.Category, error) {
 	existingCategory, err := pu.productRepo.FindCategoryByName(category.CategoryName)
 	if existingCategory.ID != 0 {
-		return ErrRecordAlreadyExist
+		return response.Category{}, ErrRecordAlreadyExist
 	}
 
-	err = pu.productRepo.CreateCategory(category)
+	result, err := pu.productRepo.CreateCategory(category)
 	if err != nil {
-		return fmt.Errorf("Failed to create category : %s", err)
+		return response.Category{}, fmt.Errorf("Failed to create category : %s", err)
 	}
 
-	return nil
+	return result, nil
 }
 
 func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Category, error) {
@@ -92,13 +99,13 @@ func (pu *productUseCase) UnBlockCategoryByID(categoryID int) error {
 	return nil
 }
 
-func (pu *productUseCase) CreateProduct(product request.Product) error {
+func (pu *productUseCase) CreateProduct(product request.Product) (response.Product, error) {
 	category, err := pu.productRepo.FindCategoryByID(product.CategoryID)
 	if err != nil {
-		return fmt.Errorf("failed to find category: %s", err)
+		return response.Product{}, fmt.Errorf("failed to find category: %s", err)
 	}
 	if category.ID == 0 {
-		return ErrCategoryNotFound
+		return response.Product{}, ErrCategoryNotFound
 	}
 
 	product.Brand = category.Category_Name
@@ -106,18 +113,18 @@ func (pu *productUseCase) CreateProduct(product request.Product) error {
 
 	existingProduct, err := pu.productRepo.FindProductByName(product.ProductName)
 	if err != nil {
-		return fmt.Errorf("failed to find product by name: %s", err)
+		return response.Product{}, fmt.Errorf("failed to find product by name: %s", err)
 	}
 	if existingProduct.ID != 0 {
-		return ErrRecordAlreadyExist
+		return response.Product{}, ErrRecordAlreadyExist
 	}
 
-	err = pu.productRepo.CreateProduct(product)
+	result, err := pu.productRepo.CreateProduct(product)
 	if err != nil {
-		return fmt.Errorf("failed to create new product: %s", err)
+		return response.Product{}, fmt.Errorf("failed to create new product: %s", err)
 	}
 
-	return nil
+	return result, nil
 }
 
 func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response.Product, error) {
@@ -275,21 +282,64 @@ func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int)
 
 }
 
-func (pu *productUseCase) UploadImage(files []*multipart.FileHeader, imageUUID string) error {
-	var dst string
-	if imageUUID == "category" {
-		dst = "./image_store/category/" + uuid.New().String()
+func (pu *productUseCase) UploadCategoryImage(files []*multipart.FileHeader, categoryID int) error {
 
-	} else if imageUUID == "product" {
-		dst = "./image_store/product/" + uuid.New().String()
+	err := pu.uploadImage(files, category, categoryID)
+	if err != nil {
+		return err
 	}
+	return nil
+}
+
+func (pu *productUseCase) UploadProductImage(files []*multipart.FileHeader, productID int) error {
+
+	err := pu.uploadImage(files, product, productID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pu *productUseCase) uploadImage(files []*multipart.FileHeader, imageFor string, ID int) error {
 
 	for _, f := range files {
-		err := helper.ImageSaver(f, dst)
+		d, err := f.Open()
 		if err != nil {
 			return err
 		}
+
+		data, err := io.ReadAll(d)
+		if err != nil {
+			return err
+		}
+		filename := uuid.New().String() + f.Filename
+		locationURL, err := helper.UploadMediaToS3(data, filename)
+		if err != nil {
+			return err
+		}
+
+		if imageFor == category {
+			err := pu.productRepo.InsertCategoryIMG(locationURL, ID)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+
+		if imageFor == product {
+			err := pu.productRepo.InsertProductIMG(locationURL, ID)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	}
-	
+
 	return nil
+}
+
+func (pu *productUseCase) GetProductImages(productID int) ([]response.ProductImages, error) {
+	return pu.productRepo.GetProductImages(productID)
+}
+
+func (pu *productUseCase) GetCategoryImage(categoryID int) (response.CategoryImage, error) {
+	return pu.productRepo.GetCategoryImage(categoryID)
 }

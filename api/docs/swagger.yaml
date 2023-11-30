@@ -229,6 +229,13 @@ definitions:
       id:
         type: integer
     type: object
+  response.CategoryImage:
+    properties:
+      categoryID:
+        type: integer
+      imageUrl:
+        type: string
+    type: object
   response.Checkout:
     properties:
       delivery_address:
@@ -357,6 +364,13 @@ definitions:
       sku:
         type: string
     type: object
+  response.ProductImages:
+    properties:
+      imageUrl:
+        type: string
+      productID:
+        type: integer
+    type: object
   response.ProductItem:
     properties:
       brand:
@@ -469,7 +483,12 @@ paths:
         "200":
           description: Success, category created
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Category'
+              type: object
         "400":
           description: Failed, input does not meet validation criteria
           schema:
@@ -481,6 +500,43 @@ paths:
       security:
       - Bearer: []
       summary: Create category
+      tags:
+      - admin category management
+  /admin/category/add-images/{categoryID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload category images.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success, image uploaded
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: "failed to get image from file\"\tor\t\"no files received to
+            the server"
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: failed to upload image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: UploadCategoryImage
       tags:
       - admin category management
   /admin/category/block-category/{categoryID}:
@@ -772,6 +828,43 @@ paths:
       summary: Get order management data
       tags:
       - admin order management
+  /admin/product/add-images/{productID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload product images.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success, images uploaded
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: "Failed to get image from file\"\tor\t\"No files received to
+            the server\"\tor\t\"Invalid input"
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to upload image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: UploadProductImages
+      tags:
+      - admin product management
   /admin/product/add-product/{categoryID}:
     post:
       consumes:
@@ -795,7 +888,12 @@ paths:
         "200":
           description: Success, added new product
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
         "400":
           description: Failed, category not found
           schema:
@@ -1431,6 +1529,83 @@ paths:
       summary: List products by category
       tags:
       - products
+  /category/all:
+    get:
+      description: Retrieves all available categories.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Category'
+                  type: array
+              type: object
+        "400":
+          description: Failed to bind page info from request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "503":
+          description: Failed to retrieve categories
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List out all categories
+      tags:
+      - category
+  /category/image/{categoryID}:
+    get:
+      description: Get category image by category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CategoryImage'
+              type: object
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to get image
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: GetCategoryImage
+      tags:
+      - category
   /checkout:
     get:
       description: Displays the checkout details for the current user.
@@ -1898,20 +2073,13 @@ paths:
       summary: View a product
       tags:
       - products
-  /product/categories:
+  /product/images/{productID}:
     get:
-      description: Retrieves all available categories.
+      description: Get product images by product ID.
       parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
+      - description: Product ID
+        in: path
+        name: productID
         required: true
         type: integer
       produces:
@@ -1925,20 +2093,20 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/response.Category'
+                    $ref: '#/definitions/response.ProductImages'
                   type: array
               type: object
         "400":
-          description: Failed to bind page info from request
+          description: Invalid input
           schema:
             $ref: '#/definitions/response.Response'
-        "503":
-          description: Failed to retrieve categories
+        "500":
+          description: Failed to get images
           schema:
             $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: List out all categories
+      summary: GetProductImages
       tags:
       - products
   /product/rating/{productID}:

@@ -6,7 +6,7 @@ import (
 )
 
 type ProductRepository interface {
-	CreateCategory(category request.Category) error
+	CreateCategory(category request.Category) (response.Category, error)
 	ReadCategory(startIndex int, endIndex int) ([]response.Category, error)
 	UpdateCategory(categoryID int, category request.Category) error
 	BlockCategoryByID(categoryID int) error
@@ -14,7 +14,7 @@ type ProductRepository interface {
 	FindCategoryByName(name string) (response.Category, error)
 	FindCategoryByID(categoryID int) (response.Category, error)
 
-	CreateProduct(product request.Product) error
+	CreateProduct(product request.Product) (response.Product, error)
 	ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error)
 	ViewAllProductsToUser(startIndex, endIndex int) ([]response.Product, error)
 	UpdateProduct(productID int, product request.Product) error
@@ -28,4 +28,9 @@ type ProductRepository interface {
 	GetProductReviews(productID int) ([]response.Rating, error)
 	SearchProducts(search string, startIndex, endIndex int) ([]response.Product, error)
 	GetProductsByCategory(categoryID int, startIndex, endIndex int) ([]response.Product, error)
+
+	InsertCategoryIMG(url string, categoryID int) error
+	InsertProductIMG(url string, productID int) error
+	GetCategoryImage(categoryID int) (response.CategoryImage, error)
+	GetProductImages(productID int) ([]response.ProductImages, error)
 }

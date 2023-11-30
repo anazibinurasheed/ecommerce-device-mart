@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/auth"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	request "github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -16,7 +16,7 @@ import (
 
 type AuthHandler struct {
 	authUseCase services.AuthUseCase
-	token       auth.TokenManager
+	token       middleware.TokenManager
 	subHandler  helper.SubHandler
 }
 
@@ -264,14 +264,14 @@ func (uh *AuthHandler) UserLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-//	@Summary		User Logout
-//	@Description	Logs out user and removes token from the header.
-//	@Security		Bearer
-//	@Tags			auth
-//	@Accept			json
-//	@Produce		json
-//	@Success		202	{object}	response.Response	"Logged out, success"
-//	@Router			/logout [post]
+// @Summary		User Logout
+// @Description	Logs out user and removes token from the header.
+// @Security		Bearer
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Success		202	{object}	response.Response	"Logged out, success"
+// @Router			/logout [post]
 func (ah *AuthHandler) Logout(c *gin.Context) {
 	ah.token.RemoveToken(c)
 

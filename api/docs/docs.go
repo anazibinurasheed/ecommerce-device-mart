@@ -57,7 +57,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Success, category created",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Category"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -68,6 +80,62 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to create new category",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/category/add-images/{categoryID}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Upload category images.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin category management"
+                ],
+                "summary": "UploadCategoryImage",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image file to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "success, image uploaded",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "failed to get image from file\"\tor\t\"no files received to the server",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "failed to upload image",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -540,6 +608,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/product/add-images/{productID}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Upload product images.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin product management"
+                ],
+                "summary": "UploadProductImages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image file to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success, images uploaded",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to get image from file\"\tor\t\"No files received to the server\"\tor\t\"Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to upload image",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/product/add-product/{categoryID}": {
             "post": {
                 "security": [
@@ -580,7 +704,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Success, added new product",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.Product"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1512,6 +1648,134 @@ const docTemplate = `{
                 }
             }
         },
+        "/category/all": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieves all available categories.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "List out all categories",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of items per page",
+                        "name": "count",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.Category"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to bind page info from request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "503": {
+                        "description": "Failed to retrieve categories",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/category/image/{categoryID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get category image by category ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "GetCategoryImage",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CategoryImage"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get image",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/category/{categoryID}": {
             "get": {
                 "security": [
@@ -2286,36 +2550,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/product/categories": {
+        "/product/images/{productID}": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieves all available categories.",
+                "description": "Get product images by product ID.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "products"
                 ],
-                "summary": "List out all categories",
+                "summary": "GetProductImages",
                 "parameters": [
                     {
                         "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Number of items per page",
-                        "name": "count",
-                        "in": "query",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -2333,7 +2588,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/response.Category"
+                                                "$ref": "#/definitions/response.ProductImages"
                                             }
                                         }
                                     }
@@ -2342,13 +2597,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Failed to bind page info from request",
+                        "description": "Invalid input",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "503": {
-                        "description": "Failed to retrieve categories",
+                    "500": {
+                        "description": "Failed to get images",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -3745,6 +4000,17 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CategoryImage": {
+            "type": "object",
+            "properties": {
+                "categoryID": {
+                    "type": "integer"
+                },
+                "imageUrl": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Checkout": {
             "type": "object",
             "properties": {
@@ -3938,6 +4204,17 @@ const docTemplate = `{
                 },
                 "sku": {
                     "type": "string"
+                }
+            }
+        },
+        "response.ProductImages": {
+            "type": "object",
+            "properties": {
+                "imageUrl": {
+                    "type": "string"
+                },
+                "productID": {
+                    "type": "integer"
                 }
             }
         },
