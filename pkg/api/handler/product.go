@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"log"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -604,12 +602,6 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 		return
 	}
 
-	if len(Products) == 0 {
-		response := response.ResponseMessage(404, "No data available", nil, nil)
-		c.JSON(http.StatusNotFound, response)
-		return
-	}
-
 	response := response.ResponseMessage(200, "Success", Products, nil)
 	c.JSON(http.StatusOK, response)
 }
@@ -661,33 +653,33 @@ func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	c.JSON(statusOK, response)
 }
 
-//	@Summary		UploadCategoryImage
-//	@Description	Upload category images.
-//	@Tags			admin category management
-//	@Security		Bearer
-//	@Accept			mpfd
-//	@Produce		json
-//	@Param			categoryID	path		int					true	"Category ID"
-//	@Param			file		formData	file				true	"Image file to upload"
-//	@Success		201			{object}	response.Response	"success, image uploaded"
-//	@Failure		400			{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
-//	@Failure		500			{object}	response.Response	"failed to upload image"
-//	@Router			/admin/category/add-images/{categoryID} [post]
+// @Summary		UploadCategoryImage
+// @Description	Upload category images.
+// @Tags			admin category management
+// @Security		Bearer
+// @Accept			mpfd
+// @Produce		json
+// @Param			categoryID		path		int					true	"Category ID"
+// @Param			category-image	formData	file				true	"Image file to upload"
+// @Success		201				{object}	response.Response	"success, image uploaded"
+// @Failure		400				{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
+// @Failure		500				{object}	response.Response	"failed to upload image"
+// @Router			/admin/category/add-image/{categoryID} [post]
 func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 
-	file, err := c.FormFile("file")
+	form, err := c.MultipartForm()
 	if err != nil {
-		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		response := response.ResponseMessage(statusBadRequest, "failed to get file from request", nil, err.Error())
 		c.JSON(statusBadRequest, response)
 		return
 	}
 
-	if file == nil {
+	files := form.File["category-image"]
+	if files == nil || len(files) == 0 {
 		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
 		c.JSON(statusBadRequest, response)
 		return
 	}
-	log.Println(file.Filename)
 
 	categoryID, err := strconv.Atoi(c.Param("categoryID"))
 	if err != nil {
@@ -696,45 +688,46 @@ func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 	}
 
 	// Upload the file to specific dst.
-	err = ad.productUseCase.UploadCategoryImage([]*multipart.FileHeader{file}, categoryID)
+	err = ad.productUseCase.UploadCategoryImage(files, categoryID)
 	if err != nil {
-		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload files", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(statusOK, "success, image uploaded", nil, nil)
+	response := response.ResponseMessage(statusOK, "success, files uploaded", nil, nil)
 	c.JSON(statusCreated, response)
 }
 
-//	@Summary		UploadProductImages
-//	@Description	Upload product images.
-//	@Tags			admin product management
-//	@Security		Bearer
-//	@Accept			mpfd
-//	@Produce		json
-//	@Param			productID	path		int					true	"Product ID"
-//	@Param			file		formData	file				true	"Image file to upload"
-//	@Success		201			{object}	response.Response	"Success, images uploaded"
-//	@Failure		400			{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
-//	@Failure		500			{object}	response.Response	"Failed to upload image"
-//	@Router			/admin/product/add-images/{productID} [post]
+// @Summary		UploadProductImages
+// @Description	Upload product images.
+// @Tags			admin product management
+// @Security		Bearer
+// @Accept			mpfd
+// @Produce		json
+// @Param			productID		path		int					true	"Product ID"
+// @Param			product-image	formData	file				true	"Image file to upload"
+// @Success		201				{object}	response.Response	"Success, images uploaded"
+// @Failure		400				{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
+// @Failure		500				{object}	response.Response	"Failed to upload image"
+// @Router			/admin/product/add-images/{productID} [post]
 func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 
 	// Multipart form
 	form, err := c.MultipartForm()
 	if err != nil {
-		response := response.ResponseMessage(statusBadRequest, "failed to get image from file", nil, err.Error())
+		response := response.ResponseMessage(statusBadRequest, "failed to get file from request", nil, err.Error())
 		c.JSON(statusBadRequest, response)
 		return
 	}
 
-	files := form.File["file"]
+	files := form.File["product-image"]
 	if files == nil || len(files) == 0 {
 		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
 		c.JSON(statusBadRequest, response)
 		return
 	}
+
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
@@ -744,69 +737,11 @@ func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 	// Upload the file to specific dst.
 	err = ad.productUseCase.UploadProductImage(files, productID)
 	if err != nil {
-		response := response.ResponseMessage(statusInternalServerError, "failed to upload image", nil, err.Error())
+		response := response.ResponseMessage(statusInternalServerError, "failed to upload file", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(statusOK, "success, images uploaded", nil, nil)
+	response := response.ResponseMessage(statusOK, "success, files uploaded", nil, nil)
 	c.JSON(statusCreated, response)
-}
-
-
-//	@Summary		GetProductImages
-//	@Description	Get product images by product ID.
-//	@Tags			products
-//	@Security		Bearer
-//	@Produce		json
-//	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response{data=[]response.ProductImages}"Success"
-//	@Failure		400			{object}	response.Response	"Invalid input"
-//	@Failure		500			{object}	response.Response	"Failed to get images"
-//	@Router			/product/images/{productID} [get]
-func (ad *ProductHandler) GetProductImages(c *gin.Context) {
-	productID, err := strconv.Atoi(c.Param("productID"))
-	if err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-	}
-
-	images, err := ad.productUseCase.GetProductImages(productID)
-	if err != nil {
-		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
-		c.JSON(statusInternalServerError, response)
-		return
-	}
-
-	response := response.ResponseMessage(statusOK, "success", images, nil)
-	c.JSON(statusOK, response)
-}
-
-
-//	@Summary		GetCategoryImage
-//	@Description	Get category image by category ID.
-//	@Tags			category
-//	@Security		Bearer
-//	@Produce		json
-//	@Param			categoryID	path		int												true	"Category ID"
-//	@Success		200			{object}	response.Response{data=response.CategoryImage}	"Success"
-//	@Failure		400			{object}	response.Response								"Invalid input"
-//	@Failure		500			{object}	response.Response								"Failed to get image"
-//	@Router			/category/image/{categoryID} [get]
-func (ad *ProductHandler) GetCategoryImage(c *gin.Context) {
-	categoryID, err := strconv.Atoi(c.Param("categoryID"))
-	if err != nil {
-		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
-	}
-
-	image, err := ad.productUseCase.GetCategoryImage(categoryID)
-	if err != nil {
-		response := response.ResponseMessage(statusInternalServerError, "failed to get image", nil, err.Error())
-		c.JSON(statusInternalServerError, response)
-		return
-	}
-
-	response := response.ResponseMessage(statusOK, "success", image, nil)
-	c.JSON(statusOK, response)
 }

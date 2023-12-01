@@ -27,6 +27,4 @@ type ProductUseCase interface {
 	
 	UploadCategoryImage(files []*multipart.FileHeader, ID int) error
 	UploadProductImage(files []*multipart.FileHeader, ID int) error
-	GetCategoryImage(categoryID int) (response.CategoryImage, error)
-	GetProductImages(productID int) ([]response.ProductImages, error)
 }

@@ -17,7 +17,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 	router.POST("/webhook", orderHandler.WebhookHandler)
 
 	// Authentication middleware
-	router.Use(auth.UserAuthRequired)
+	// router.Use(auth.UserAuthRequired)
 	{
 		profile := router.Group("/profile")
 		{
@@ -49,13 +49,13 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 		category := router.Group("/category")
 		{
 			category.GET("/all", productHandler.Categories)
-			category.GET("/image/:categoryID", productHandler.GetCategoryImage)
+			// category.GET("/image/:categoryID", productHandler.GetCategoryImage)
 
 		}
 
 		product := router.Group("/product")
 		{
-			product.GET("/images/:productID", productHandler.GetProductImages)
+			// product.GET("/images/:productID", productHandler.GetProductImages)
 			product.GET("/", productHandler.DisplayAllProductsToUser)
 			// product.GET("/categories", productHandler.Categories)
 			product.GET("/:productID", productHandler.ViewIndividualProduct)
