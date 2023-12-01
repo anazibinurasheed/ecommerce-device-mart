@@ -29,8 +29,6 @@ type ProductRepository interface {
 	SearchProducts(search string, startIndex, endIndex int) ([]response.Product, error)
 	GetProductsByCategory(categoryID int, startIndex, endIndex int) ([]response.Product, error)
 
-	InsertCategoryIMG(url string, categoryID int) error
-	InsertProductIMG(url string, productID int) error
-	GetCategoryImage(categoryID int) (response.CategoryImage, error)
-	GetProductImages(productID int) ([]response.ProductImages, error)
+	InsertCategoryIMG(urls interface{}, categoryID int) error
+	InsertProductIMG(urls interface{}, productID int) error
 }

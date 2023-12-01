@@ -3,6 +3,7 @@ package repo
 import (
 	"fmt"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/domain"
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
@@ -28,7 +29,7 @@ func (pd *productDatabase) CreateCategory(category request.Category) (response.C
 func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]response.Category, error) {
 	var ListOfAllCategories = make([]response.Category, 0)
 
-	query := "SELECT id,category_name FROM Categories ORDER BY category_name OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
+	query := "SELECT * FROM Categories ORDER BY category_name OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
 
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllCategories).Error
 	fmt.Println(ListOfAllCategories)
@@ -74,10 +75,16 @@ func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, 
 	return ResultOfFinding, err
 }
 
+//	func (pd *productDatabase) CreateProduct(product request.Product) (response.Product, error) {
+//		var result response.Product
+//		query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) returning *;"
+//		err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&result).Error
+//		return result, err
+//	}
 func (pd *productDatabase) CreateProduct(product request.Product) (response.Product, error) {
 	var result response.Product
-	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) returning *;"
-	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&result).Error
+	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description, Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7) returning *;"
+	err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.Brand, product.SKU, product.IsBlocked).Scan(&result).Error
 	return result, err
 }
 
@@ -85,12 +92,13 @@ func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]r
 	var ListOfAllProducts = make([]response.Product, 0)
 	query := "SELECT * FROM Products OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllProducts).Error
+	fmt.Println(ListOfAllProducts)
 	return ListOfAllProducts, err
 }
 
 func (pd *productDatabase) UpdateProduct(productID int, updations request.Product) error {
-	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 ,Product_Image = $4 , Price = $5 WHERE ID = $6 ;"
-	err := pd.DB.Exec(query, updations.CategoryID, updations.ProductName, updations.ProductDescription, updations.ProductImage, updations.Price, productID).Error
+	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 , Price = $5 WHERE ID = $6 ;"
+	err := pd.DB.Exec(query, updations.CategoryID, updations.ProductName, updations.ProductDescription, updations.Price, productID).Error
 	return err
 }
 
@@ -122,8 +130,6 @@ func (pd *productDatabase) ViewAllProductsToUser(startIndex, endIndex int) ([]re
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllProducts).Error
 	return ListOfAllProducts, err
 }
-
-//-------------------------------------------------------------------------------------------------------------------------
 
 func (pd *productDatabase) FindProductByID(productID int) (response.Product, error) {
 	var Product response.Product
@@ -181,27 +187,20 @@ func (pd *productDatabase) GetProductsByCategory(categoryID int, startIndex, end
 
 }
 
-func (pd *productDatabase) InsertCategoryIMG(url string, categoryID int) error {
-	query := `insert into category_images (image_url, category_id) values ($1, $2)`
-	return pd.DB.Exec(query, url, categoryID).Error
+
+
+func (pd *productDatabase) InsertCategoryIMG(urls interface{}, categoryID int) error {
+
+	images := domain.NewJsonB()
+	images["urls"] = urls
+	query := `update categories set images = $1 where id = $2;`
+	return pd.DB.Exec(query, images, categoryID).Error
 }
 
-func (pd *productDatabase) InsertProductIMG(url string, productID int) error {
-	query := `insert into product_images (image_url, product_id) values ($1, $2)`
-	return pd.DB.Exec(query, url, productID).Error
-}
+func (pd *productDatabase) InsertProductIMG(urls interface{}, productID int) error {
 
-func (pd *productDatabase) GetProductImages(productID int) ([]response.ProductImages, error) {
-	images := make([]response.ProductImages, 0)
-	query := `select * from product_images where product_id = $1`
-
-	err := pd.DB.Raw(query, productID).Scan(&images).Error
-	return images, err
-}
-
-func (pd *productDatabase) GetCategoryImage(categoryID int) (response.CategoryImage, error) {
-	var image response.CategoryImage
-	query := `select * from category_images where category_id = $1`
-	err := pd.DB.Raw(query, categoryID).Scan(&image).Error
-	return image, err
+	images := domain.NewJsonB()
+	images["urls"] = urls
+	query := `update products set images = $1 where id = $2;`
+	return pd.DB.Exec(query, images, productID).Error
 }
