@@ -351,6 +351,8 @@ definitions:
         $ref: '#/definitions/domain.JSONB'
       is_blocked:
         type: boolean
+      is_wishlisted:
+        type: boolean
       price:
         type: integer
       product_description:
@@ -371,6 +373,8 @@ definitions:
       images:
         $ref: '#/definitions/domain.JSONB'
       is_blocked:
+        type: boolean
+      is_wishlisted:
         type: boolean
       price:
         type: integer
@@ -2650,6 +2654,105 @@ paths:
       summary: User wallet transaction history
       tags:
       - wallet
+  /wishlist:
+    get:
+      description: shows the products in users wishlist
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.Product'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Show wishlist products
+      tags:
+      - wishlist
+  /wishlist/add/{productID}:
+    post:
+      description: Adds a product into wishlist.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Add to wishList
+      tags:
+      - wishlist
+  /wishlist/remove/{productID}:
+    delete:
+      description: Adds a product into wishlist.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Add to wishList
+      tags:
+      - wishlist
 securityDefinitions:
   Bearer:
     in: header

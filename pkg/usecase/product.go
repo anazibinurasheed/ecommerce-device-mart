@@ -137,10 +137,10 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	return products, nil
 }
 
-func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
+func (pu *productUseCase) DisplayAllProductsToUser(userID, page, count int) ([]response.Product, error) {
 	startIndex, endIndex := helper.Paginate(page, count)
 
-	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
+	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(userID, startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
@@ -174,8 +174,9 @@ func (pu *productUseCase) UnBlockProductByID(productID int) error {
 	return nil
 }
 
-func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, error) {
-	product, err := pd.productRepo.FindProductByID(productID)
+func (pd *productUseCase) ViewIndividualProduct(userID, productID int) (response.ProductItem, error) {
+
+	product, err := pd.productRepo.ViewIndividualProduct(userID, productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
@@ -197,6 +198,7 @@ func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, 
 		Brand:               product.Brand,
 		Product_Description: product.Product_Description,
 		Images:              product.Images,
+		IsWishlisted:        product.IsWishlisted,
 		Is_Blocked:          product.IsBlocked,
 		RatingAndReviews:    ratings,
 	}, nil
@@ -334,4 +336,17 @@ func (pu *productUseCase) uploadImage(files []*multipart.FileHeader, imageFor st
 		}
 	}
 	return nil
+}
+
+func (pu *productUseCase) AddToWishList(userID, productID int) error {
+	return pu.productRepo.AddToWishList(userID, productID)
+}
+
+func (pu *productUseCase) RemoveFromWishList(userID, productID int) error {
+	return pu.productRepo.RemoveFromWishList(userID, productID)
+}
+
+func (pu *productUseCase) ShowWishListProducts(userID, page, count int) ([]response.Product, error) {
+	startIndex, endIndex := helper.Paginate(page, count)
+	return pu.productRepo.ShowWishListProducts(userID, startIndex, endIndex)
 }

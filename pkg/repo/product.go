@@ -75,12 +75,6 @@ func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, 
 	return ResultOfFinding, err
 }
 
-//	func (pd *productDatabase) CreateProduct(product request.Product) (response.Product, error) {
-//		var result response.Product
-//		query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description,Product_Image,Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7,$8) returning *;"
-//		err := pd.DB.Raw(query, product.CategoryID, product.ProductName, product.Price, product.ProductDescription, product.ProductImage, product.Brand, product.SKU, product.IsBlocked).Scan(&result).Error
-//		return result, err
-//	}
 func (pd *productDatabase) CreateProduct(product request.Product) (response.Product, error) {
 	var result response.Product
 	query := "INSERT INTO Products (Category_ID,Product_Name,Price,Product_Description, Brand,Sku,is_blocked) Values($1,$2,$3,$4,$5,$6,$7) returning *;"
@@ -89,10 +83,9 @@ func (pd *productDatabase) CreateProduct(product request.Product) (response.Prod
 }
 
 func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error) {
-	var ListOfAllProducts = make([]response.Product, 0)
+	ListOfAllProducts := []response.Product{}
 	query := "SELECT * FROM Products OFFSET $1 FETCH NEXT $2 ROW ONLY ;"
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllProducts).Error
-	fmt.Println(ListOfAllProducts)
 	return ListOfAllProducts, err
 }
 
@@ -117,16 +110,24 @@ func (pd *productDatabase) UnblockProduct(productID int) error {
 }
 
 func (pd *productDatabase) FindProductByName(productName string) (response.Product, error) {
-	var NewProduct response.Product
+	var product response.Product
 	query := "SELECT * FROM Products WHERE Product_name = $1  FETCH FIRST 1 ROW ONLY"
-	err := pd.DB.Raw(query, productName).Scan(&NewProduct).Error
-	return NewProduct, err
+	err := pd.DB.Raw(query, productName).Scan(&product).Error
+	return product, err
 }
 
-func (pd *productDatabase) ViewAllProductsToUser(startIndex, endIndex int) ([]response.Product, error) {
-	var ListOfAllProducts = make([]response.Product, 0)
+func (pd *productDatabase) ViewIndividualProduct(userID, productID int) (response.Product, error) {
+	var product response.Product
+	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlist WHERE user_id = $1 AND product_id = $2) AS is_wishlisted
+	FROM products p FETCH FIRST 1 ROW ONLY`
+	err := pd.DB.Raw(query, userID).Scan(&product).Error
+	return product, err
+}
 
-	query := "SELECT * FROM Products  OFFSET $1 FETCH NEXT $2 ROW ONLY;"
+func (pd *productDatabase) ViewAllProductsToUser(userID, startIndex, endIndex int) ([]response.Product, error) {
+	ListOfAllProducts := []response.Product{}
+	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlist WHERE user_id = $1 AND product_id = p.id) AS is_wishlisted
+	FROM products p OFFSET $2 FETCH NEXT $3 ROW ONLY`
 	err := pd.DB.Raw(query, startIndex, endIndex).Scan(&ListOfAllProducts).Error
 	return ListOfAllProducts, err
 }
@@ -164,7 +165,6 @@ func (pd *productDatabase) InsertProductRating(rating request.Rating) error {
 
 func (pd *productDatabase) SearchProducts(search string, startIndex, endIndex int) ([]response.Product, error) {
 	var Products = make([]response.Product, 0)
-
 	query := `SELECT *
 	FROM products
 	WHERE product_name ILIKE $1 OR
@@ -187,8 +187,6 @@ func (pd *productDatabase) GetProductsByCategory(categoryID int, startIndex, end
 
 }
 
-
-
 func (pd *productDatabase) InsertCategoryIMG(urls interface{}, categoryID int) error {
 
 	images := domain.NewJsonB()
@@ -203,4 +201,25 @@ func (pd *productDatabase) InsertProductIMG(urls interface{}, productID int) err
 	images["urls"] = urls
 	query := `update products set images = $1 where id = $2;`
 	return pd.DB.Exec(query, images, productID).Error
+}
+
+// wishlist
+func (pd *productDatabase) AddToWishList(userID, productID int) error {
+
+	query := `insert into wishlists (user_id, product_id) values($1, $2)`
+	return pd.DB.Exec(query, userID, productID).Error
+}
+
+func (pd *productDatabase) RemoveFromWishList(userID, productID int) error {
+
+	query := `delete from wishlists where product_id = $1 and user_id = $2;`
+	return pd.DB.Exec(query, productID, userID).Error
+}
+
+func (pd *productDatabase) ShowWishListProducts(userID, page, count int) ([]response.Product, error) {
+
+	products := []response.Product{}
+	query := `select p.* from products p inner join wishlists w on w.product_id = p.id where w.user_id = $1 offset $2 fetch next $3 row only `
+	err := pd.DB.Raw(query, userID, page, count).Scan(&products).Error
+	return products, err
 }

@@ -12,7 +12,7 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 
 	router.POST("/login", authHandler.AdminLogin)
 
-	// router.Use(auth.AdminAuthRequired)
+	router.Use(auth.AdminAuthRequired)
 	{
 
 		category := router.Group("/category")
