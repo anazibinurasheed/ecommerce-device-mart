@@ -9,15 +9,15 @@ import (
 
 func main() {
 
-	config, configErr := config.LoadConfig()
-	if configErr != nil {
-		log.Fatal("cannot load config: ", configErr)
+	config, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("cannot load config: ", err)
 	}
 
-	server, diErr := di.InitializeAPI(config)
-	if diErr != nil {
-		log.Fatal("cannot start server: ", diErr)
+	server, err := di.InitializeAPI(config)
+	if err != nil {
+		log.Fatal("cannot start server: ", err)
 	}
 
-	server.Start()
+	server.Start(config.PORT)
 }

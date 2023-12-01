@@ -10,6 +10,7 @@ import (
 //config package is to load configurations from .env file
 
 type Config struct {
+	PORT               string `mapstructure:"PORT"`
 	DBHost             string `mapstructure:"DB_HOST"`
 	DBName             string `mapstructure:"DB_NAME"`
 	DBUser             string `mapstructure:"DB_USER"`
@@ -18,7 +19,7 @@ type Config struct {
 	AdminUsername      string `mapstructure:"ADMIN"`
 	AdminPassword      string `mapstructure:"ADMINPASS"`
 	JwtSecret          string `mapstructure:"JWT_SECRET"`
-	TwiliAccountSid    string `mapstructure:"TWILIO_ACCOUNT_SID"`
+	TwilioAccountSid   string `mapstructure:"TWILIO_ACCOUNT_SID"`
 	TwilioAuthToken    string `mapstructure:"TWILIO_AUTH_TOKEN"`
 	TwilioServiceSid   string `mapstructure:"VERIFY_SERVICE_SID"`
 	RazorPayKeyId      string `mapstructure:"RAZORPAY_KEY_ID"`
