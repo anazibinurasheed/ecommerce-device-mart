@@ -87,7 +87,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/category/add-images/{categoryID}": {
+        "/admin/category/add-image/{categoryID}": {
             "post": {
                 "security": [
                     {
@@ -116,7 +116,7 @@ const docTemplate = `{
                     {
                         "type": "file",
                         "description": "Image file to upload",
-                        "name": "file",
+                        "name": "category-image",
                         "in": "formData",
                         "required": true
                     }
@@ -637,7 +637,7 @@ const docTemplate = `{
                     {
                         "type": "file",
                         "description": "Image file to upload",
-                        "name": "file",
+                        "name": "product-image",
                         "in": "formData",
                         "required": true
                     }
@@ -1718,64 +1718,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/category/image/{categoryID}": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "Get category image by category ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "category"
-                ],
-                "summary": "GetCategoryImage",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/response.CategoryImage"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to get image",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/category/{categoryID}": {
             "get": {
                 "security": [
@@ -2543,67 +2485,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to retrieve products",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/product/images/{productID}": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "Get product images by product ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "GetProductImages",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Product ID",
-                        "name": "productID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/response.ProductImages"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to get images",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -3660,6 +3541,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.JSONB": {
+            "type": "object",
+            "additionalProperties": true
+        },
         "request.Address": {
             "type": "object",
             "required": [
@@ -3839,9 +3724,6 @@ const docTemplate = `{
                 "product_description": {
                     "type": "string"
                 },
-                "product_image": {
-                    "type": "string"
-                },
                 "product_name": {
                     "type": "string"
                 }
@@ -3997,17 +3879,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                }
-            }
-        },
-        "response.CategoryImage": {
-            "type": "object",
-            "properties": {
-                "categoryID": {
-                    "type": "integer"
                 },
-                "imageUrl": {
-                    "type": "string"
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
                 }
             }
         },
@@ -4187,6 +4061,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
+                },
                 "is_blocked": {
                     "type": "boolean"
                 },
@@ -4196,25 +4073,11 @@ const docTemplate = `{
                 "product_description": {
                     "type": "string"
                 },
-                "product_image": {
-                    "type": "string"
-                },
                 "product_name": {
                     "type": "string"
                 },
                 "sku": {
                     "type": "string"
-                }
-            }
-        },
-        "response.ProductImages": {
-            "type": "object",
-            "properties": {
-                "imageUrl": {
-                    "type": "string"
-                },
-                "productID": {
-                    "type": "integer"
                 }
             }
         },
@@ -4230,6 +4093,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
+                },
                 "is_blocked": {
                     "type": "boolean"
                 },
@@ -4237,9 +4103,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "product_description": {
-                    "type": "string"
-                },
-                "product_image": {
                     "type": "string"
                 },
                 "product_name": {

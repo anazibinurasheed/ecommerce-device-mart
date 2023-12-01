@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 
 	interfaces "github.com/anazibinurasheed/project-device-mart/pkg/repo/interface"
@@ -23,9 +22,9 @@ var (
 )
 
 const (
-	delivered = "Delivered"
-	cancelled = "Cancelled"
-	returned  = "Returned"
+	statusDelivered = "Delivered"
+	statusCancelled = "Cancelled"
+	statusReturned  = "Returned"
 )
 
 const (
@@ -197,7 +196,7 @@ func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, 
 		SKU:                 product.SKU,
 		Brand:               product.Brand,
 		Product_Description: product.Product_Description,
-		Product_Image:       product.Product_Image,
+		Images:              product.Images,
 		Is_Blocked:          product.IsBlocked,
 		RatingAndReviews:    ratings,
 	}, nil
@@ -227,7 +226,7 @@ func (pu *productUseCase) ValidateProductRatingRequest(userID, productID int) er
 		return fmt.Errorf("Failed to find order status")
 	}
 
-	if status != delivered || status != returned {
+	if status != statusDelivered || status != statusReturned {
 		return ErrInProcessing
 	}
 
@@ -302,7 +301,8 @@ func (pu *productUseCase) UploadProductImage(files []*multipart.FileHeader, prod
 
 func (pu *productUseCase) uploadImage(files []*multipart.FileHeader, imageFor string, ID int) error {
 
-	for _, f := range files {
+	imageURLs := make([]string, len(files))
+	for i, f := range files {
 		d, err := f.Open()
 		if err != nil {
 			return err
@@ -317,29 +317,21 @@ func (pu *productUseCase) uploadImage(files []*multipart.FileHeader, imageFor st
 		if err != nil {
 			return err
 		}
+		imageURLs[i] = locationURL
+	}
 
-		if imageFor == category {
-			err := pu.productRepo.InsertCategoryIMG(locationURL, ID)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-
-		if imageFor == product {
-			err := pu.productRepo.InsertProductIMG(locationURL, ID)
-			if err != nil {
-				log.Println(err)
-			}
+	if imageFor == category {
+		err := pu.productRepo.InsertCategoryIMG(imageURLs, ID)
+		if err != nil {
+			return err
 		}
 	}
 
+	if imageFor == product {
+		err := pu.productRepo.InsertProductIMG(imageURLs, ID)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
-}
-
-func (pu *productUseCase) GetProductImages(productID int) ([]response.ProductImages, error) {
-	return pu.productRepo.GetProductImages(productID)
-}
-
-func (pu *productUseCase) GetCategoryImage(categoryID int) (response.CategoryImage, error) {
-	return pu.productRepo.GetCategoryImage(categoryID)
 }

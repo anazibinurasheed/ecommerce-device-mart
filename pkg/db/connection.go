@@ -37,8 +37,6 @@ func ConnectToDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.Wallet{},
 		&domain.Referral{},
 		&domain.WalletTransactionHistory{},
-		&domain.CategoryImages{},
-		&domain.ProductImages{},
 	); err != nil {
 		log.Fatal("Failed to connect with DB", err)
 		return nil, err
