@@ -17,7 +17,7 @@ type ProductRepository interface {
 	CreateProduct(product request.Product) (response.Product, error)
 	ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error)
 	ViewAllProductsToUser(userID, startIndex, endIndex int) ([]response.Product, error)
-	UpdateProduct(productID int, product request.Product) error
+	UpdateProduct(productID int, product request.UpdateProduct) error
 	BlockProduct(productID int) error
 	UnblockProduct(productID int) error
 	FindProductByName(paramName string) (response.Product, error)

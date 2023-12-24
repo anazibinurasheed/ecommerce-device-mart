@@ -32,9 +32,11 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 			products.POST("/add-product/:categoryID", productHandler.CreateProduct)
 			products.POST("/add-images/:productID", productHandler.UploadProductImages)
 			products.GET("/products", productHandler.ShowProductsToAdmin)
+			products.GET("/all", productHandler.ShowProductsToAdmin)
 			products.PUT("/update-product/:productID", productHandler.UpdateProduct)
 			products.PUT("/block-product/:productID", productHandler.BlockProduct)
 			products.PUT("/unblock-product/:productID", productHandler.UnBlockProduct)
+			products.GET("/category/:categoryID", productHandler.ListProductsByCategory)
 
 		}
 

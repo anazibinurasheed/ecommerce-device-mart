@@ -21,8 +21,6 @@ func NewProductHandler(useCase services.ProductUseCase) *ProductHandler {
 	return &ProductHandler{productUseCase: useCase}
 }
 
-//	@Security	Bearer
-
 // CreateCategory godoc
 //
 //	@Summary		Create category
@@ -314,16 +312,16 @@ func (ph *ProductHandler) ShowProductsToAdmin(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			productID	path		int					true	"Product ID"
-//	@Param			body		body		request.Product		true	"Product object"
-//	@Success		200			{object}	response.Response	"Success, product updated"
-//	@Failure		400			{object}	response.Response	"Failed to bind JSON inputs from request"
-//	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		400			{object}	response.Response	"Failed, input does not meet validation criteria"
-//	@Failure		500			{object}	response.Response	"Failed update product"
+//	@Param			productID	path		int						true	"Product ID"
+//	@Param			body		body		request.UpdateProduct	true	"Product details"
+//	@Success		200			{object}	response.Response		"Success, product updated"
+//	@Failure		400			{object}	response.Response		"Failed to bind JSON inputs from request"
+//	@Failure		400			{object}	response.Response		"Failed, input does not meet validation criteria"
+//	@Failure		400			{object}	response.Response		"Failed, input does not meet validation criteria"
+//	@Failure		500			{object}	response.Response		"Failed update product"
 //	@Router			/admin/product/update-product/{productID} [put]
 func (ph *ProductHandler) UpdateProduct(c *gin.Context) {
-	var body request.Product
+	var body request.UpdateProduct
 	if !ph.subHandler.BindRequest(c, &body) {
 		return
 	}
@@ -416,7 +414,7 @@ func (ph *ProductHandler) UnBlockProduct(c *gin.Context) {
 //	@Success		200		{object}	response.Response{data=response.Product}	"Success"
 //	@Failure		400		{object}	response.Response							"Failed to bind page info from request"
 //	@Failure		500		{object}	response.Response							"Failed to retrieve products"
-//	@Router			/product/ [get]
+//	@Router			/product/all [get]
 func (ph *ProductHandler) DisplayAllProductsToUser(c *gin.Context) {
 	page, count, ok := ph.subHandler.GetPageNCount(c)
 	if !ok {
@@ -623,8 +621,55 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Success		200			{object}	response.Response{data=[]response.Product}
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/category/{categoryID} [get]
+//	@Router			/product/{categoryID} [get]
 func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	count, err := strconv.Atoi(c.Query("count"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	categoryID, err := strconv.Atoi(c.Param("categoryID"))
+	if err != nil {
+		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	Products, err := ph.productUseCase.GetProductsByCategory(categoryID, page, count)
+	if err != nil {
+		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := response.ResponseMessage(200, "Success", Products, nil)
+	c.JSON(statusOK, response)
+}
+
+// ListProductsByCategory lists products by category ID.
+//
+//	@Summary		List products by category
+//	@Description	Lists products based on the provided category ID.
+//	@Tags			admin product management
+//	@Security		Bearer
+//	@Accept			json
+//	@Produce		json
+//	@Param			categoryID	path		int	true	"Category ID"
+//	@Param			page		query		int	true	"Page number"				default(1)
+//	@Param			count		query		int	true	"Number of items per page"	default(10)
+//	@Success		200			{object}	response.Response{data=[]response.Product}
+//	@Failure		400			{object}	response.Response
+//	@Failure		500			{object}	response.Response
+//	@Router			/admin/product/category/{categoryID} [get]
+func (ph *ProductHandler) ListProductsByCategoryAdmin(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, nil)

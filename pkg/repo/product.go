@@ -89,8 +89,8 @@ func (pd *productDatabase) ViewAllProductsToAdmin(startIndex, endIndex int) ([]r
 	return ListOfAllProducts, err
 }
 
-func (pd *productDatabase) UpdateProduct(productID int, updations request.Product) error {
-	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 , Price = $5 WHERE ID = $6 ;"
+func (pd *productDatabase) UpdateProduct(productID int, updations request.UpdateProduct) error {
+	query := "Update Products SET Category_ID = $1 ,Product_Name = $2 ,Product_Description = $3 , Price = $4  WHERE ID = $5"
 	err := pd.DB.Exec(query, updations.CategoryID, updations.ProductName, updations.ProductDescription, updations.Price, productID).Error
 	return err
 }

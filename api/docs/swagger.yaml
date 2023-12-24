@@ -155,6 +155,22 @@ definitions:
     - username
     - uuid
     type: object
+  request.UpdateProduct:
+    properties:
+      category_id:
+        type: integer
+      price:
+        type: integer
+      product_description:
+        type: string
+      product_name:
+        type: string
+    required:
+    - category_id
+    - price
+    - product_description
+    - product_name
+    type: object
   request.VerifyPayment:
     properties:
       razorpay_order_id:
@@ -935,6 +951,56 @@ paths:
       summary: Block a product
       tags:
       - admin product management
+  /admin/product/category/{categoryID}:
+    get:
+      consumes:
+      - application/json
+      description: Lists products based on the provided category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Product'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List products by category
+      tags:
+      - admin product management
   /admin/product/products:
     get:
       description: Retrieves a list of all products including blocked.
@@ -1018,12 +1084,12 @@ paths:
         name: productID
         required: true
         type: integer
-      - description: Product object
+      - description: Product details
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/request.Product'
+          $ref: '#/definitions/request.UpdateProduct'
       produces:
       - application/json
       responses:
@@ -1472,56 +1538,6 @@ paths:
       summary: Remove product from cart
       tags:
       - cart
-  /category/{categoryID}:
-    get:
-      consumes:
-      - application/json
-      description: Lists products based on the provided category ID.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/response.Product'
-                  type: array
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: List products by category
-      tags:
-      - products
   /category/all:
     get:
       description: Retrieves all available categories.
@@ -1955,7 +1971,91 @@ paths:
       summary: Pay using wallet
       tags:
       - checkout
-  /product/:
+  /product/{categoryID}:
+    get:
+      consumes:
+      - application/json
+      description: Lists products based on the provided category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Product'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List products by category
+      tags:
+      - products
+  /product/{productID}:
+    get:
+      description: Retrieves details of a product with the specified ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.ProductItem'
+              type: object
+        "400":
+          description: Failed to retrieve param from URL
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to fetch product
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: View a product
+      tags:
+      - products
+  /product/all:
     get:
       consumes:
       - application/json
@@ -1996,40 +2096,6 @@ paths:
       security:
       - Bearer: []
       summary: Display all products to the user
-      tags:
-      - products
-  /product/{productID}:
-    get:
-      description: Retrieves details of a product with the specified ID.
-      parameters:
-      - description: Product ID
-        in: path
-        name: productID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/response.ProductItem'
-              type: object
-        "400":
-          description: Failed to retrieve param from URL
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Failed to fetch product
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: View a product
       tags:
       - products
   /product/rating/{productID}:
