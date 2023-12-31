@@ -6,6 +6,7 @@ type Category struct {
 	ID            int          `json:"id"`
 	Category_Name string       `json:"category_name"`
 	Images        domain.JSONB `json:"images"`
+	IsBlocked     bool         `json:"is_blocked"`
 }
 
 // type Product struct {

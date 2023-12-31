@@ -206,7 +206,7 @@ func (ph *ProductHandler) UnBlockCategory(c *gin.Context) {
 		return
 	}
 
-	err := ph.productUseCase.BlockCategoryByID(categoryID)
+	err := ph.productUseCase.UnBlockCategoryByID(categoryID)
 	if err != nil {
 		response := response.ResponseMessage(statusInternalServerError, "Failed to block category", nil, err.Error())
 		c.JSON(statusInternalServerError, response)
