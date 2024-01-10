@@ -3,19 +3,7 @@
 
 package di
 
-// import (
-// 	http "github.com/anazibinurasheed/project-device-mart/pkg/api"
-// 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
-// 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
-// 	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
-// 	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
-
-// 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
-
-// 	"github.com/google/wire"
-// )
-
-// func InitializeAPI(cfg config.Config) (*http.ServerHTTP, error) {
+// func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 
 // 	wire.Build(
 
@@ -69,7 +57,7 @@ package di
 
 // 		repo.NewReferralRepository,
 
-// 		http.NewServerHTTP)
+// 		api.NewServerHTTP)
 
-// 	return &http.ServerHTTP{}, nil
+// 	return &api.ServerHTTP{}, nil
 // }

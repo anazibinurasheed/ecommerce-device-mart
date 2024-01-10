@@ -35,7 +35,7 @@ func NewCartHandler(useCase services.CartUseCase) *CartHandler {
 func (ch *CartHandler) AddToCart(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
-		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
+		response := response.ResponseMessage(statusBadRequest, "Invalid entry", nil, nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -44,13 +44,13 @@ func (ch *CartHandler) AddToCart(c *gin.Context) {
 
 	err = ch.cartUseCase.AddToCart(userID, productID)
 	if err != nil {
-		response := response.ResponseMessage(500, "Failed", nil, err.Error())
+		response := response.ResponseMessage(statusInternalServerError, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := response.ResponseMessage(200, "Success", nil, nil)
-	c.JSON(http.StatusOK, response)
+	response := response.ResponseMessage(statusCreated, "Success", nil, nil)
+	c.JSON(statusCreated, response)
 }
 
 // ViewCart is the handler function for viewing the cart items.

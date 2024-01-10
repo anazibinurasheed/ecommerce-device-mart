@@ -17,7 +17,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 	router.POST("/webhook", orderHandler.WebhookHandler)
 
 	// Authentication middleware
-	// router.Use(auth.UserAuthRequired)
+	router.Use(auth.UserAuthRequired)
 	{
 		profile := router.Group("/profile")
 		{
@@ -49,20 +49,24 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 		category := router.Group("/category")
 		{
 			category.GET("/all", productHandler.Categories)
-			// category.GET("/image/:categoryID", productHandler.GetCategoryImage)
 
 		}
 
 		product := router.Group("/product")
 		{
-			// product.GET("/images/:productID", productHandler.GetProductImages)
-			product.GET("/", productHandler.DisplayAllProductsToUser)
-			// product.GET("/categories", productHandler.Categories)
+			product.GET("/all", productHandler.DisplayAllProductsToUser)
 			product.GET("/:productID", productHandler.ViewIndividualProduct)
 			product.POST("/search", productHandler.SearchProducts)
 			product.GET("/rating/:productID", productHandler.ValidateRatingRequest)
 			product.POST("/rating/:productID", productHandler.AddProductRating)
-			product.GET("/category/:categoryID", productHandler.ListProductsByCategory)
+			product.GET("/category/:categoryID", productHandler.ListProductsByCategoryUser)
+		}
+
+		wishlist := router.Group("/wishlist")
+		{
+			wishlist.GET("/", productHandler.ShowWishListProducts)
+			wishlist.POST("/add/:productID", productHandler.AddToWishList)
+			wishlist.DELETE("/remove/:productID", productHandler.RemoveFromWishList)
 		}
 
 		cart := router.Group("/cart")

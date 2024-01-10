@@ -16,7 +16,7 @@ var client *twilio.RestClient
 
 func SendOtp(phone string) error {
 	return nil // set predefined in development mode
-	TWILIO_ACCOUNT_SID = config.GetConfig().TwiliAccountSid
+	TWILIO_ACCOUNT_SID = config.GetConfig().TwilioAccountSid
 	TWILIO_AUTH_TOKEN = config.GetConfig().TwilioAuthToken
 	VERIFY_SERVICE_SID = config.GetConfig().TwilioServiceSid
 	client = twilio.NewRestClientWithParams(twilio.ClientParams{
@@ -48,7 +48,7 @@ func CheckOtp(phone string, code string) (string, error) {
 	} else {
 		return "incorrect", fmt.Errorf("Failed to verify , incorrect otp provided")
 	}
-	TWILIO_ACCOUNT_SID = config.GetConfig().TwiliAccountSid
+	TWILIO_ACCOUNT_SID = config.GetConfig().TwilioAccountSid
 	TWILIO_AUTH_TOKEN = config.GetConfig().TwilioAuthToken
 	VERIFY_SERVICE_SID = config.GetConfig().TwilioServiceSid
 	client = twilio.NewRestClientWithParams(twilio.ClientParams{

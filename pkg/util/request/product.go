@@ -17,6 +17,13 @@ type Product struct {
 	IsBlocked          bool         `json:"-"`
 }
 
+type UpdateProduct struct {
+	CategoryID         int    `json:"category_id" binding:"required"`
+	ProductName        string `json:"product_name" binding:"required"`
+	ProductDescription string `json:"product_description" binding:"required"`
+	Price              int    `json:"price" binding:"required"`
+}
+
 type Rating struct {
 	UserID      int    `json:"-"`
 	ProductID   int    `json:"-"`

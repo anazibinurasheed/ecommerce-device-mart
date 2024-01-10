@@ -107,7 +107,7 @@ func (od *orderDatabase) GetAllOrderData(startIndex, endIndex int) ([]response.O
 	query := `SELECT
     o.id AS order_id,
     o.product_id,
-    p.product_image,
+    p.images,
     p.product_name,
     p.price AS product_price,
     o.order_status_id,

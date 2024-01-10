@@ -16,12 +16,13 @@ type ProductRepository interface {
 
 	CreateProduct(product request.Product) (response.Product, error)
 	ViewAllProductsToAdmin(startIndex, endIndex int) ([]response.Product, error)
-	ViewAllProductsToUser(startIndex, endIndex int) ([]response.Product, error)
-	UpdateProduct(productID int, product request.Product) error
+	ViewAllProductsToUser(userID, startIndex, endIndex int) ([]response.Product, error)
+	UpdateProduct(productID int, product request.UpdateProduct) error
 	BlockProduct(productID int) error
 	UnblockProduct(productID int) error
 	FindProductByName(paramName string) (response.Product, error)
 	FindProductByID(productID int) (response.Product, error)
+	ViewIndividualProduct(userID, productID int) (response.Product, error)
 
 	FindUserRatingOnProduct(userID, productID int) (response.Rating, error)
 	InsertProductRating(rating request.Rating) error
@@ -31,4 +32,8 @@ type ProductRepository interface {
 
 	InsertCategoryIMG(urls interface{}, categoryID int) error
 	InsertProductIMG(urls interface{}, productID int) error
+
+	AddToWishList(userID, productID int) error
+	RemoveFromWishList(userID, productID int) error
+	ShowWishListProducts(userID, page, count int) ([]response.Product, error)
 }

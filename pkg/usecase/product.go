@@ -137,10 +137,10 @@ func (pu *productUseCase) DisplayAllProductsToAdmin(page, count int) ([]response
 	return products, nil
 }
 
-func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]response.Product, error) {
+func (pu *productUseCase) DisplayAllProductsToUser(userID, page, count int) ([]response.Product, error) {
 	startIndex, endIndex := helper.Paginate(page, count)
 
-	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(startIndex, endIndex)
+	listOfAllProducts, err := pu.productRepo.ViewAllProductsToUser(userID, startIndex, endIndex)
 	if err != nil {
 		return []response.Product{}, err
 	}
@@ -148,7 +148,7 @@ func (pu *productUseCase) DisplayAllAvailableProductsToUser(page, count int) ([]
 	return listOfAllProducts, nil
 }
 
-func (pu *productUseCase) UpdateProductByID(productID int, update request.Product) error {
+func (pu *productUseCase) UpdateProductByID(productID int, update request.UpdateProduct) error {
 	err := pu.productRepo.UpdateProduct(productID, update)
 	if err != nil {
 		return fmt.Errorf("Failed to update product :%s", err)
@@ -174,13 +174,11 @@ func (pu *productUseCase) UnBlockProductByID(productID int) error {
 	return nil
 }
 
-func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, error) {
-	product, err := pd.productRepo.FindProductByID(productID)
+func (pd *productUseCase) ViewIndividualProduct(userID, productID int) (response.ProductItem, error) {
+
+	product, err := pd.productRepo.ViewIndividualProduct(userID, productID)
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
-	}
-	if product.ID == 0 {
-		return response.ProductItem{}, fmt.Errorf("Failed to fetch product")
 	}
 
 	ratings, err := pd.productRepo.GetProductReviews(productID)
@@ -197,6 +195,7 @@ func (pd *productUseCase) ViewProductByID(productID int) (response.ProductItem, 
 		Brand:               product.Brand,
 		Product_Description: product.Product_Description,
 		Images:              product.Images,
+		IsWishlisted:        product.IsWishlisted,
 		Is_Blocked:          product.IsBlocked,
 		RatingAndReviews:    ratings,
 	}, nil
@@ -259,9 +258,6 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 	if err != nil {
 		return nil, fmt.Errorf("Failed to search products  :%s", err)
 	}
-	if len(products) == 0 {
-		return nil, fmt.Errorf("Product not found")
-	}
 
 	return products, nil
 }
@@ -272,9 +268,6 @@ func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int)
 	products, err := pu.productRepo.GetProductsByCategory(categoryID, startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get products by category : %s", err)
-	}
-	if len(products) == 0 {
-		return nil, fmt.Errorf(" no product found  ")
 	}
 
 	return products, nil
@@ -334,4 +327,17 @@ func (pu *productUseCase) uploadImage(files []*multipart.FileHeader, imageFor st
 		}
 	}
 	return nil
+}
+
+func (pu *productUseCase) AddToWishList(userID, productID int) error {
+	return pu.productRepo.AddToWishList(userID, productID)
+}
+
+func (pu *productUseCase) RemoveFromWishList(userID, productID int) error {
+	return pu.productRepo.RemoveFromWishList(userID, productID)
+}
+
+func (pu *productUseCase) ShowWishListProducts(userID, page, count int) ([]response.Product, error) {
+	startIndex, endIndex := helper.Paginate(page, count)
+	return pu.productRepo.ShowWishListProducts(userID, startIndex, endIndex)
 }

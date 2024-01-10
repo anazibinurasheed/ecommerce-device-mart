@@ -6,6 +6,7 @@ type Category struct {
 	ID            int          `json:"id"`
 	Category_Name string       `json:"category_name"`
 	Images        domain.JSONB `json:"images"`
+	IsBlocked     bool         `json:"is_blocked"`
 }
 
 // type Product struct {
@@ -29,7 +30,8 @@ type Product struct {
 	Brand               string       `json:"brand"`
 	Product_Description string       `json:"product_description,omitempty"`
 	Images              domain.JSONB `json:"images,omitempty"`
-	IsBlocked           bool         `json:"is_blocked"`
+	IsWishlisted        bool         `json:"is_wishlisted,omitempty"`
+	IsBlocked           bool         `json:"is_blocked,omitempty"`
 }
 
 //	type ProductItem struct {
@@ -53,6 +55,7 @@ type ProductItem struct {
 	Brand               string       `json:"brand"`
 	Product_Description string       `json:"product_description"`
 	Images              domain.JSONB `json:"images"`
+	IsWishlisted        bool         `json:"is_wishlisted"`
 	Is_Blocked          bool         `json:"is_blocked"`
 	RatingAndReviews    []Rating     `json:"rating_and_reviews"`
 }
@@ -62,14 +65,4 @@ type Rating struct {
 	User_name   string `json:"user_name"`
 	Rating      int    `json:"rating"`
 	Description string `json:"desription"`
-}
-
-type ProductImages struct {
-	ProductID int    `gorm:"product_id,omitempty"`
-	ImageUrl  string `gorm:"image_url,omitempty"`
-}
-
-type CategoryImage struct {
-	CategoryID int    `gorm:"category_id,omitempty"`
-	ImageUrl   string `gorm:"image_url,omitempty"`
 }
