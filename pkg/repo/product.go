@@ -118,7 +118,7 @@ func (pd *productDatabase) FindProductByName(productName string) (response.Produ
 func (pd *productDatabase) ViewIndividualProduct(userID, productID int) (response.Product, error) {
 	var product response.Product
 	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = $2) AS is_wishlisted
-	FROM products p FETCH FIRST 1 ROW ONLY`
+	FROM products p WHERE P.id = $2 FETCH FIRST 1 ROW ONLY`
 	err := pd.DB.Raw(query, userID,productID).Scan(&product).Error
 	return product, err
 }

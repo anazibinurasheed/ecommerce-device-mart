@@ -36,7 +36,7 @@ func AdminRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admi
 			products.PUT("/update-product/:productID", productHandler.UpdateProduct)
 			products.PUT("/block-product/:productID", productHandler.BlockProduct)
 			products.PUT("/unblock-product/:productID", productHandler.UnBlockProduct)
-			products.GET("/category/:categoryID", productHandler.ListProductsByCategory)
+			products.GET("/category/:categoryID", productHandler.ListProductsByCategoryAdmin)
 
 		}
 

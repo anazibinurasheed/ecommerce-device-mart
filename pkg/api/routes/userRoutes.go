@@ -59,14 +59,14 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			product.POST("/search", productHandler.SearchProducts)
 			product.GET("/rating/:productID", productHandler.ValidateRatingRequest)
 			product.POST("/rating/:productID", productHandler.AddProductRating)
-			product.GET("/category/:categoryID", productHandler.ListProductsByCategoryAdmin)
+			product.GET("/category/:categoryID", productHandler.ListProductsByCategoryUser)
 		}
 
 		wishlist := router.Group("/wishlist")
 		{
 			wishlist.GET("/", productHandler.ShowWishListProducts)
-			wishlist.POST("/add/:productID",productHandler.AddToWishList)
-			wishlist.DELETE("/remove/:productID",productHandler.RemoveFromWishList)
+			wishlist.POST("/add/:productID", productHandler.AddToWishList)
+			wishlist.DELETE("/remove/:productID", productHandler.RemoveFromWishList)
 		}
 
 		cart := router.Group("/cart")

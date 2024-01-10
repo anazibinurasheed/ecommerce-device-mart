@@ -180,9 +180,6 @@ func (pd *productUseCase) ViewIndividualProduct(userID, productID int) (response
 	if err != nil {
 		return response.ProductItem{}, fmt.Errorf("Failed to find product :%s", err)
 	}
-	if product.ID == 0 {
-		return response.ProductItem{}, fmt.Errorf("Failed to fetch product")
-	}
 
 	ratings, err := pd.productRepo.GetProductReviews(productID)
 	if err != nil {
@@ -261,9 +258,6 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 	if err != nil {
 		return nil, fmt.Errorf("Failed to search products  :%s", err)
 	}
-	if len(products) == 0 {
-		return nil, fmt.Errorf("Product not found")
-	}
 
 	return products, nil
 }
@@ -274,9 +268,6 @@ func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int)
 	products, err := pu.productRepo.GetProductsByCategory(categoryID, startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get products by category : %s", err)
-	}
-	if len(products) == 0 {
-		return nil, fmt.Errorf(" no product found  ")
 	}
 
 	return products, nil

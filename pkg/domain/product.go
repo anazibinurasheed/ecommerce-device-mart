@@ -45,6 +45,7 @@ type Rating struct {
 	UserID      int    `gorm:"not null"`
 	User        User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Rating      int    `gorm:"not null"`
+	ProductID   int    `gorm:"not null"`
 	Description string `gorm:"not null"`
 }
 

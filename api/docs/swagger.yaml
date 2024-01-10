@@ -247,6 +247,8 @@ definitions:
         type: integer
       images:
         $ref: '#/definitions/domain.JSONB'
+      is_blocked:
+        type: boolean
     type: object
   response.Checkout:
     properties:
@@ -1971,56 +1973,6 @@ paths:
       summary: Pay using wallet
       tags:
       - checkout
-  /product/{categoryID}:
-    get:
-      consumes:
-      - application/json
-      description: Lists products based on the provided category ID.
-      parameters:
-      - description: Category ID
-        in: path
-        name: categoryID
-        required: true
-        type: integer
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - default: 10
-        description: Number of items per page
-        in: query
-        name: count
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/response.Product'
-                  type: array
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: List products by category
-      tags:
-      - products
   /product/{productID}:
     get:
       description: Retrieves details of a product with the specified ID.
@@ -2096,6 +2048,56 @@ paths:
       security:
       - Bearer: []
       summary: Display all products to the user
+      tags:
+      - products
+  /product/category/{categoryID}:
+    get:
+      consumes:
+      - application/json
+      description: Lists products based on the provided category ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: categoryID
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.Product'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List products by category
       tags:
       - products
   /product/rating/{productID}:

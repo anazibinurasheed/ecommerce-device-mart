@@ -621,8 +621,8 @@ func (ph *ProductHandler) SearchProducts(c *gin.Context) {
 //	@Success		200			{object}	response.Response{data=[]response.Product}
 //	@Failure		400			{object}	response.Response
 //	@Failure		500			{object}	response.Response
-//	@Router			/product/{categoryID} [get]
-func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
+//	@Router			/product/category/{categoryID} [get]
+func (ph *ProductHandler) ListProductsByCategoryUser(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		response := response.ResponseMessage(400, "Invalid entry", nil, nil)
@@ -654,7 +654,7 @@ func (ph *ProductHandler) ListProductsByCategory(c *gin.Context) {
 	c.JSON(statusOK, response)
 }
 
-// ListProductsByCategory lists products by category ID.
+// ListProductsByCategoryAdmin lists products by category ID.
 //
 //	@Summary		List products by category
 //	@Description	Lists products based on the provided category ID.
@@ -701,18 +701,18 @@ func (ph *ProductHandler) ListProductsByCategoryAdmin(c *gin.Context) {
 	c.JSON(statusOK, response)
 }
 
-//	@Summary		UploadCategoryImage
-//	@Description	Upload category images.
-//	@Tags			admin category management
-//	@Security		Bearer
-//	@Accept			mpfd
-//	@Produce		json
-//	@Param			categoryID		path		int					true	"Category ID"
-//	@Param			category-image	formData	file				true	"Image file to upload"
-//	@Success		201				{object}	response.Response	"success, image uploaded"
-//	@Failure		400				{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
-//	@Failure		500				{object}	response.Response	"failed to upload image"
-//	@Router			/admin/category/add-image/{categoryID} [post]
+// @Summary		UploadCategoryImage
+// @Description	Upload category images.
+// @Tags			admin category management
+// @Security		Bearer
+// @Accept			mpfd
+// @Produce		json
+// @Param			categoryID		path		int					true	"Category ID"
+// @Param			category-image	formData	file				true	"Image file to upload"
+// @Success		201				{object}	response.Response	"success, image uploaded"
+// @Failure		400				{object}	response.Response	"failed to get image from file"	or	"no files received to the server"
+// @Failure		500				{object}	response.Response	"failed to upload image"
+// @Router			/admin/category/add-image/{categoryID} [post]
 func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 
 	form, err := c.MultipartForm()
@@ -747,18 +747,18 @@ func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 	c.JSON(statusCreated, response)
 }
 
-//	@Summary		UploadProductImages
-//	@Description	Upload product images.
-//	@Tags			admin product management
-//	@Security		Bearer
-//	@Accept			mpfd
-//	@Produce		json
-//	@Param			productID		path		int					true	"Product ID"
-//	@Param			product-image	formData	file				true	"Image file to upload"
-//	@Success		201				{object}	response.Response	"Success, images uploaded"
-//	@Failure		400				{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
-//	@Failure		500				{object}	response.Response	"Failed to upload image"
-//	@Router			/admin/product/add-images/{productID} [post]
+// @Summary		UploadProductImages
+// @Description	Upload product images.
+// @Tags			admin product management
+// @Security		Bearer
+// @Accept			mpfd
+// @Produce		json
+// @Param			productID		path		int					true	"Product ID"
+// @Param			product-image	formData	file				true	"Image file to upload"
+// @Success		201				{object}	response.Response	"Success, images uploaded"
+// @Failure		400				{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
+// @Failure		500				{object}	response.Response	"Failed to upload image"
+// @Router			/admin/product/add-images/{productID} [post]
 func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 
 	// Multipart form
@@ -794,16 +794,16 @@ func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 	c.JSON(statusCreated, response)
 }
 
-//	@Summary		Add to wishList
-//	@Description	Adds a product into wishlist.
-//	@Tags			wishlist
-//	@Security		Bearer
-//	@Produce		json
-//	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response
-//	@Failure		400			{object}	response.Response
-//	@Failure		500			{object}	response.Response
-//	@Router			/wishlist/add/{productID} [post]
+// @Summary		Add to wishList
+// @Description	Adds a product into wishlist.
+// @Tags			wishlist
+// @Security		Bearer
+// @Produce		json
+// @Param			productID	path		int	true	"Product ID"
+// @Success		200			{object}	response.Response
+// @Failure		400			{object}	response.Response
+// @Failure		500			{object}	response.Response
+// @Router			/wishlist/add/{productID} [post]
 func (ph *ProductHandler) AddToWishList(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -825,16 +825,16 @@ func (ph *ProductHandler) AddToWishList(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-//	@Summary		Add to wishList
-//	@Description	Adds a product into wishlist.
-//	@Tags			wishlist
-//	@Security		Bearer
-//	@Produce		json
-//	@Param			productID	path		int	true	"Product ID"
-//	@Success		200			{object}	response.Response
-//	@Failure		400			{object}	response.Response
-//	@Failure		500			{object}	response.Response
-//	@Router			/wishlist/remove/{productID} [delete]
+// @Summary		Add to wishList
+// @Description	Adds a product into wishlist.
+// @Tags			wishlist
+// @Security		Bearer
+// @Produce		json
+// @Param			productID	path		int	true	"Product ID"
+// @Success		200			{object}	response.Response
+// @Failure		400			{object}	response.Response
+// @Failure		500			{object}	response.Response
+// @Router			/wishlist/remove/{productID} [delete]
 func (ph *ProductHandler) RemoveFromWishList(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Param("productID"))
 	if err != nil {
@@ -856,17 +856,17 @@ func (ph *ProductHandler) RemoveFromWishList(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-//	@Summary		Show wishlist products
-//	@Description	shows the products in users wishlist
-//	@Tags			wishlist
-//	@Security		Bearer
-//	@Produce		json
-//	@Param			page	query		int											true	"Page number"				default(1)
-//	@Param			count	query		int											true	"Number of items per page"	default(10)
-//	@Success		200		{object}	response.Response{data=response.Product}	"Success"
-//	@Failure		400		{object}	response.Response
-//	@Failure		500		{object}	response.Response
-//	@Router			/wishlist [get]
+// @Summary		Show wishlist products
+// @Description	shows the products in users wishlist
+// @Tags			wishlist
+// @Security		Bearer
+// @Produce		json
+// @Param			page	query		int											true	"Page number"				default(1)
+// @Param			count	query		int											true	"Number of items per page"	default(10)
+// @Success		200		{object}	response.Response{data=response.Product}	"Success"
+// @Failure		400		{object}	response.Response
+// @Failure		500		{object}	response.Response
+// @Router			/wishlist [get]
 func (ph *ProductHandler) ShowWishListProducts(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 	page, err := strconv.Atoi(c.Query("page"))
