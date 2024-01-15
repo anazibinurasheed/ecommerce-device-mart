@@ -645,7 +645,7 @@ func (ph *ProductHandler) ListProductsByCategoryUser(c *gin.Context) {
 
 	userID, _ := helper.GetIDFromContext(c)
 
-	Products, err := ph.productUseCase.GetProductsByCategory(userID, categoryID, page, count)
+	Products, err := ph.productUseCase.GetProductsByCategoryUser(userID, categoryID, page, count)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -692,7 +692,7 @@ func (ph *ProductHandler) ListProductsByCategoryAdmin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	Products, err := ph.productUseCase.GetProductsByCategory(categoryID, page, count)
+	Products, err := ph.productUseCase.GetProductsByCategoryAdmin(categoryID, page, count)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
