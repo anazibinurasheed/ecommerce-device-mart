@@ -28,7 +28,9 @@ type ProductRepository interface {
 	InsertProductRating(rating request.Rating) error
 	GetProductReviews(productID int) ([]response.Rating, error)
 	SearchProducts(search string, startIndex, endIndex int) ([]response.Product, error)
-	GetProductsByCategory(categoryID int, startIndex, endIndex int) ([]response.Product, error)
+	GetProductsByCategoryAdmin(categoryID, startIndex, endIndex int) ([]response.Product, error)
+
+	GetProductsByCategoryUser(userID, categoryID, startIndex, endIndex int) ([]response.Product, error)
 
 	InsertCategoryIMG(urls interface{}, categoryID int) error
 	InsertProductIMG(urls interface{}, productID int) error

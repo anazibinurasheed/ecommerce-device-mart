@@ -60,7 +60,6 @@ func (pd *productDatabase) FindCategoryByName(name string) (response.Category, e
 	query := `SELECT * FROM Categories WHERE Category_Name = $1`
 	err := pd.DB.Raw(query, name).Scan(&ResultOfFinding).Error
 	return ResultOfFinding, err
-
 }
 
 func (pd *productDatabase) FindCategoryByID(categoryID int) (response.Category, error) {
@@ -170,14 +169,24 @@ func (pd *productDatabase) SearchProducts(search string, startIndex, endIndex in
 	return Products, err
 }
 
-func (pd *productDatabase) GetProductsByCategory(categoryID int, startIndex, endIndex int) ([]response.Product, error) {
+func (pd *productDatabase) GetProductsByCategoryAdmin(categoryID, startIndex, endIndex int) ([]response.Product, error) {
 	var Products = make([]response.Product, 0)
 
-	query := `SELECT *
-	FROM products
-	WHERE category_id = $1 OFFSET  $2 FETCH NEXT $3 ROW ONLY ;`
+	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = p.id) AS is_wishlisted
+	FROM products p where category_id = $2 OFFSET $3 FETCH NEXT $4 ROW ONLY`
 
 	err := pd.DB.Raw(query, categoryID, startIndex, endIndex).Scan(&Products).Error
+	return Products, err
+
+}
+
+func (pd *productDatabase) GetProductsByCategoryUser(userID, categoryID, startIndex, endIndex int) ([]response.Product, error) {
+	var Products = make([]response.Product, 0)
+
+	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = p.id) AS is_wishlisted
+	FROM products p where category_id = $2 OFFSET $3 FETCH NEXT $4 ROW ONLY`
+
+	err := pd.DB.Raw(query, userID, categoryID, startIndex, endIndex).Scan(&Products).Error
 	return Products, err
 
 }

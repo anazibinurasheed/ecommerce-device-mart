@@ -3,7 +3,7 @@ FROM golang:1.20.6-alpine3.18 AS build-stage
 #consider this is the workingdir we copy and store all in this, and the rest of the work is in this workdir
 WORKDIR /devicemart 
 #copy the entire entire things from the current dir
-COPY  . ../ 
+COPY  . . 
 # RUN go mod download
 # first path is the out put path and the second path is the main path
 RUN go build -v -o ./build/bin ./cmd/main

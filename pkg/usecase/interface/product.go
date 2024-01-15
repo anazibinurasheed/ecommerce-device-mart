@@ -22,7 +22,8 @@ type ProductUseCase interface {
 	ValidateProductRatingRequest(userID, productID int) error
 	InsertNewProductRating(userID, productID int, rating request.Rating) error
 	SearchProducts(search string, page, count int) ([]response.Product, error)
-	GetProductsByCategory(categoryID, page, count int) ([]response.Product, error)
+	GetProductsByCategoryUser(userID, categoryID, page, count int) ([]response.Product, error)
+	GetProductsByCategoryAdmin( categoryID, page, count int) ([]response.Product, error)
 
 	UploadCategoryImage(files []*multipart.FileHeader, ID int) error
 	UploadProductImage(files []*multipart.FileHeader, ID int) error
