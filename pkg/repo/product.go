@@ -37,12 +37,8 @@ func (pd *productDatabase) ReadCategory(startIndex int, endIndex int) ([]respons
 }
 
 func (pd *productDatabase) UpdateCategory(categoryID int, category request.Category) error {
-
 	query := `UPDATE Categories SET Category_Name = $1 WHERE ID = $2 ;`
-
-	err := pd.DB.Exec(query, category.CategoryName, categoryID).Error
-
-	return err
+	return pd.DB.Exec(query, category.CategoryName, categoryID).Error
 }
 
 func (pd *productDatabase) BlockCategoryByID(categoryID int) error {
@@ -119,7 +115,7 @@ func (pd *productDatabase) ViewIndividualProduct(userID, productID int) (respons
 	var product response.Product
 	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = $2) AS is_wishlisted
 	FROM products p WHERE P.id = $2 FETCH FIRST 1 ROW ONLY`
-	err := pd.DB.Raw(query, userID,productID).Scan(&product).Error
+	err := pd.DB.Raw(query, userID, productID).Scan(&product).Error
 	return product, err
 }
 
@@ -127,7 +123,7 @@ func (pd *productDatabase) ViewAllProductsToUser(userID, startIndex, endIndex in
 	ListOfAllProducts := []response.Product{}
 	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = p.id) AS is_wishlisted
 	FROM products p OFFSET $2 FETCH NEXT $3 ROW ONLY`
-	err := pd.DB.Raw(query, userID,startIndex, endIndex).Scan(&ListOfAllProducts).Error
+	err := pd.DB.Raw(query, userID, startIndex, endIndex).Scan(&ListOfAllProducts).Error
 	return ListOfAllProducts, err
 }
 

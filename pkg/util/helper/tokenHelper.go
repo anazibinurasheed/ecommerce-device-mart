@@ -18,7 +18,7 @@ func GenerateToken(userId int, roleName string) (tokenString string, err error) 
 	maxAge := time.Now().Add((time.Hour * 24 * 30)).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		userID:    userId,
+		userID:    fmt.Sprint(userId),
 		expiresAt: maxAge,
 		role:      roleName,
 	})

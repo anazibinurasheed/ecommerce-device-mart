@@ -91,6 +91,7 @@ func (a *AuthMiddleware) tokenAuth(c *gin.Context, role string) bool {
 		}
 
 		c.Set("userID", fmt.Sprint(claims["userID"]))
+
 		return true
 	}
 
