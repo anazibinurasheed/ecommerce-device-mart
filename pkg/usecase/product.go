@@ -59,7 +59,7 @@ func (pu *productUseCase) CreateCategory(category request.Category) (response.Ca
 	return result, nil
 }
 
-func (pu *productUseCase) ReadAllCategories(page int, count int) ([]response.Category, error) {
+func (pu *productUseCase) ReadAllCategories(page, count int) ([]response.Category, error) {
 
 	startIndex, endIndex := helper.Paginate(page, count)
 
@@ -262,10 +262,10 @@ func (pu *productUseCase) SearchProducts(search string, page, count int) ([]resp
 	return products, nil
 }
 
-func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int) ([]response.Product, error) {
+func (pu *productUseCase) GetProductsByCategoryUser(userID, categoryID, page, count int) ([]response.Product, error) {
 	startIndex, endIndex := helper.Paginate(page, count)
 
-	products, err := pu.productRepo.GetProductsByCategory(categoryID, startIndex, endIndex)
+	products, err := pu.productRepo.GetProductsByCategoryUser(userID, categoryID, startIndex, endIndex)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get products by category : %s", err)
 	}
@@ -274,6 +274,17 @@ func (pu *productUseCase) GetProductsByCategory(categoryID int, page, count int)
 
 }
 
+func (pu *productUseCase) GetProductsByCategoryAdmin( categoryID, page, count int) ([]response.Product, error) {
+	startIndex, endIndex := helper.Paginate(page, count)
+
+	products, err := pu.productRepo.GetProductsByCategoryAdmin( categoryID, startIndex, endIndex)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get products by category : %s", err)
+	}
+
+	return products, nil
+
+}
 func (pu *productUseCase) UploadCategoryImage(files []*multipart.FileHeader, categoryID int) error {
 
 	err := pu.uploadImage(files, category, categoryID)

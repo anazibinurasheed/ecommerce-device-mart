@@ -643,7 +643,9 @@ func (ph *ProductHandler) ListProductsByCategoryUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	Products, err := ph.productUseCase.GetProductsByCategory(categoryID, page, count)
+	userID, _ := helper.GetIDFromContext(c)
+
+	Products, err := ph.productUseCase.GetProductsByCategory(userID, categoryID, page, count)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)

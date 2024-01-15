@@ -4,7 +4,7 @@ FROM golang:1.20.6-alpine3.18 AS build-stage
 WORKDIR /devicemart 
 #copy the entire entire things from the current dir
 COPY  . . 
-RUN go mod download
+# RUN go mod download
 # first path is the out put path and the second path is the main path
 RUN go build -v -o ./build/bin ./cmd/main
 

@@ -29,7 +29,7 @@ func (cd *cartDatabase) AddToCart(userID int, ProductID int) (response.Cart, err
 func (cd *cartDatabase) ViewCart(userID int) ([]response.Cart, error) {
 	var CartItem = make([]response.Cart, 0)
 
-	query := `SELECT c.id , c.product_id,c.qty,p.product_name , p.brand,p.price FROM carts c INNER JOIN products p ON c.product_id = p.id WHERE c.user_id = $1 `
+	query := `SELECT c.id , c.product_id, c.qty,p.product_name , p.brand, p.price, p.images FROM carts c INNER JOIN products p ON c.product_id = p.id WHERE c.user_id = $1 `
 	err := cd.DB.Raw(query, userID).Scan(&CartItem).Error
 
 	return CartItem, err
