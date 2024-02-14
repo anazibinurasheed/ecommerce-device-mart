@@ -5,7 +5,6 @@ standard.txt
 statuscode.txt
 studies.txt
 quistion.txt
-README.md   
 workfortomorrow.txt
 doc.txt
 app.html
@@ -17,3 +16,4 @@ out.pdf
 demoPrograms
 notes
 .gitignore
+build.sh
