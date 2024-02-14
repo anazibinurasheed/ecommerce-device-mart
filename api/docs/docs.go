@@ -1862,11 +1862,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Coupon code",
-                        "name": "body",
+                        "name": "code",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/request.ApplyCoupon"
                         }
                     }
                 ],
@@ -3038,13 +3038,6 @@ const docTemplate = `{
                 "summary": "Change user password",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "uuid",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Change password request body",
                         "name": "body",
                         "in": "body",
@@ -3140,11 +3133,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "New username",
-                        "name": "body",
+                        "name": "username",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/request.Name"
                         }
                     }
                 ],
@@ -3837,6 +3830,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.ApplyCoupon": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
         "request.Category": {
             "type": "object",
             "required": [
@@ -3853,13 +3854,17 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "new_password",
-                "re_new_password"
+                "re_new_password",
+                "uuid"
             ],
             "properties": {
                 "new_password": {
                     "type": "string"
                 },
                 "re_new_password": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -3908,6 +3913,17 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.Name": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -4101,6 +4117,9 @@ const docTemplate = `{
                 },
                 "cart_id": {
                     "type": "integer"
+                },
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
                 },
                 "price": {
                     "type": "integer"

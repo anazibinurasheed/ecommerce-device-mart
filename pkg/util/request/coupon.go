@@ -13,3 +13,7 @@ type Coupon struct {
 	ValidFrom         time.Time `json:"-"`
 	ValidTill         time.Time `json:"-"`
 }
+
+type ApplyCoupon struct {
+	Code string `json:"code"`
+}

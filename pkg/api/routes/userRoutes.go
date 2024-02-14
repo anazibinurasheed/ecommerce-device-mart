@@ -24,7 +24,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 			profile.GET("/", userHandler.Profile)
 			profile.GET("/add-address", userHandler.GetAddAddressPage)
 			profile.POST("/add-address", userHandler.AddAddress)
-			profile.POST("/address-default/:addressID", userHandler.SetDefaultAddress)
+			profile.PUT("/address-default/:addressID", userHandler.SetDefaultAddress)
 			profile.PUT("/update-address/:addressID", userHandler.UpdateAddress)
 			profile.GET("/addresses", userHandler.GetAllAddresses)
 			profile.DELETE("/delete-address/:addressID", userHandler.DeleteAddress)

@@ -60,3 +60,5 @@ func (ad *adminDatabase) FindUsersByName(name string) ([]response.UserData, erro
 	err := ad.DB.Raw(query, name).Scan(&users).Error
 	return users, err
 }
+
+

@@ -39,6 +39,11 @@ definitions:
     - password
     - username
     type: object
+  request.ApplyCoupon:
+    properties:
+      code:
+        type: string
+    type: object
   request.Category:
     properties:
       category_name:
@@ -53,9 +58,12 @@ definitions:
         type: string
       re_new_password:
         type: string
+      uuid:
+        type: string
     required:
     - new_password
     - re_new_password
+    - uuid
     type: object
   request.Coupon:
     properties:
@@ -89,6 +97,13 @@ definitions:
     required:
     - password
     - phone
+    type: object
+  request.Name:
+    properties:
+      name:
+        type: string
+    required:
+    - name
     type: object
   request.OldPassword:
     properties:
@@ -219,6 +234,8 @@ definitions:
         type: string
       cart_id:
         type: integer
+      images:
+        $ref: '#/definitions/domain.JSONB'
       price:
         type: integer
       product_id:
@@ -1615,10 +1632,10 @@ paths:
       parameters:
       - description: Coupon code
         in: body
-        name: body
+        name: code
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/request.ApplyCoupon'
       produces:
       - application/json
       responses:
@@ -2351,11 +2368,6 @@ paths:
       - application/json
       description: Change the password of the authenticated user
       parameters:
-      - description: uuid
-        in: path
-        name: uuid
-        required: true
-        type: integer
       - description: Change password request body
         in: body
         name: body
@@ -2415,10 +2427,10 @@ paths:
       parameters:
       - description: New username
         in: body
-        name: body
+        name: username
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/request.Name'
       produces:
       - application/json
       responses:

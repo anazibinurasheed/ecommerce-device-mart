@@ -172,8 +172,9 @@ func (pd *productDatabase) SearchProducts(search string, startIndex, endIndex in
 func (pd *productDatabase) GetProductsByCategoryAdmin(categoryID, startIndex, endIndex int) ([]response.Product, error) {
 	var Products = make([]response.Product, 0)
 
-	query := `SELECT p.*, EXISTS (SELECT 1 FROM wishlists WHERE user_id = $1 AND product_id = p.id) AS is_wishlisted
-	FROM products p where category_id = $2 OFFSET $3 FETCH NEXT $4 ROW ONLY`
+	query := `SELECT *
+	FROM products
+	WHERE category_id = $1 OFFSET  $2 FETCH NEXT $3 ROW ONLY ;`
 
 	err := pd.DB.Raw(query, categoryID, startIndex, endIndex).Scan(&Products).Error
 	return Products, err
