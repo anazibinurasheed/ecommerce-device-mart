@@ -181,13 +181,13 @@ func (ch *CouponHandler) ListOutAllCouponsToAdmin(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		string				true	"Coupon code"
+//	@Param			code	body		request.ApplyCoupon			true	"Coupon code"
 //	@Success		200		{object}	response.Response	"Success"
 //	@Failure		400		{object}	response.Response
 //	@Failure		403		{object}	response.Response
 //	@Router			/coupon/apply [post]
 func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
-	var body string
+	var body request.ApplyCoupon
 	if err := c.ShouldBindJSON(&body); err != nil {
 		response := response.ResponseMessage(400, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
@@ -196,7 +196,7 @@ func (ch *CouponHandler) ApplyCoupon(c *gin.Context) {
 
 	userID, _ := helper.GetIDFromContext(c)
 
-	err := ch.coupenUseCase.ProcessApplyCoupon(body, userID)
+	err := ch.coupenUseCase.ProcessApplyCoupon(body.Code, userID)
 	if err != nil {
 		response := response.ResponseMessage(403, "Failed", nil, err.Error())
 		c.JSON(http.StatusForbidden, response)

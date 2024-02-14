@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
@@ -247,7 +249,6 @@ func (uh *UserHandler) ChangePasswordRequest(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			uuid	path		int						true	"uuid"
 //	@Param			body	body		request.ChangePassword	true	"Change password request body"
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
@@ -262,8 +263,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	userID, _ := helper.GetIDFromContext(c)
-	uuid := c.Query("uuid")
-	ok := passwordManager.Check(uuid, userID)
+	ok := passwordManager.Check(body.UUID, userID)
 
 	err := uh.userUseCase.ChangeUserPassword(body, userID, c)
 	if err != nil || !ok {
@@ -300,7 +300,7 @@ func (uh *UserHandler) ChangePassword(c *gin.Context) {
 func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 	addressID, err := strconv.Atoi(c.Param("addressID"))
 	if err != nil || addressID == 0 {
-		response := response.ResponseMessage(400, "Invalid entry", nil, err.Error())
+		response := response.ResponseMessage(400, "Invalid entry", nil, fmt.Sprint(err.Error()))
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -308,6 +308,13 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
 	err = uh.userUseCase.SetDefaultAddress(userID, addressID)
+
+	if err == usecase.ErrNoAddress {
+		response := response.ResponseMessage(400, "user don't have an address ", nil, err.Error())
+		c.JSON(http. StatusBadRequest, response)
+		return
+	}
+	
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to set address to default", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -327,7 +334,7 @@ func (uh *UserHandler) SetDefaultAddress(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			body	body		string	true	"New username"
+//	@Param			username	body		request.Name	true	"New username"
 //	@Success		200		{object}	response.Response
 //	@Failure		400		{object}	response.Response
 //	@Failure		500		{object}	response.Response

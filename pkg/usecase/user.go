@@ -14,6 +14,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	ErrNoAddress = errors.New("no address exist")
+)
+
 type userUseCase struct {
 	userRepo interfaces.UserRepository
 }
@@ -148,6 +152,10 @@ func (u *userUseCase) SetDefaultAddress(userID, addressID int) error {
 		return fmt.Errorf("Failed to find default address :%s", err)
 	}
 
+	if defaultAddress.ID == 0 {
+		return ErrNoAddress
+	}
+	
 	address, err := u.userRepo.SetDefaultAddressStatus(false, int(defaultAddress.ID), userID)
 	if address.ID == 0 || address.IsDefault || err != nil {
 		return fmt.Errorf("Failed to change default address : %s", err)

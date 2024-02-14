@@ -7,6 +7,7 @@ type Otp struct {
 type ChangePassword struct {
 	NewPassword   string `json:"new_password" binding:"required"`
 	ReNewPassword string `json:"re_new_password" binding:"required"`
+	UUID          string `json:"uuid" binding:"required"`
 }
 type OldPassword struct {
 	Password string `json:"old_password" binding:"required"`
