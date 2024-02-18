@@ -93,11 +93,24 @@ func (oh *OrderHandler) GetOnlinePayment(c *gin.Context) {
 		return
 	}
 
-	c.HTML(200, "razorpay.html", gin.H{
-		"username":          PaymentDetails.Username,
-		"razorpay_order_id": PaymentDetails.RazorPayOrderID,
-		"amount":            PaymentDetails.Amount * 100,
-	})
+	// c.HTML(200, "razorpay.html", gin.H{
+	// 	"username":          PaymentDetails.Username,
+	// 	"razorpay_order_id": PaymentDetails.RazorPayOrderID,
+	// 	"amount":            PaymentDetails.Amount * 100,
+	// })
+
+
+
+	paymentDetails := response.PaymentDetails{
+		Username:        PaymentDetails.Username,
+		RazorPayOrderID: PaymentDetails.RazorPayOrderID,
+		Amount:          PaymentDetails.Amount * 100,
+	}
+
+
+	
+	response := response.ResponseMessage(statusOK, "success", paymentDetails, nil)
+	c.JSON(statusOK, response)
 }
 
 // ProcessOnlinePayment is the handler function for verify  razorpay payment.
@@ -253,7 +266,6 @@ func (oh *OrderHandler) GetAllOrderOverViewPage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-
 
 	response := response.ResponseMessage(200, "Success", AllOrders, nil)
 	c.JSON(http.StatusOK, response)

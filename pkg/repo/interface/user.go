@@ -40,5 +40,4 @@ type UserRepository interface {
 	FindUserAddress(userID int) (response.Address, error)
 	UpdateUserName(name string, userID int) (response.UserData, error)
 	FindAddressByID(addressID int) (response.Address, error)
-	InsertStates()
 }
