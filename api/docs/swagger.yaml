@@ -2674,7 +2674,7 @@ paths:
       summary: Verify sign up  OTP
       tags:
       - auth
-  /wallet/:
+  /wallet:
     get:
       description: Get the wallet details for the authenticated user.
       produces:

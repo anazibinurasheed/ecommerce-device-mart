@@ -3516,7 +3516,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/wallet/": {
+        "/wallet": {
             "get": {
                 "security": [
                     {

@@ -62,7 +62,7 @@ func (ad *adminDatabase) FindUsersByName(name string) ([]response.UserData, erro
 }
 
 func (ad *adminDatabase) SetupDB() {
-
+	ad.DropTable()
 	ad.InsertOrderStatus()
 	ad.InsertPaymentMethods()
 	ad.InsertStates()
@@ -104,13 +104,19 @@ func (ad *adminDatabase) InsertStates() {
 }
 
 func (ad *adminDatabase) InsertPaymentMethods() {
-	query := `INSERT INTO payment_methods (method_name) VALUES ('online payment'),  ('cash on delivery') , ('Wallet')`
+	query := `INSERT INTO payment_methods (method_name) VALUES ('cash on delivery') , ('online payment') , ('Wallet')`
+
+	ad.DB.Exec(query)
+}
+
+func (ad *adminDatabase) DropTable() {
+	query := `drop table order_lines; drop table order_statuses ; drop table payment_methods;`
 
 	ad.DB.Exec(query)
 }
 
 func (ad *adminDatabase) InsertOrderStatus() {
-	query := `INSERT INTO order_statuses (method_name) VALUES ('Pending'),('Shipped'), ('Delivered'), ('Cancelled'), ('Returned')`
+	query := `INSERT INTO order_statuses (status) VALUES ('Pending'),('Shipped'), ('Delivered'), ('Cancelled'), ('Returned')`
 
 	ad.DB.Exec(query)
 }

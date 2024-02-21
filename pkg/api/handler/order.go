@@ -99,16 +99,12 @@ func (oh *OrderHandler) GetOnlinePayment(c *gin.Context) {
 	// 	"amount":            PaymentDetails.Amount * 100,
 	// })
 
-
-
 	paymentDetails := response.PaymentDetails{
 		Username:        PaymentDetails.Username,
 		RazorPayOrderID: PaymentDetails.RazorPayOrderID,
 		Amount:          PaymentDetails.Amount * 100,
 	}
 
-
-	
 	response := response.ResponseMessage(statusOK, "success", paymentDetails, nil)
 	c.JSON(statusOK, response)
 }
@@ -444,11 +440,17 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	response.Response{response.Wallet}
 //	@Failure		500	{object}	response.Response
-//	@Router			/wallet/ [get]
+//	@Router			/wallet [get]
 func (oh *OrderHandler) ViewUserWallet(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
 	Wallet, err := oh.orderUseCase.GetUserWallet(userID)
+
+	if err == usecase.ErrNoWallet {
+		response := response.ResponseMessage(204, "user does not have wallet", nil, err.Error())
+		c.JSON(http.StatusNoContent, response)
+		return
+	}
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)

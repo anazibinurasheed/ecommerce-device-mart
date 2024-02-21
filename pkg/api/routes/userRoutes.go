@@ -41,7 +41,7 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 
 		wallet := router.Group("/wallet")
 		{
-			wallet.GET("/", orderHandler.ViewUserWallet)
+			wallet.GET("", orderHandler.ViewUserWallet)
 			wallet.POST("/create", orderHandler.CreateUserWallet)
 			wallet.GET("/history", orderHandler.WalletTransactionHistory)
 		}
