@@ -1,6 +1,10 @@
 package response
 
-import "time"
+import (
+	"time"
+
+	"github.com/anazibinurasheed/project-device-mart/pkg/domain"
+)
 
 // No external connections
 type OrderLine struct {
@@ -18,17 +22,17 @@ type OrderLine struct {
 }
 
 type Orders struct {
-	OrderID         int     `json:"order_id"`
-	ProductID       int     `json:"product_id"`
-	ProductImage    string  `json:"product_image"`
-	ProductName     string  `json:"product_name"`
-	ProductPrice    float32 `json:"product_price"`
-	OrderStatusID   int     `json:"-"`
-	OrderStatus     string  `json:"order_status"`
-	PaymentMethodID int     `json:"-"`
-	PaymentMethod   string  `json:"payment_method"`
-	AddressesID     int     `json:"-"`
-	DeliveryAddress string  `json:"delivery_address"`
+	OrderID         int          `json:"order_id"`
+	ProductID       int          `json:"product_id"`
+	ProductImage    domain.JSONB `json:"product_image"`
+	ProductName     string       `json:"product_name"`
+	ProductPrice    float32      `json:"product_price"`
+	OrderStatusID   int          `json:"-"`
+	OrderStatus     string       `json:"order_status"`
+	PaymentMethodID int          `json:"-"`
+	PaymentMethod   string       `json:"payment_method"`
+	AddressesID     int          `json:"-"`
+	DeliveryAddress string       `json:"delivery_address"`
 }
 
 type Invoice struct {
