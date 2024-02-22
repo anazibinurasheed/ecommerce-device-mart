@@ -20,4 +20,6 @@ type AdminRepository interface {
 	BlockUserByID(userID int) error
 	UnblockUserByID(userID int) error
 	FindUsersByName(name string) ([]response.UserData, error)
+	SetupDB()
+
 }

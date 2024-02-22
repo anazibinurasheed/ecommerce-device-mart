@@ -19,6 +19,7 @@ const (
 
 var (
 	ErrNoOrders = errors.New("no orders created yet")
+	ErrNoWallet = errors.New("User don't have an wallet")
 )
 
 type orderUseCase struct {
@@ -453,7 +454,7 @@ func (ou *orderUseCase) GetUserWallet(userID int) (response.Wallet, error) {
 		return response.Wallet{}, fmt.Errorf("Failed to get user wallet :%s", err)
 	}
 	if wallet.ID == 0 {
-		return response.Wallet{}, fmt.Errorf("User don't have an wallet")
+		return response.Wallet{}, ErrNoWallet
 	}
 	return wallet, nil
 }

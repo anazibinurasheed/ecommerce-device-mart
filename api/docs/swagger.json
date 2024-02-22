@@ -3510,7 +3510,7 @@
                 }
             }
         },
-        "/wallet/": {
+        "/wallet": {
             "get": {
                 "security": [
                     {

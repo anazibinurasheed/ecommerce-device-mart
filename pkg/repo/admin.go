@@ -61,4 +61,62 @@ func (ad *adminDatabase) FindUsersByName(name string) ([]response.UserData, erro
 	return users, err
 }
 
+func (ad *adminDatabase) SetupDB() {
+	// ad.DropTable()
+	ad.InsertOrderStatus()
+	ad.InsertPaymentMethods()
+	ad.InsertStates()
 
+}
+
+func (ad *adminDatabase) InsertStates() {
+	query := `INSERT INTO states (name) VALUES
+('Andhra Pradesh'),
+('Arunachal Pradesh'),
+('Assam'),
+('Bihar'),
+('Chhattisgarh'),
+('Goa'),
+('Gujarat'),
+('Haryana'),
+('Himachal Pradesh'),
+('Jharkhand'),
+('Karnataka'),
+('Kerala'),
+('Madhya Pradesh'),
+('Maharashtra'),
+('Manipur'),
+('Meghalaya'),
+('Mizoram'),
+('Nagaland'),
+('Odisha'),
+('Punjab'),
+('Rajasthan'),
+('Sikkim'),
+('Tamil Nadu'),
+('Telangana'),
+('Tripura'),
+('Uttar Pradesh'),
+('Uttarakhand'),
+('West Bengal');`
+
+	ad.DB.Exec(query)
+}
+
+func (ad *adminDatabase) InsertPaymentMethods() {
+	query := `INSERT INTO payment_methods (method_name) VALUES ('cash on delivery') , ('online payment') , ('Wallet')`
+
+	ad.DB.Exec(query)
+}
+
+// func (ad *adminDatabase) DropTable() {
+// 	query := `drop table order_lines; drop table order_statuses ; drop table payment_methods;`
+
+// 	ad.DB.Exec(query)
+// }
+
+func (ad *adminDatabase) InsertOrderStatus() {
+	query := `INSERT INTO order_statuses (status) VALUES ('Pending'),('Shipped'), ('Delivered'), ('Cancelled'), ('Returned')`
+
+	ad.DB.Exec(query)
+}

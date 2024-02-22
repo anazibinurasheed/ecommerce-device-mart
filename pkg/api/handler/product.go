@@ -753,9 +753,9 @@ func (ad *ProductHandler) UploadCategoryImage(c *gin.Context) {
 // @Description	Upload product images.
 // @Tags			admin product management
 // @Security		Bearer
-// @Accept			mpfd
 // @Produce		json
 // @Param			productID		path		int					true	"Product ID"
+// @Accept			mpfd
 // @Param			product-image	formData	file				true	"Image file to upload"
 // @Success		201				{object}	response.Response	"Success, images uploaded"
 // @Failure		400				{object}	response.Response	"Failed to get image from file"	or	"No files received to the server"	or	"Invalid input"
@@ -772,7 +772,7 @@ func (ad *ProductHandler) UploadProductImages(c *gin.Context) {
 	}
 
 	files := form.File["product-image"]
-	if files == nil || len(files) == 0 {
+	if len(files) == 0 {
 		response := response.ResponseMessage(statusBadRequest, "no files received to the server", nil, "got 0 files for upload")
 		c.JSON(statusBadRequest, response)
 		return
