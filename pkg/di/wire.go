@@ -1,7 +1,18 @@
-// //go:build wireinject
-// // +build wireinject
+// // //go:build wireinject
+// // // +build wireinject
 
 package di
+
+// import (
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/api"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
+// 	"github.com/anazibinurasheed/project-device-mart/pkg/usecase"
+// 	"github.com/google/wire"
+// )
 
 // func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 
@@ -9,7 +20,11 @@ package di
 
 // 		db.ConnectToDatabase,
 
+// 		middleware.NewAuthMiddleware,
+
 // 		handler.NewAdminHandler,
+
+// 		handler.NewAuthHandler,
 
 // 		handler.NewUserHandler,
 
@@ -23,11 +38,17 @@ package di
 
 // 		handler.NewReferralHandler,
 
+// 		handler.NewWalletHandler,
+
+// 		handler.NewRazorpayHandler,
+
 // 		usecase.NewAdminUseCase,
 
 // 		usecase.NewUserUseCase,
 
-// 		usecase.NewPaymentUseCase,
+// 		usecase.NewRazorpayUseCase,
+
+// 		usecase.NewWalletUseCase,
 
 // 		usecase.NewProductUseCase,
 
@@ -56,6 +77,8 @@ package di
 // 		repo.NewCouponRepository,
 
 // 		repo.NewReferralRepository,
+
+// 		repo.NewWalletRepository,
 
 // 		api.NewServerHTTP)
 

@@ -8,8 +8,8 @@ package di
 
 import (
 	"github.com/anazibinurasheed/project-device-mart/pkg/api"
-	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/anazibinurasheed/project-device-mart/pkg/api/handler"
+	"github.com/anazibinurasheed/project-device-mart/pkg/api/middleware"
 	"github.com/anazibinurasheed/project-device-mart/pkg/config"
 	"github.com/anazibinurasheed/project-device-mart/pkg/db"
 	"github.com/anazibinurasheed/project-device-mart/pkg/repo"
@@ -27,15 +27,14 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 	adminRepository := repo.NewAdminRepository(gormDB)
-	adminRepository.SetupDB()
 	adminUseCase := usecase.NewAdminUseCase(adminRepository, userRepository)
 	adminHandler := handler.NewAdminHandler(adminUseCase)
 	productRepository := repo.NewProductRepository(gormDB)
 	orderRepository := repo.NewOrderRepository(gormDB)
 	productUseCase := usecase.NewProductUseCase(productRepository, orderRepository)
 	productHandler := handler.NewProductHandler(productUseCase)
-	commonUseCase := usecase.NewCommonUseCase(userRepository, adminRepository)
-	commonHandler := handler.NewAuthHandler(commonUseCase)
+	authUseCase := usecase.NewCommonUseCase(userRepository, adminRepository)
+	authHandler := handler.NewAuthHandler(authUseCase)
 	cartRepository := repo.NewCartRepository(gormDB)
 	couponRepository := repo.NewCouponRepository(gormDB)
 	cartUseCase := usecase.NewCartUseCase(cartRepository, couponRepository)
@@ -48,8 +47,12 @@ func InitializeAPI(cfg config.Config) (*api.ServerHTTP, error) {
 	referralRepository := repo.NewReferralRepository(gormDB)
 	referralUseCase := usecase.NewReferralUseCase(referralRepository, orderRepository)
 	referralHandler := handler.NewReferralHandler(referralUseCase)
-	auth := middleware.NewAuthMiddleware(userUseCase)
-
-	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, commonHandler, cartHandler, orderHandler, couponHandler, referralHandler, auth)
+	authMiddleware := middleware.NewAuthMiddleware(userUseCase)
+	walletRepository := repo.NewWalletRepository(gormDB)
+	walletUseCase := usecase.NewWalletUseCase(walletRepository, orderRepository, cartUseCase)
+	walletHandler := handler.NewWalletHandler(walletUseCase, orderUseCase)
+	razorpayUseCase := usecase.NewRazorpayUseCase(paymentRepository, cartUseCase, userRepository)
+	razorpayHandler := handler.NewRazorpayHandler(razorpayUseCase, orderUseCase)
+	serverHTTP := api.NewServerHTTP(userHandler, adminHandler, productHandler, authHandler, cartHandler, orderHandler, couponHandler, referralHandler, authMiddleware, walletHandler, razorpayHandler)
 	return serverHTTP, nil
 }

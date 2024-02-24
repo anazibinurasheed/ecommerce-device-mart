@@ -10,19 +10,23 @@ import (
 	// razorpay "github.com/razorpay/razorpay-go"
 )
 
-type paymentUseCase struct {
+type razorpayUseCase struct {
 	paymentRepo interfaces.PaymentRepository
 	cartUseCase services.CartUseCase
 	userRepo    interfaces.UserRepository
 }
 
-func NewPaymentUseCase(PaymentUseCase interfaces.PaymentRepository) services.PaymentUseCase {
-	return &paymentUseCase{
-		paymentRepo: PaymentUseCase,
+func NewRazorpayUseCase(paymentRepo interfaces.PaymentRepository,
+	cartUseCase services.CartUseCase,
+	userRepo interfaces.UserRepository) services.RazorpayUseCase {
+	return &razorpayUseCase{
+		paymentRepo: paymentRepo,
+		cartUseCase: cartUseCase,
+		userRepo:    userRepo,
 	}
 }
 
-func (ou *paymentUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails, error) {
+func (ou *razorpayUseCase) GetRazorPayDetails(userID int) (response.PaymentDetails, error) {
 	userCart, err := ou.cartUseCase.ViewCart(userID)
 	if err != nil {
 		return response.PaymentDetails{}, fmt.Errorf("Failed to retrieve userCart :%s", err)
@@ -45,7 +49,7 @@ func (ou *paymentUseCase) GetRazorPayDetails(userID int) (response.PaymentDetail
 	}, nil
 }
 
-func (ou *paymentUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID string, paymentID string) error {
+func (ou *razorpayUseCase) VerifyRazorPayPayment(signature string, razorpayOrderID string, paymentID string) error {
 	err := helper.VerifyRazorPayPayment(signature, razorpayOrderID, paymentID)
 	if err != nil {
 		return fmt.Errorf("Failed payment not success : %s", err)

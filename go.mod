@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.1.2
-	github.com/google/wire v0.5.0
+	github.com/google/wire v0.6.0
 	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/razorpay/razorpay-go v0.0.0-20230410044935-943abe07d4c1
 	github.com/spf13/viper v1.16.0
@@ -16,7 +16,7 @@ require (
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
 	github.com/twilio/twilio-go v1.7.2
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.18.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
@@ -53,8 +53,8 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/tools v0.10.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )
 
@@ -71,8 +71,8 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
