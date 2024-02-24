@@ -17,8 +17,6 @@ package di
 
 // 		handler.NewCartHandler,
 
-// 		handler.NewCommonHandler,
-
 // 		handler.NewOrderHandler,
 
 // 		handler.NewCouponHandler,
@@ -28,6 +26,8 @@ package di
 // 		usecase.NewAdminUseCase,
 
 // 		usecase.NewUserUseCase,
+
+// 		usecase.NewPaymentUseCase,
 
 // 		usecase.NewProductUseCase,
 

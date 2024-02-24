@@ -352,6 +352,8 @@ definitions:
     properties:
       delivery_address:
         type: string
+      images:
+        $ref: '#/definitions/domain.JSONB'
       order_id:
         type: integer
       order_status:
@@ -360,8 +362,6 @@ definitions:
         type: string
       product_id:
         type: integer
-      product_image:
-        type: string
       product_name:
         type: string
       product_price:

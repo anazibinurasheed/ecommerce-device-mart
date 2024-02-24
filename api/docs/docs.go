@@ -4299,6 +4299,9 @@ const docTemplate = `{
                 "delivery_address": {
                     "type": "string"
                 },
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
+                },
                 "order_id": {
                     "type": "integer"
                 },
@@ -4310,9 +4313,6 @@ const docTemplate = `{
                 },
                 "product_id": {
                     "type": "integer"
-                },
-                "product_image": {
-                    "type": "string"
                 },
                 "product_name": {
                     "type": "string"
