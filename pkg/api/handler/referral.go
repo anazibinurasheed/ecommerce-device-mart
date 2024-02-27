@@ -5,12 +5,14 @@ import (
 
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
+	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
 )
 
 type ReferralHandler struct {
 	referralUseCase services.ReferralUseCase
+	helper.SubHandler
 }
 
 // for wire
@@ -60,15 +62,13 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Failure		500	{object}	response.Response	"Failed."
 //	@Router			/referral/claim [post]
 func (rh *ReferralHandler) ApplyReferralCode(c *gin.Context) {
-	var body string
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid Input.", nil, err.Error())
-		c.JSON(http.StatusBadRequest, response)
+	var body request.Referral
+	if ok := rh.SubHandler.BindRequest(c, &body); ok {
 		return
 	}
 
 	userID, _ := helper.GetIDFromContext(c)
-	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body, userID)
+	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body.Code, userID)
 
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed.", nil, err.Error())
