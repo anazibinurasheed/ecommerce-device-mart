@@ -16,6 +16,7 @@ const (
 	debit  = "debit"
 	credit = "credit"
 )
+const walletPaymentID = 3
 
 var (
 	ErrNoOrders = errors.New("no orders created yet")
@@ -125,16 +126,6 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		return fmt.Errorf("Failed to retrieve the coupon tracking details  ;%s", err)
 	}
 
-	if couponDetails.CouponID != 0 {
-		UpdatedCouponTracking, err := ou.couponRepo.UpdateCouponUsage(userID)
-		if err != nil {
-			return fmt.Errorf("Failed to update coupon usage :%s", err)
-		}
-		if UpdatedCouponTracking.ID == 0 {
-			return fmt.Errorf("Failed to verify inserted coupon record")
-		}
-	}
-
 	if couponDetails.ID != 0 {
 		Coupon, err := ou.couponRepo.FindCouponByID(couponDetails.CouponID)
 		if err != nil {
@@ -142,6 +133,16 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		}
 		if !helper.IsCouponValid(Coupon.ValidTill) {
 			return fmt.Errorf("Failed applied Coupon is expired")
+		}
+	}
+
+	if couponDetails.CouponID != 0 {
+		UpdatedCouponTracking, err := ou.couponRepo.UpdateCouponUsage(userID)
+		if err != nil {
+			return fmt.Errorf("Failed to update coupon usage :%s", err)
+		}
+		if UpdatedCouponTracking.ID == 0 {
+			return fmt.Errorf("Failed to verify inserted coupon record")
 		}
 	}
 
@@ -176,9 +177,13 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		}
 	}
 
-	err = ou.UpdateWallet(userID, cartData.Total, debit)
-	if err != nil {
-		return err
+	if paymentMethodID == walletPaymentID {
+
+		err = ou.UpdateWallet(userID, cartData.Total, debit)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	err = ou.cartUseCase.DeleteUserCart(userID)
