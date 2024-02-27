@@ -37,7 +37,7 @@ func NewWalletHandler(walletUseCase services.WalletUseCase,
 func (oh *WalletHandler) CreateUserWallet(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
-	err := oh.orderUseCase.CreateUserWallet(userID)
+	err := oh.walletUseCase.CreateUserWallet(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -62,7 +62,7 @@ func (oh *WalletHandler) CreateUserWallet(c *gin.Context) {
 func (oh *WalletHandler) ViewUserWallet(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
-	Wallet, err := oh.orderUseCase.GetUserWallet(userID)
+	Wallet, err := oh.walletUseCase.GetUserWallet(userID)
 
 	if err == usecase.ErrNoWallet {
 		response := response.ResponseMessage(204, "user does not have wallet", nil, err.Error())
@@ -123,7 +123,7 @@ func (od *WalletHandler) PayUsingWallet(c *gin.Context) {
 func (od *WalletHandler) WalletTransactionHistory(c *gin.Context) {
 	userID, _ := helper.GetIDFromContext(c)
 
-	walletHistory, err := od.orderUseCase.GetWalletHistory(userID)
+	walletHistory, err := od.walletUseCase.GetWalletHistory(userID)
 	if err != nil {
 		response := response.ResponseMessage(500, "Failed to get wallet history", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
