@@ -20,7 +20,7 @@ const walletPaymentID = 3
 
 var (
 	ErrNoOrders = errors.New("no orders created yet")
-	ErrNoWallet = errors.New("User don't have an wallet")
+	ErrNoWallet = errors.New("user does not have a wallet")
 )
 
 type orderUseCase struct {
@@ -29,7 +29,7 @@ type orderUseCase struct {
 	paymentRepo interfaces.PaymentRepository
 	orderRepo   interfaces.OrderRepository
 	couponRepo  interfaces.CouponRepository
-	walletRepo  interfaces.WalletRepository
+	// walletRepo  interfaces.WalletRepository
 	productRepo interfaces.ProductRepository
 }
 
