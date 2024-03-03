@@ -54,7 +54,7 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body	string	true	"Referral code to apply"
+//	@Param			referral code	body	request.Referral	true	"Referral code to apply"
 //	@Security		ApiKeyAuth
 //	@Success		200	{object}	response.Response	"Success, bonus amount updated in wallet."
 //	@Failure		400	{object}	response.Response	"Invalid Input."
@@ -63,10 +63,13 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Router			/referral/claim [post]
 func (rh *ReferralHandler) ApplyReferralCode(c *gin.Context) {
 	var body request.Referral
-	if ok := rh.SubHandler.BindRequest(c, &body); ok {
+	if err := c.BindJSON(&body); err != nil {
+		response := response.ResponseMessage(403, "Invalid input", nil, err.Error())
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
+	
 	userID, _ := helper.GetIDFromContext(c)
 	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body.Code, userID)
 

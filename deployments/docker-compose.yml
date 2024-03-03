@@ -14,7 +14,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   devicemart:
-    image: anazibinurasheed/devicemart:latest
+    image: anazibinurasheed/devicemart:latest.test
     # restart: on-failure ##docker-compose file restarts the postgres container automatically if it exits with a non-zero exit code
     environment:
       DB_HOST: postgres

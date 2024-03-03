@@ -1,5 +1,5 @@
 package request
 
 type Referral struct {
-	Code string `json:"code" validate:"required"`
+	Code string `json:"code" binding:"required"`
 }

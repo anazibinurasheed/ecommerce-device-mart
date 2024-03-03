@@ -153,6 +153,13 @@ definitions:
     - description
     - rating
     type: object
+  request.Referral:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
   request.SignUpData:
     properties:
       email:
@@ -2531,10 +2538,10 @@ paths:
       parameters:
       - description: Referral code to apply
         in: body
-        name: body
+        name: code
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/request.Referral'
       produces:
       - application/json
       responses:

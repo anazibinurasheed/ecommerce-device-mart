@@ -55,7 +55,7 @@ func (ou *walletUseCase) CreateUserWallet(userID int) error {
 	}
 
 	if wallet.ID != 0 {
-		return fmt.Errorf("User already have wallet")
+		return fmt.Errorf("User already have a wallet")
 	}
 
 	newWallet, err := ou.orderRepo.InitializeNewUserWallet(userID)

@@ -3299,11 +3299,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Referral code to apply",
-                        "name": "body",
+                        "name": "code",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/request.Referral"
                         }
                     }
                 ],
@@ -3996,6 +3996,17 @@ const docTemplate = `{
                 },
                 "rating": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.Referral": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
                 }
             }
         },
