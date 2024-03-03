@@ -24,7 +24,7 @@ type OrderRepository interface {
 	GetStatusPending() (response.OrderStatus, error)
 	GetOrderStatuses() ([]response.OrderStatus, error)
 	GetInvoiceDataByID(orderID int) (response.Orders, error)
-	//
+
 	UpdateWalletTransactionHistory(update request.WalletTransactionHistory) (response.WalletTransactionHistory, error)
 	GetWalletHistoryByUserID(userID int) ([]response.WalletTransactionHistory, error)
 

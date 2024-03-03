@@ -24,7 +24,7 @@ type OrderLine struct {
 type Orders struct {
 	OrderID         int          `json:"order_id"`
 	ProductID       int          `json:"product_id"`
-	ProductImage    domain.JSONB `json:"product_image"`
+	Images          domain.JSONB `json:"images"`
 	ProductName     string       `json:"product_name"`
 	ProductPrice    float32      `json:"product_price"`
 	OrderStatusID   int          `json:"-"`

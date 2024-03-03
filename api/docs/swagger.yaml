@@ -153,6 +153,13 @@ definitions:
     - description
     - rating
     type: object
+  request.Referral:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
   request.SignUpData:
     properties:
       email:
@@ -352,6 +359,8 @@ definitions:
     properties:
       delivery_address:
         type: string
+      images:
+        $ref: '#/definitions/domain.JSONB'
       order_id:
         type: integer
       order_status:
@@ -360,8 +369,6 @@ definitions:
         type: string
       product_id:
         type: integer
-      product_image:
-        type: string
       product_name:
         type: string
       product_price:
@@ -2531,10 +2538,10 @@ paths:
       parameters:
       - description: Referral code to apply
         in: body
-        name: body
+        name: code
         required: true
         schema:
-          type: string
+          $ref: '#/definitions/request.Referral'
       produces:
       - application/json
       responses:

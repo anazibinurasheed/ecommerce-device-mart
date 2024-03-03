@@ -428,7 +428,6 @@ func (oh *OrderHandler) CreateUserWallet(c *gin.Context) {
 
 	response := response.ResponseMessage(200, "Success ,wallet initialized ", nil, nil)
 	c.JSON(http.StatusOK, response)
-
 }
 
 // ViewUserWallet godoc

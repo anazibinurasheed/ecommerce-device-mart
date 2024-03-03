@@ -5,12 +5,14 @@ import (
 
 	services "github.com/anazibinurasheed/project-device-mart/pkg/usecase/interface"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/helper"
+	"github.com/anazibinurasheed/project-device-mart/pkg/util/request"
 	"github.com/anazibinurasheed/project-device-mart/pkg/util/response"
 	"github.com/gin-gonic/gin"
 )
 
 type ReferralHandler struct {
 	referralUseCase services.ReferralUseCase
+	helper.SubHandler
 }
 
 // for wire
@@ -52,7 +54,7 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Security		Bearer
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body	string	true	"Referral code to apply"
+//	@Param			referral code	body	request.Referral	true	"Referral code to apply"
 //	@Security		ApiKeyAuth
 //	@Success		200	{object}	response.Response	"Success, bonus amount updated in wallet."
 //	@Failure		400	{object}	response.Response	"Invalid Input."
@@ -60,15 +62,16 @@ func (rh *ReferralHandler) GetReferralCode(c *gin.Context) {
 //	@Failure		500	{object}	response.Response	"Failed."
 //	@Router			/referral/claim [post]
 func (rh *ReferralHandler) ApplyReferralCode(c *gin.Context) {
-	var body string
-	if err := c.ShouldBindJSON(&body); err != nil {
-		response := response.ResponseMessage(400, "Invalid Input.", nil, err.Error())
+	var body request.Referral
+	if err := c.BindJSON(&body); err != nil {
+		response := response.ResponseMessage(403, "Invalid input", nil, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
+	
 	userID, _ := helper.GetIDFromContext(c)
-	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body, userID)
+	codeOwnerID, err := rh.referralUseCase.VerifyReferralCode(body.Code, userID)
 
 	if err != nil {
 		response := response.ResponseMessage(400, "Failed.", nil, err.Error())

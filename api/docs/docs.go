@@ -3299,11 +3299,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Referral code to apply",
-                        "name": "body",
+                        "name": "code",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/request.Referral"
                         }
                     }
                 ],
@@ -3999,6 +3999,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.Referral": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
         "request.SignUpData": {
             "type": "object",
             "required": [
@@ -4299,6 +4310,9 @@ const docTemplate = `{
                 "delivery_address": {
                     "type": "string"
                 },
+                "images": {
+                    "$ref": "#/definitions/domain.JSONB"
+                },
                 "order_id": {
                     "type": "integer"
                 },
@@ -4310,9 +4324,6 @@ const docTemplate = `{
                 },
                 "product_id": {
                     "type": "integer"
-                },
-                "product_image": {
-                    "type": "string"
                 },
                 "product_name": {
                     "type": "string"

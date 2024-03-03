@@ -16,10 +16,11 @@ const (
 	debit  = "debit"
 	credit = "credit"
 )
+const walletPaymentID = 3
 
 var (
 	ErrNoOrders = errors.New("no orders created yet")
-	ErrNoWallet = errors.New("User don't have an wallet")
+	ErrNoWallet = errors.New("user does not have a wallet")
 )
 
 type orderUseCase struct {
@@ -28,11 +29,9 @@ type orderUseCase struct {
 	paymentRepo interfaces.PaymentRepository
 	orderRepo   interfaces.OrderRepository
 	couponRepo  interfaces.CouponRepository
-	walletRepo  interfaces.WalletRepository
 	productRepo interfaces.ProductRepository
 }
 
-// some times error will invoke from here
 func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services.CartUseCase, paymentUseCase interfaces.PaymentRepository, OrderUseCase interfaces.OrderRepository, CouponUseCase interfaces.CouponRepository, productUseCase interfaces.ProductRepository) services.OrderUseCase {
 	return &orderUseCase{
 		userRepo:    UserUseCase,
@@ -43,8 +42,6 @@ func NewOrderUseCase(UserUseCase interfaces.UserRepository, CartUseCase services
 		productRepo: productUseCase,
 	}
 }
-
-//safe for concurrent use by multiple goroutines without additional locking or coordination. Loads, stores, and deletes run in amortized constant time.
 
 func (ou *orderUseCase) CheckOutDetails(userID int) (response.Checkout, error) {
 
@@ -125,16 +122,6 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		return fmt.Errorf("Failed to retrieve the coupon tracking details  ;%s", err)
 	}
 
-	if couponDetails.CouponID != 0 {
-		UpdatedCouponTracking, err := ou.couponRepo.UpdateCouponUsage(userID)
-		if err != nil {
-			return fmt.Errorf("Failed to update coupon usage :%s", err)
-		}
-		if UpdatedCouponTracking.ID == 0 {
-			return fmt.Errorf("Failed to verify inserted coupon record")
-		}
-	}
-
 	if couponDetails.ID != 0 {
 		Coupon, err := ou.couponRepo.FindCouponByID(couponDetails.CouponID)
 		if err != nil {
@@ -142,6 +129,16 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		}
 		if !helper.IsCouponValid(Coupon.ValidTill) {
 			return fmt.Errorf("Failed applied Coupon is expired")
+		}
+	}
+
+	if couponDetails.CouponID != 0 {
+		UpdatedCouponTracking, err := ou.couponRepo.UpdateCouponUsage(userID)
+		if err != nil {
+			return fmt.Errorf("Failed to update coupon usage :%s", err)
+		}
+		if UpdatedCouponTracking.ID == 0 {
+			return fmt.Errorf("Failed to verify inserted coupon record")
 		}
 	}
 
@@ -176,9 +173,13 @@ func (ou *orderUseCase) ConfirmedOrder(userID int, paymentMethodID int) error {
 		}
 	}
 
-	err = ou.UpdateWallet(userID, cartData.Total, debit)
-	if err != nil {
-		return err
+	if paymentMethodID == walletPaymentID {
+
+		err = ou.UpdateWallet(userID, cartData.Total, debit)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	err = ou.cartUseCase.DeleteUserCart(userID)
@@ -300,6 +301,7 @@ func (ou *orderUseCase) ProcessReturnRequest(orderID int) error {
 	if updatedOrder.ID == 0 {
 		return fmt.Errorf("Failed to verify returned order")
 	}
+
 	err = ou.OrderCancellation(orderID)
 	if err != nil {
 		return fmt.Errorf("Failed to return order :%s", err)
@@ -309,51 +311,56 @@ func (ou *orderUseCase) ProcessReturnRequest(orderID int) error {
 
 func (ou *orderUseCase) OrderCancellation(orderID int) error {
 	//find the order by provided orderID
-	cancellingOrder, err := ou.orderRepo.FindOrderByID(orderID)
+	order, err := ou.orderRepo.FindOrderByID(orderID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order  :%s ", err)
 	}
-	//
-	if cancellingOrder.ID == 0 {
+	if order.ID == 0 {
 		return fmt.Errorf("Failed to verify order by id")
 	}
-	paymentMethodUsed, err := ou.paymentRepo.FindPaymentMethodById(cancellingOrder.PaymentMethodID)
+
+	// find payment method
+	paymentMethodUsed, err := ou.paymentRepo.FindPaymentMethodById(order.PaymentMethodID)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch payment method :%s", err)
 	}
 
-	orderStatus, err := ou.orderRepo.FindOrderStatusByID(cancellingOrder.OrderStatusID)
+	// current order status
+	orderStatus, err := ou.orderRepo.FindOrderStatusByID(order.OrderStatusID)
 	if err != nil {
 		return fmt.Errorf("Failed to find order statuses :%s", err)
 	}
 
 	//checking user has used coupon or not
 	//reduce coupon percentage and insert money into wallet
-	if cancellingOrder.CouponID != 0 && paymentMethodUsed.MethodName == "online payment" || paymentMethodUsed.MethodName == "Wallet" || orderStatus == "Returned" {
-		couponClaimedOrders, err := ou.orderRepo.FindOrdersBoughtUsingCoupon(int(cancellingOrder.CouponID))
-		if err != nil {
-			return fmt.Errorf("Failed to fetch orders purchased using coupon : %s", err)
-		}
-		if len(couponClaimedOrders) == 0 {
-			return fmt.Errorf("Failed to get coupon used orders")
-		}
-
-		var totalPriceOfOrder float32
-		for _, order := range couponClaimedOrders {
-			totalPriceOfOrder += order.Price
-		}
-
-		coupon, err := ou.couponRepo.FindCouponByID(int(cancellingOrder.CouponID))
-
-		if err != nil {
-			return fmt.Errorf("Failed to fetch coupon details :%s", err)
-		}
-
+	if paymentMethodUsed.MethodName == "online payment" || paymentMethodUsed.MethodName == "Wallet" || orderStatus == "Returned" {
 		var discountedAmountPerOrderUsingCoupon float32
-		if coupon.ID != 0 {
 
-			TotalDiscountedAmountOnOrders := (totalPriceOfOrder * float32(coupon.DiscountPercent)) / 100
-			discountedAmountPerOrderUsingCoupon = TotalDiscountedAmountOnOrders / float32(len(couponClaimedOrders))
+		if order.CouponID != 0 {
+			couponClaimedOrders, err := ou.orderRepo.FindOrdersBoughtUsingCoupon(int(order.CouponID))
+			if err != nil {
+				return fmt.Errorf("Failed to fetch orders purchased using coupon : %s", err)
+			}
+			if len(couponClaimedOrders) == 0 {
+				return fmt.Errorf("Failed to get coupon used orders")
+			}
+
+			var totalPriceOfOrder float32
+			for _, order := range couponClaimedOrders {
+				totalPriceOfOrder += order.Price
+			}
+
+			coupon, err := ou.couponRepo.FindCouponByID(int(order.CouponID))
+
+			if err != nil {
+				return fmt.Errorf("Failed to fetch coupon details :%s", err)
+			}
+
+			if coupon.ID != 0 {
+
+				TotalDiscountedAmountOnOrders := (totalPriceOfOrder * float32(coupon.DiscountPercent)) / 100
+				discountedAmountPerOrderUsingCoupon = TotalDiscountedAmountOnOrders / float32(len(couponClaimedOrders))
+			}
 		}
 
 		if orderStatus != "Returned" {
@@ -375,15 +382,15 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 
 		}
 
-		refundingAmount := (cancellingOrder.Price - discountedAmountPerOrderUsingCoupon)
-		wallet, err := ou.orderRepo.FindUserWalletByID(int(cancellingOrder.UserID))
+		refundingAmount := (order.Price - discountedAmountPerOrderUsingCoupon)
+		wallet, err := ou.orderRepo.FindUserWalletByID(int(order.UserID))
 		if err != nil {
 			return fmt.Errorf("Failed to find user wallet : %s", err)
 		}
 		if wallet.ID == 0 {
-			newWallet, err := ou.orderRepo.InitializeNewUserWallet(int(cancellingOrder.UserID))
+			newWallet, err := ou.orderRepo.InitializeNewUserWallet(int(order.UserID))
 			if err != nil {
-				return fmt.Errorf("Failed to initialize wallet for user id %d", cancellingOrder.UserID)
+				return fmt.Errorf("Failed to initialize wallet for user id %d", order.UserID)
 			}
 			if newWallet.ID == 0 {
 				return fmt.Errorf("Failed to verify initialized wallet")
@@ -393,7 +400,9 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 		err = ou.UpdateWallet(wallet.UserID, refundingAmount, credit)
 		if err != nil {
 			return fmt.Errorf("Failed to update wallet %s:", err)
+
 		}
+		// end
 	}
 
 	if paymentMethodUsed.MethodName == "cash on delivery" && orderStatus != "Returned" {
@@ -413,6 +422,7 @@ func (ou *orderUseCase) OrderCancellation(orderID int) error {
 			return fmt.Errorf("Failed to verify updated order")
 		}
 	}
+
 	return nil
 }
 

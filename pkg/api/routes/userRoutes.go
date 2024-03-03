@@ -7,7 +7,9 @@ import (
 )
 
 func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, adminHandler *handler.AdminHandler,
-	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *middleware.AuthMiddleware) {
+	productHandler *handler.ProductHandler, authHandler *handler.AuthHandler, cartHandler *handler.CartHandler, orderHandler *handler.OrderHandler, couponHandler *handler.CouponHandler, referralHandler *handler.ReferralHandler, auth *middleware.AuthMiddleware,
+	walletHandler *handler.WalletHandler, razorpayHandler *handler.RazorpayHandler,
+) {
 
 	router.POST("/send-otp", authHandler.SendOTP)
 	router.POST("/verify-otp", authHandler.VerifyOTP)
@@ -41,9 +43,9 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 
 		wallet := router.Group("/wallet")
 		{
-			wallet.GET("", orderHandler.ViewUserWallet)
-			wallet.POST("/create", orderHandler.CreateUserWallet)
-			wallet.GET("/history", orderHandler.WalletTransactionHistory)
+			wallet.GET("", walletHandler.ViewUserWallet)
+			wallet.POST("/create", walletHandler.CreateUserWallet)
+			wallet.GET("/history", walletHandler.WalletTransactionHistory)
 		}
 
 		category := router.Group("/category")
@@ -92,9 +94,9 @@ func UserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandler, admin
 
 		payment := router.Group("/payment")
 		{
-			payment.GET("/online", orderHandler.GetOnlinePayment)
-			payment.POST("/online/process", orderHandler.ProcessOnlinePayment)
-			payment.POST("/wallet", orderHandler.PayUsingWallet)
+			payment.GET("/online", razorpayHandler.GetOnlinePayment)
+			payment.POST("/online/process", razorpayHandler.ProcessOnlinePayment)
+			payment.POST("/wallet", walletHandler.PayUsingWallet)
 			payment.POST("/cod-confirm", orderHandler.ConfirmCodDelivery)
 
 		}

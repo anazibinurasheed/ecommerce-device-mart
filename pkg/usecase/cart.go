@@ -63,14 +63,25 @@ func (cu *CartUseCase) ViewCart(userID int) (response.CartItems, error) {
 
 	if couponDetails.ID != 0 && couponDetails.CouponID != 0 {
 		Coupon, err := cu.couponRepo.FindCouponByID(couponDetails.CouponID)
-		fmt.Println(Coupon)
 		if err != nil {
 			return response.CartItems{}, fmt.Errorf("Failed to find coupon :%s", err)
 		}
 
+		fmt.Println("coupon :", Coupon)
+
 		if !helper.IsCouponValid(Coupon.ValidTill) {
-			return response.CartItems{}, fmt.Errorf("Expired coupon")
+
+			removedCoupon, err := cu.couponRepo.RemoveCouponFromTracking(Coupon.ID, userID)
+			if err != nil {
+				return response.CartItems{}, err
+			}
+
+			if removedCoupon.ID == 0 {
+				return response.CartItems{}, fmt.Errorf("failed to verify removed coupon")
+			}
+
 		}
+
 		if cartItems.Total > float32(Coupon.MinOrderValue) {
 			discountPrize = (float64(cartItems.Total) * Coupon.DiscountPercent) / 100
 			if discountPrize > Coupon.DiscountMaxAmount {

@@ -205,7 +205,7 @@ func (od *orderDatabase) UpdateWalletTransactionHistory(update request.WalletTra
 	query := `INSERT INTO wallet_transaction_histories(transaction_time,user_id,amount,transaction_type) 
 	VALUES($1,$2,$3,$4) RETURNING *;`
 
-	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, updatedHistory.TransactionType).Scan(&updatedHistory).Error
+	err := od.DB.Raw(query, update.TransactionTime, update.UserID, update.Amount, update.TransactionType).Scan(&updatedHistory).Error
 
 	return updatedHistory, err
 }
